@@ -3,11 +3,12 @@
 from __future__ import annotations
 
 import logging
-import os
 import time
 from typing import Any
 
 from falkordb import FalkorDB
+
+from app.config import get_settings
 
 log = logging.getLogger("modelbrain.graph")
 
@@ -15,10 +16,11 @@ _db: FalkorDB | None = None
 
 
 def _client() -> FalkorDB:
-    password = os.environ.get("FALKORDB_PASSWORD") or None
+    settings = get_settings()
+    password = settings.falkordb_password or None
     return FalkorDB(
-        host=os.environ.get("FALKORDB_HOST", "localhost"),
-        port=int(os.environ.get("FALKORDB_PORT", "6379")),
+        host=settings.falkordb_host,
+        port=settings.falkordb_port,
         password=password,
     )
 

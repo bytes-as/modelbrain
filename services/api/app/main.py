@@ -7,6 +7,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
+from app.config import get_settings
 from app.graph.db import connect, health_snapshot
 
 logging.basicConfig(level=logging.INFO)
@@ -17,6 +18,7 @@ VERSION = "0.1.0"
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
+    get_settings()
     try:
         connect()
     except Exception:
