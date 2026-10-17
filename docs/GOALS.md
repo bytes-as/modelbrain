@@ -24,7 +24,7 @@ Milestones: **M1** = G001-G019 (O1), **M2** = G020-G029 (O4), **M3 (core, never 
 - [ ] **G015** Railway services `falkordb` (private networking, volume, `requirepass`) and `api` are deployed; Vercel project for `apps/web`. **Accept:** public `/api/health` green from the Vercel page. **Verify:** open the Vercel URL.
 - [ ] **G016** `scripts/smoke.sh <api> <web>` checks health, verdict for OPEA in DE and US, lineage, and MCP `tools/list`. **Accept:** exits 0 against the deployment. **Verify:** run it.
 
-- [ ] **G017** `.env.example` is complete and matches `app/config.py` exactly (a test compares the variable lists). **Verify:** `pytest tests/test_env_example.py`.
+- [x] **G017** `.env.example` is complete and matches `app/config.py` exactly (a test compares the variable lists). **Verify:** `pytest tests/test_env_example.py`. Done 18 Oct 2026.
 - [ ] **G018** `Makefile` targets: `up`, `down`, `test`, `smoke`, `eval`, `seed`, `reset` (deletes and re-seeds tenant graphs only, never the hub). **Verify:** run each target.
 - [ ] **G019** Lint and format: ruff + black for Python, eslint + prettier for web, run in CI. **Verify:** CI green.
 
