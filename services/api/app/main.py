@@ -11,6 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.config import get_settings
 from app.errors import install_error_handlers
 from app.graph.db import connect, health_snapshot
+from app.graph.schema import apply_schema
 from app.observe import OriginAllowlistMiddleware, RequestIdMiddleware, configure_logging
 
 configure_logging()
@@ -26,6 +27,8 @@ async def lifespan(_app: FastAPI):
         connect()
     except Exception:
         log.warning("starting with falkordb down")
+    else:
+        apply_schema()
     yield
 
 
