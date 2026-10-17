@@ -8,6 +8,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 
 from app.config import get_settings
+from app.errors import install_error_handlers
 from app.graph.db import connect, health_snapshot
 from app.observe import RequestIdMiddleware, configure_logging
 
@@ -29,6 +30,7 @@ async def lifespan(_app: FastAPI):
 
 app = FastAPI(title="ModelBrain", version=VERSION, lifespan=lifespan)
 app.add_middleware(RequestIdMiddleware)
+install_error_handlers(app)
 
 
 @app.get("/api/health")
