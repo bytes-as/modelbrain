@@ -7,7 +7,7 @@ Milestones: **M1** = G001-G019 (O1), **M2** = G020-G029 (O4), **M3 (core, never 
 ---
 
 ## 1. Foundation (M1)
-- [ ] **G001** Repo created during the event with the layout in BLUEPRINT section 13; first commit message `chore: scaffold ModelBrain`. **Accept:** tree matches section 13. **Verify:** `git log --reverse | head -3` shows a 18 Oct 2026 first commit.
+- [x] **G001** Repo created during the event with the layout in BLUEPRINT section 13; first commit message `chore: scaffold ModelBrain`. **Accept:** tree matches section 13. **Verify:** `git log --reverse | head -3` shows a 18 Oct 2026 first commit. Done 18 Oct 2026.
 - [ ] **G002** `docker compose up` starts FalkorDB (`falkordb/falkordb:latest`, data at `/var/lib/falkordb/data`, `REDIS_ARGS=--appendonly yes`, `FALKORDB_ARGS="MAX_QUEUED_QUERIES 25 TIMEOUT 5000 RESULTSET_SIZE 10000"`) and the API. **Accept:** `curl localhost:8000/api/health` returns `falkordb:"up"`; FalkorDB Browser loads on `localhost:3000`. **Verify:** run both commands.
 - [ ] **G003** `services/api/pyproject.toml` pins: fastapi, uvicorn, pydantic>=2, httpx, falkordb, apscheduler, slowapi, `mcp>=1.10,<2`, pytest (the OpenRouter client is plain httpx; no LLM SDK needed), pytest-asyncio. **Accept:** `pip install -e .` succeeds in a clean Python 3.12 container. **Verify:** `docker build services/api`.
 - [ ] **G004** `app/config.py` reads every variable in `.env.example` with types and defaults; missing `HF_TOKEN` logs a warning, missing `ADMIN_TOKEN` or `PUBLISHER_SALT` fails startup. **Accept:** unit test for config. **Verify:** `pytest tests/test_config.py`.
