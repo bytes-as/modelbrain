@@ -9,8 +9,9 @@ from fastapi import FastAPI
 
 from app.config import get_settings
 from app.graph.db import connect, health_snapshot
+from app.observe import RequestIdMiddleware, configure_logging
 
-logging.basicConfig(level=logging.INFO)
+configure_logging()
 log = logging.getLogger("modelbrain")
 
 VERSION = "0.1.0"
@@ -27,6 +28,7 @@ async def lifespan(_app: FastAPI):
 
 
 app = FastAPI(title="ModelBrain", version=VERSION, lifespan=lifespan)
+app.add_middleware(RequestIdMiddleware)
 
 
 @app.get("/api/health")
