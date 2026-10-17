@@ -64,6 +64,20 @@ def configure_logging() -> None:
         logger.propagate = True
 
 
+class OriginAllowlistMiddleware(BaseHTTPMiddleware):
+    """Reject browser calls whose Origin is outside CORS_ORIGINS."""
+
+    def __init__(self, app: object, origins: list[str]) -> None:
+        super().__init__(app)
+        self.origins = set(origins)
+
+    async def dispatch(self, request: Request, call_next) -> Response:
+        origin = request.headers.get("origin")
+        if origin and origin not in self.origins:
+            return Response("Disallowed CORS origin", status_code=400, media_type="text/plain")
+        return await call_next(request)
+
+
 class RequestIdMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next) -> Response:
         incoming = request.headers.get("x-request-id", "").strip()

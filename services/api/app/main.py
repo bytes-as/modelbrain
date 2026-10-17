@@ -6,11 +6,12 @@ import logging
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import get_settings
 from app.errors import install_error_handlers
 from app.graph.db import connect, health_snapshot
-from app.observe import RequestIdMiddleware, configure_logging
+from app.observe import OriginAllowlistMiddleware, RequestIdMiddleware, configure_logging
 
 configure_logging()
 log = logging.getLogger("modelbrain")
@@ -29,7 +30,15 @@ async def lifespan(_app: FastAPI):
 
 
 app = FastAPI(title="ModelBrain", version=VERSION, lifespan=lifespan)
+_origins = get_settings().cors_origins
 app.add_middleware(RequestIdMiddleware)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=_origins,
+    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allow_headers=["*"],
+)
+app.add_middleware(OriginAllowlistMiddleware, origins=_origins)
 install_error_handlers(app)
 
 
