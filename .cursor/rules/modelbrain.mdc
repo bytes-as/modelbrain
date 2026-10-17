@@ -1,0 +1,14 @@
+---
+description: ModelBrain project rules (always on)
+alwaysApply: true
+---
+
+- Start with `BLUEPRINT.md` section 0 (document map). Rules: `AGENTS.md`. Work list: `docs/GOALS.md` (138 goals). Flows: `docs/FLOWS.md`. Contract: `docs/API.md`. Pages: `docs/UI.md`. Cypher: `docs/queries.cypher`. Hackathon rules mapping: `docs/REQUIREMENTS.md`.
+- FalkorDB decides every verdict through the Cypher in `docs/queries.cypher`. LLMs only phrase explanations or draft text, and the product must work with no LLM key.
+- Never post to Hugging Face repos outside `HF_POST_ALLOWLIST`; every outward action needs a human Approve.
+- Append-only rulings, events and snapshots. Bounded variable-length paths only.
+- Never paste licence text into the repo; the Clause Loader extracts quotes at runtime from the official source via locators; unresolved clauses load as NEEDS_COUNSEL.
+- FalkorDB is the heart: every answer and every memory write goes through FalkorDB. The MCP SDK is pinned `mcp>=1.10,<2`.
+- The work list is `docs/GOALS.md`; do not stop until every goal is done or explicitly cut with a reason.
+- Wording: never "violating" or accusations of named parties; always show "Automated screening, not legal advice."
+- Keep the hour-8 core working; follow the cut order in BLUEPRINT.md section 14 if behind.

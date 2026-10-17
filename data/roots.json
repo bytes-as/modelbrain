@@ -1,0 +1,24 @@
+{
+  "_readme": "Organisations whose original base models count as lineage roots (is_root=true) when the repo has no declared parent. Extend as needed; never mark re-uploaders as roots.",
+  "orgs": [
+    "meta-llama",
+    "google",
+    "mistralai",
+    "Qwen",
+    "microsoft",
+    "tiiuae",
+    "bigscience",
+    "EleutherAI",
+    "allenai",
+    "stabilityai",
+    "openai-community",
+    "deepseek-ai",
+    "nvidia",
+    "ibm-granite",
+    "HuggingFaceTB",
+    "01-ai",
+    "CohereForAI",
+    "black-forest-labs",
+    "openai"
+  ]
+}

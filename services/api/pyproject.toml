@@ -1,0 +1,43 @@
+[project]
+name = "modelbrain-api"
+version = "0.1.0"
+description = "ModelBrain API: FalkorDB verdicts for the Hugging Face model supply chain."
+requires-python = ">=3.12"
+dependencies = [
+  "fastapi",
+  "uvicorn[standard]",
+  "pydantic>=2",
+  "httpx",
+  "falkordb",
+  "apscheduler",
+  "slowapi",
+  "mcp>=1.10,<2",
+  "pytest",
+  "pytest-asyncio",
+]
+
+[project.optional-dependencies]
+dev = [
+  "ruff",
+  "black",
+]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["app*"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.black]
+line-length = 100
+target-version = ["py312"]

@@ -1,0 +1,28 @@
+name: ModelBrain check
+description: Scan a repo for Hugging Face model loads and ask ModelBrain for a verdict.
+inputs:
+  api_url:
+    description: ModelBrain API base URL
+    required: true
+  hq_country:
+    description: ISO-2 headquarters country
+    required: true
+    default: DE
+  commercial:
+    description: Whether the product is commercial
+    required: false
+    default: "true"
+  markets:
+    description: Comma-separated ISO-2 markets
+    required: false
+    default: ""
+  strict:
+    description: Fail on CANNOT_DETERMINE as well as BLOCKED
+    required: false
+    default: "false"
+runs:
+  using: composite
+  steps:
+    - name: ModelBrain check
+      shell: bash
+      run: echo "modelbrain-check is implemented in G090"

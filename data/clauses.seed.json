@@ -1,0 +1,814 @@
+{
+  "_readme": [
+    "Licence clause table for ModelBrain. Load into the hub as (:License)-[:IMPOSES]->(:Clause).",
+    "QUOTES ARE NOT STORED IN THIS REPO. At startup the Clause Loader fetches source_raw_url, normalises whitespace (HTML: strip script/style/tags, unescape entities), splits into units with the regex in 'split_regex', and stores the first unit matching 'locator' (case-insensitive) as Clause.quote, capped at 80 words with an ellipsis. Cache the fetched texts on disk for 7 days.",
+    "If a locator finds nothing, or source_raw_url is null, the clause loads with effect NEEDS_COUNSEL and the loader logs a warning. Tests assert every locator_verified clause extracts a non-empty quote containing its locator.",
+    "'summary' is our plain-English paraphrase for the UI; it is never shown as a quote.",
+    "applies_when / check use the rule language in BLUEPRINT.md section 6.1."
+  ],
+  "licenses": [
+    {
+      "key": "llama3",
+      "name": "Meta Llama 3 Community License",
+      "hub_tags": [
+        "llama3"
+      ],
+      "url": "https://github.com/meta-llama/llama-models/blob/main/models/llama3/LICENSE",
+      "clauses": [
+        {
+          "id": "llama3.ship_license_copy",
+          "kind": "SHIP_LICENSE_COPY",
+          "effect": "OBLIGATION",
+          "applies_when": {
+            "distributes_weights": true
+          },
+          "check": {
+            "license_file_present": true
+          },
+          "summary": "If you distribute the model or a derivative, include a copy of the licence agreement.",
+          "section": "1.b.i",
+          "source_url": "https://github.com/meta-llama/llama-models/blob/main/models/llama3/LICENSE",
+          "locator": "copy of this Agreement",
+          "source_raw_url": "https://raw.githubusercontent.com/meta-llama/llama-models/main/models/llama3/LICENSE",
+          "source_format": "text",
+          "locator_verified": "2026-10-18",
+          "extracted_words": 63
+        },
+        {
+          "id": "llama3.built_with_notice",
+          "kind": "ATTRIBUTION_NOTICE",
+          "effect": "OBLIGATION",
+          "applies_when": {
+            "always": true
+          },
+          "check": {
+            "card_mentions": "Built with Meta Llama 3"
+          },
+          "summary": "Prominently display the 'Built with Meta Llama 3' notice on a related website, user interface, blog post, about page or product documentation.",
+          "section": "1.b.i",
+          "source_url": "https://github.com/meta-llama/llama-models/blob/main/models/llama3/LICENSE",
+          "locator": "Built with Meta Llama 3",
+          "source_raw_url": "https://raw.githubusercontent.com/meta-llama/llama-models/main/models/llama3/LICENSE",
+          "source_format": "text",
+          "locator_verified": "2026-10-18",
+          "extracted_words": 63
+        },
+        {
+          "id": "llama3.name_prefix",
+          "kind": "NAME_PREFIX",
+          "effect": "OBLIGATION",
+          "applies_when": {
+            "distributes_weights": true
+          },
+          "check": {
+            "name_prefix": "Llama"
+          },
+          "summary": "A distributed model created from Llama 3 must include 'Llama 3' at the beginning of its name.",
+          "section": "1.b.i",
+          "source_url": "https://github.com/meta-llama/llama-models/blob/main/models/llama3/LICENSE",
+          "locator": "beginning of any such AI model name",
+          "source_raw_url": "https://raw.githubusercontent.com/meta-llama/llama-models/main/models/llama3/LICENSE",
+          "source_format": "text",
+          "locator_verified": "2026-10-18",
+          "extracted_words": 39
+        },
+        {
+          "id": "llama3.mau_700m",
+          "kind": "MAU_THRESHOLD",
+          "effect": "BLOCK",
+          "applies_when": {
+            "mau_gt": 700000000
+          },
+          "summary": "Above 700 million monthly active users you must request a separate licence from Meta.",
+          "section": "2",
+          "source_url": "https://github.com/meta-llama/llama-models/blob/main/models/llama3/LICENSE",
+          "locator": "700 million",
+          "source_raw_url": "https://raw.githubusercontent.com/meta-llama/llama-models/main/models/llama3/LICENSE",
+          "source_format": "text",
+          "locator_verified": "2026-10-18",
+          "extracted_words": 82
+        },
+        {
+          "id": "llama3.aup",
+          "kind": "AUP_PASSDOWN",
+          "effect": "OBLIGATION",
+          "applies_when": {
+            "always": true
+          },
+          "summary": "Use must comply with the Acceptable Use Policy, which is incorporated into the licence.",
+          "section": "1.b.iv",
+          "source_url": "https://github.com/meta-llama/llama-models/blob/main/models/llama3/LICENSE",
+          "locator": "Acceptable Use Policy",
+          "source_raw_url": "https://raw.githubusercontent.com/meta-llama/llama-models/main/models/llama3/LICENSE",
+          "source_format": "text",
+          "locator_verified": "2026-10-18",
+          "extracted_words": 43
+        }
+      ]
+    },
+    {
+      "key": "llama3_1",
+      "name": "Llama 3.1 Community License",
+      "hub_tags": [
+        "llama3.1"
+      ],
+      "url": "https://github.com/meta-llama/llama-models/blob/main/models/llama3_1/LICENSE",
+      "clauses": [
+        {
+          "id": "llama3_1.ship_license_copy",
+          "kind": "SHIP_LICENSE_COPY",
+          "effect": "OBLIGATION",
+          "applies_when": {
+            "distributes_weights": true
+          },
+          "check": {
+            "license_file_present": true
+          },
+          "summary": "If you distribute the model or a derivative, provide a copy of the licence agreement.",
+          "section": "1.b.i",
+          "source_url": "https://github.com/meta-llama/llama-models/blob/main/models/llama3_1/LICENSE",
+          "locator": "copy of this Agreement",
+          "source_raw_url": "https://raw.githubusercontent.com/meta-llama/llama-models/main/models/llama3_1/LICENSE",
+          "source_format": "text",
+          "locator_verified": "2026-10-18",
+          "extracted_words": 61
+        },
+        {
+          "id": "llama3_1.built_with_notice",
+          "kind": "ATTRIBUTION_NOTICE",
+          "effect": "OBLIGATION",
+          "applies_when": {
+            "always": true
+          },
+          "check": {
+            "card_mentions": "Built with Llama"
+          },
+          "summary": "Prominently display 'Built with Llama' on a related website, user interface, blog post, about page or product documentation.",
+          "section": "1.b.i",
+          "source_url": "https://github.com/meta-llama/llama-models/blob/main/models/llama3_1/LICENSE",
+          "locator": "Built with Llama",
+          "source_raw_url": "https://raw.githubusercontent.com/meta-llama/llama-models/main/models/llama3_1/LICENSE",
+          "source_format": "text",
+          "locator_verified": "2026-10-18",
+          "extracted_words": 61
+        },
+        {
+          "id": "llama3_1.name_prefix",
+          "kind": "NAME_PREFIX",
+          "effect": "OBLIGATION",
+          "applies_when": {
+            "distributes_weights": true
+          },
+          "check": {
+            "name_prefix": "Llama"
+          },
+          "summary": "A distributed model created or fine-tuned from Llama 3.1 must include 'Llama' at the beginning of its name.",
+          "section": "1.b.i",
+          "source_url": "https://github.com/meta-llama/llama-models/blob/main/models/llama3_1/LICENSE",
+          "locator": "beginning of any such AI model name",
+          "source_raw_url": "https://raw.githubusercontent.com/meta-llama/llama-models/main/models/llama3_1/LICENSE",
+          "source_format": "text",
+          "locator_verified": "2026-10-18",
+          "extracted_words": 47
+        },
+        {
+          "id": "llama3_1.mau_700m",
+          "kind": "MAU_THRESHOLD",
+          "effect": "BLOCK",
+          "applies_when": {
+            "mau_gt": 700000000
+          },
+          "summary": "Above 700 million monthly active users you must request a separate licence from Meta.",
+          "section": "2",
+          "source_url": "https://github.com/meta-llama/llama-models/blob/main/models/llama3_1/LICENSE",
+          "locator": "700 million",
+          "source_raw_url": "https://raw.githubusercontent.com/meta-llama/llama-models/main/models/llama3_1/LICENSE",
+          "source_format": "text",
+          "locator_verified": "2026-10-18",
+          "extracted_words": 81
+        },
+        {
+          "id": "llama3_1.aup",
+          "kind": "AUP_PASSDOWN",
+          "effect": "OBLIGATION",
+          "applies_when": {
+            "always": true
+          },
+          "summary": "Use must comply with the Llama 3.1 Acceptable Use Policy.",
+          "section": "1.b.iv",
+          "source_url": "https://github.com/meta-llama/llama-models/blob/main/models/llama3_1/USE_POLICY.md",
+          "locator": "Acceptable Use Policy",
+          "source_raw_url": "https://raw.githubusercontent.com/meta-llama/llama-models/main/models/llama3_1/LICENSE",
+          "source_format": "text",
+          "locator_verified": "2026-10-18",
+          "extracted_words": 43
+        }
+      ]
+    },
+    {
+      "key": "llama3_2",
+      "name": "Llama 3.2 Community License",
+      "hub_tags": [
+        "llama3.2"
+      ],
+      "url": "https://github.com/meta-llama/llama-models/blob/main/models/llama3_2/LICENSE",
+      "clauses": [
+        {
+          "id": "llama3_2.geo_eu_multimodal",
+          "kind": "GEO_RIGHTS_EXCLUSION",
+          "effect": "BLOCK",
+          "applies_when": {
+            "all": [
+              {
+                "hq_in": "EU"
+              },
+              {
+                "ancestor_multimodal": true
+              },
+              {
+                "not": {
+                  "end_user_only": true
+                }
+              }
+            ]
+          },
+          "summary": "For the multimodal Llama 3.2 models, the licence rights are not granted to individuals domiciled in, or companies with a principal place of business in, the European Union. End users of a product that incorporates the model are not affected.",
+          "section": "Acceptable Use Policy",
+          "source_url": "https://github.com/meta-llama/llama-models/blob/main/models/llama3_2/USE_POLICY.md",
+          "locator": "European Union",
+          "source_raw_url": "https://raw.githubusercontent.com/meta-llama/llama-models/main/models/llama3_2/USE_POLICY.md",
+          "source_format": "text",
+          "locator_verified": "2026-10-18",
+          "extracted_words": 87
+        },
+        {
+          "id": "llama3_2.ship_license_copy",
+          "kind": "SHIP_LICENSE_COPY",
+          "effect": "OBLIGATION",
+          "applies_when": {
+            "distributes_weights": true
+          },
+          "check": {
+            "license_file_present": true
+          },
+          "summary": "If you distribute the model or a derivative, provide a copy of the licence agreement.",
+          "section": "1.b.i",
+          "source_url": "https://github.com/meta-llama/llama-models/blob/main/models/llama3_2/LICENSE",
+          "locator": "copy of this Agreement",
+          "source_raw_url": "https://raw.githubusercontent.com/meta-llama/llama-models/main/models/llama3_2/LICENSE",
+          "source_format": "text",
+          "locator_verified": "2026-10-18",
+          "extracted_words": 61
+        },
+        {
+          "id": "llama3_2.built_with_notice",
+          "kind": "ATTRIBUTION_NOTICE",
+          "effect": "OBLIGATION",
+          "applies_when": {
+            "always": true
+          },
+          "check": {
+            "card_mentions": "Built with Llama"
+          },
+          "summary": "Prominently display 'Built with Llama'.",
+          "section": "1.b.i",
+          "source_url": "https://github.com/meta-llama/llama-models/blob/main/models/llama3_2/LICENSE",
+          "locator": "Built with Llama",
+          "source_raw_url": "https://raw.githubusercontent.com/meta-llama/llama-models/main/models/llama3_2/LICENSE",
+          "source_format": "text",
+          "locator_verified": "2026-10-18",
+          "extracted_words": 61
+        },
+        {
+          "id": "llama3_2.name_prefix",
+          "kind": "NAME_PREFIX",
+          "effect": "OBLIGATION",
+          "applies_when": {
+            "distributes_weights": true
+          },
+          "check": {
+            "name_prefix": "Llama"
+          },
+          "summary": "A distributed model created from Llama 3.2 must include 'Llama' at the beginning of its name.",
+          "section": "1.b.i",
+          "source_url": "https://github.com/meta-llama/llama-models/blob/main/models/llama3_2/LICENSE",
+          "locator": "beginning of any such AI model name",
+          "source_raw_url": "https://raw.githubusercontent.com/meta-llama/llama-models/main/models/llama3_2/LICENSE",
+          "source_format": "text",
+          "locator_verified": "2026-10-18",
+          "extracted_words": 47
+        },
+        {
+          "id": "llama3_2.mau_700m",
+          "kind": "MAU_THRESHOLD",
+          "effect": "BLOCK",
+          "applies_when": {
+            "mau_gt": 700000000
+          },
+          "summary": "Above 700 million monthly active users you must request a separate licence from Meta.",
+          "section": "2",
+          "source_url": "https://github.com/meta-llama/llama-models/blob/main/models/llama3_2/LICENSE",
+          "locator": "700 million",
+          "source_raw_url": "https://raw.githubusercontent.com/meta-llama/llama-models/main/models/llama3_2/LICENSE",
+          "source_format": "text",
+          "locator_verified": "2026-10-18",
+          "extracted_words": 81
+        },
+        {
+          "id": "llama3_2.aup",
+          "kind": "AUP_PASSDOWN",
+          "effect": "OBLIGATION",
+          "applies_when": {
+            "always": true
+          },
+          "summary": "Use must comply with the Llama 3.2 Acceptable Use Policy.",
+          "section": "1.b.iv",
+          "source_url": "https://github.com/meta-llama/llama-models/blob/main/models/llama3_2/USE_POLICY.md",
+          "locator": "Acceptable Use Policy",
+          "source_raw_url": "https://raw.githubusercontent.com/meta-llama/llama-models/main/models/llama3_2/LICENSE",
+          "source_format": "text",
+          "locator_verified": "2026-10-18",
+          "extracted_words": 43
+        }
+      ]
+    },
+    {
+      "key": "llama3_3",
+      "name": "Llama 3.3 Community License",
+      "hub_tags": [
+        "llama3.3"
+      ],
+      "url": "https://github.com/meta-llama/llama-models/blob/main/models/llama3_3/LICENSE",
+      "verify": true,
+      "clauses": [
+        {
+          "id": "llama3_3.built_with_notice",
+          "kind": "ATTRIBUTION_NOTICE",
+          "effect": "OBLIGATION",
+          "applies_when": {
+            "always": true
+          },
+          "check": {
+            "card_mentions": "Built with Llama"
+          },
+          "summary": "Prominently display 'Built with Llama'.",
+          "section": "1.b.i",
+          "source_url": "https://github.com/meta-llama/llama-models/blob/main/models/llama3_3/LICENSE",
+          "locator": "Built with Llama",
+          "source_raw_url": "https://raw.githubusercontent.com/meta-llama/llama-models/main/models/llama3_3/LICENSE",
+          "source_format": "text",
+          "locator_verified": "2026-10-18",
+          "extracted_words": 61
+        },
+        {
+          "id": "llama3_3.name_prefix",
+          "kind": "NAME_PREFIX",
+          "effect": "OBLIGATION",
+          "applies_when": {
+            "distributes_weights": true
+          },
+          "check": {
+            "name_prefix": "Llama"
+          },
+          "summary": "Distributed derivatives must start their name with 'Llama'.",
+          "section": "1.b.i",
+          "source_url": "https://github.com/meta-llama/llama-models/blob/main/models/llama3_3/LICENSE",
+          "locator": "beginning of any such AI model name",
+          "source_raw_url": "https://raw.githubusercontent.com/meta-llama/llama-models/main/models/llama3_3/LICENSE",
+          "source_format": "text",
+          "locator_verified": "2026-10-18",
+          "extracted_words": 47
+        },
+        {
+          "id": "llama3_3.mau_700m",
+          "kind": "MAU_THRESHOLD",
+          "effect": "BLOCK",
+          "applies_when": {
+            "mau_gt": 700000000
+          },
+          "summary": "Above 700 million MAU a separate licence is required.",
+          "section": "2",
+          "source_url": "https://github.com/meta-llama/llama-models/blob/main/models/llama3_3/LICENSE",
+          "locator": "700 million",
+          "source_raw_url": "https://raw.githubusercontent.com/meta-llama/llama-models/main/models/llama3_3/LICENSE",
+          "source_format": "text",
+          "locator_verified": "2026-10-18",
+          "extracted_words": 81
+        }
+      ]
+    },
+    {
+      "key": "llama4",
+      "name": "Llama 4 Community License",
+      "hub_tags": [
+        "llama4"
+      ],
+      "url": "https://github.com/meta-llama/llama-models/blob/main/models/llama4/LICENSE",
+      "clauses": [
+        {
+          "id": "llama4.geo_eu_multimodal",
+          "kind": "GEO_RIGHTS_EXCLUSION",
+          "effect": "BLOCK",
+          "applies_when": {
+            "all": [
+              {
+                "hq_in": "EU"
+              },
+              {
+                "ancestor_multimodal": true
+              },
+              {
+                "not": {
+                  "end_user_only": true
+                }
+              }
+            ]
+          },
+          "summary": "For the multimodal Llama 4 models, the licence rights are not granted to individuals domiciled in, or companies with a principal place of business in, the European Union. End users of a product that incorporates the model are not affected.",
+          "section": "Acceptable Use Policy",
+          "source_url": "https://github.com/meta-llama/llama-models/blob/main/models/llama4/USE_POLICY.md",
+          "locator": "European Union",
+          "source_raw_url": "https://raw.githubusercontent.com/meta-llama/llama-models/main/models/llama4/USE_POLICY.md",
+          "source_format": "text",
+          "locator_verified": "2026-10-18",
+          "extracted_words": 87
+        },
+        {
+          "id": "llama4.built_with_notice",
+          "kind": "ATTRIBUTION_NOTICE",
+          "effect": "OBLIGATION",
+          "applies_when": {
+            "always": true
+          },
+          "check": {
+            "card_mentions": "Built with Llama"
+          },
+          "summary": "Prominently display 'Built with Llama'.",
+          "section": "1.b.i",
+          "source_url": "https://github.com/meta-llama/llama-models/blob/main/models/llama4/LICENSE",
+          "locator": "Built with Llama",
+          "source_raw_url": "https://raw.githubusercontent.com/meta-llama/llama-models/main/models/llama4/LICENSE",
+          "source_format": "text",
+          "locator_verified": "2026-10-18",
+          "extracted_words": 61
+        }
+      ],
+      "note": "EU exclusion for multimodal models confirmed present in the Llama 4 Acceptable Use Policy (checked 2026-10-18)."
+    },
+    {
+      "key": "gemma",
+      "name": "Gemma Terms of Use",
+      "hub_tags": [
+        "gemma"
+      ],
+      "url": "https://ai.google.dev/gemma/terms",
+      "clauses": [
+        {
+          "id": "gemma.passdown_restrictions",
+          "kind": "USE_RESTRICTION_PASSDOWN",
+          "effect": "OBLIGATION",
+          "applies_when": {
+            "distributes_weights": true
+          },
+          "summary": "When you distribute Gemma or a Model Derivative, you must pass on the use restrictions (the Prohibited Use Policy) as an enforceable provision in your terms.",
+          "section": "3.1",
+          "source_url": "https://ai.google.dev/gemma/terms",
+          "locator": "as an enforceable provision|use restrictions referenced in Section 3\\.2",
+          "source_raw_url": "https://ai.google.dev/gemma/terms",
+          "source_format": "html",
+          "locator_verified": "2026-10-18",
+          "extracted_words": 59
+        },
+        {
+          "id": "gemma.notice_file",
+          "kind": "ATTRIBUTION_NOTICE",
+          "effect": "OBLIGATION",
+          "applies_when": {
+            "distributes_weights": true
+          },
+          "check": {
+            "license_file_present": true
+          },
+          "summary": "Include the Gemma notice text with any distribution, and mark modified files as modified.",
+          "section": "3.1",
+          "source_url": "https://ai.google.dev/gemma/terms",
+          "locator": "Gemma is provided under and subject to",
+          "source_raw_url": "https://ai.google.dev/gemma/terms",
+          "source_format": "html",
+          "locator_verified": "2026-10-18",
+          "extracted_words": 17
+        },
+        {
+          "id": "gemma.derivatives_include_distillation",
+          "kind": "DEFINITION",
+          "effect": "OBLIGATION",
+          "applies_when": {
+            "always": true
+          },
+          "summary": "Model Derivatives include models trained by distillation from Gemma outputs, so the terms follow distilled models too.",
+          "section": "1 (Definitions)",
+          "source_url": "https://ai.google.dev/gemma/terms",
+          "locator": "distillation",
+          "source_raw_url": "https://ai.google.dev/gemma/terms",
+          "source_format": "html",
+          "locator_verified": "2026-10-18",
+          "extracted_words": 70
+        },
+        {
+          "id": "gemma.prohibited_use",
+          "kind": "AUP_PASSDOWN",
+          "effect": "OBLIGATION",
+          "applies_when": {
+            "always": true
+          },
+          "summary": "Use must comply with the Gemma Prohibited Use Policy.",
+          "section": "3.2",
+          "source_url": "https://ai.google.dev/gemma/prohibited_use_policy",
+          "locator": "Prohibited Use Policy",
+          "source_raw_url": "https://ai.google.dev/gemma/terms",
+          "source_format": "html",
+          "locator_verified": "2026-10-18",
+          "extracted_words": 66
+        }
+      ]
+    },
+    {
+      "key": "apache-2.0",
+      "name": "Apache License 2.0",
+      "hub_tags": [
+        "apache-2.0"
+      ],
+      "url": "https://www.apache.org/licenses/LICENSE-2.0",
+      "clauses": [
+        {
+          "id": "apache.give_license",
+          "kind": "SHIP_LICENSE_COPY",
+          "effect": "OBLIGATION",
+          "applies_when": {
+            "distributes_weights": true
+          },
+          "check": {
+            "license_file_present": true
+          },
+          "summary": "Give recipients a copy of the licence.",
+          "section": "4(a)",
+          "source_url": "https://www.apache.org/licenses/LICENSE-2.0",
+          "locator": "You must give any other recipients",
+          "source_raw_url": "https://raw.githubusercontent.com/spdx/license-list-data/main/text/Apache-2.0.txt",
+          "source_format": "text",
+          "locator_verified": "2026-10-18",
+          "extracted_words": 19
+        },
+        {
+          "id": "apache.state_changes",
+          "kind": "STATE_CHANGES",
+          "effect": "OBLIGATION",
+          "applies_when": {
+            "distributes_weights": true
+          },
+          "summary": "Modified files must carry prominent notices stating that you changed them.",
+          "section": "4(b)",
+          "source_url": "https://www.apache.org/licenses/LICENSE-2.0",
+          "locator": "prominent notices stating that You changed",
+          "source_raw_url": "https://raw.githubusercontent.com/spdx/license-list-data/main/text/Apache-2.0.txt",
+          "source_format": "text",
+          "locator_verified": "2026-10-18",
+          "extracted_words": 18
+        },
+        {
+          "id": "apache.retain_notices",
+          "kind": "RETAIN_NOTICES",
+          "effect": "OBLIGATION",
+          "applies_when": {
+            "distributes_weights": true
+          },
+          "summary": "Retain copyright, patent, trademark and attribution notices, and include any NOTICE file.",
+          "section": "4(c)-(d)",
+          "source_url": "https://www.apache.org/licenses/LICENSE-2.0",
+          "locator": "You must retain, in the Source form",
+          "source_raw_url": "https://raw.githubusercontent.com/spdx/license-list-data/main/text/Apache-2.0.txt",
+          "source_format": "text",
+          "locator_verified": "2026-10-18",
+          "extracted_words": 44
+        }
+      ]
+    },
+    {
+      "key": "mit",
+      "name": "MIT License",
+      "hub_tags": [
+        "mit"
+      ],
+      "url": "https://opensource.org/license/mit",
+      "clauses": [
+        {
+          "id": "mit.include_notice",
+          "kind": "RETAIN_NOTICES",
+          "effect": "OBLIGATION",
+          "applies_when": {
+            "distributes_weights": true
+          },
+          "check": {
+            "license_file_present": true
+          },
+          "summary": "Include the copyright notice and permission notice in all copies or substantial portions.",
+          "section": "body",
+          "source_url": "https://opensource.org/license/mit",
+          "locator": "shall be included in all copies",
+          "source_raw_url": "https://raw.githubusercontent.com/spdx/license-list-data/main/text/MIT.txt",
+          "source_format": "text",
+          "locator_verified": "2026-10-18",
+          "extracted_words": 20
+        }
+      ]
+    },
+    {
+      "key": "cc-by-nc-4.0",
+      "name": "Creative Commons Attribution-NonCommercial 4.0",
+      "hub_tags": [
+        "cc-by-nc-4.0"
+      ],
+      "url": "https://creativecommons.org/licenses/by-nc/4.0/legalcode",
+      "clauses": [
+        {
+          "id": "ccbync.noncommercial",
+          "kind": "NONCOMMERCIAL",
+          "effect": "BLOCK",
+          "applies_when": {
+            "commercial": true
+          },
+          "summary": "Licensed rights may be exercised only for non-commercial purposes.",
+          "section": "2.a.1",
+          "source_url": "https://creativecommons.org/licenses/by-nc/4.0/legalcode",
+          "locator": "NonCommercial purposes only",
+          "source_raw_url": "https://raw.githubusercontent.com/spdx/license-list-data/main/text/CC-BY-NC-4.0.txt",
+          "source_format": "text",
+          "locator_verified": "2026-10-18",
+          "extracted_words": 29
+        },
+        {
+          "id": "ccbync.attribution",
+          "kind": "ATTRIBUTION_NOTICE",
+          "effect": "OBLIGATION",
+          "applies_when": {
+            "always": true
+          },
+          "summary": "Give appropriate credit, link the licence and indicate changes.",
+          "section": "3.a",
+          "source_url": "https://creativecommons.org/licenses/by-nc/4.0/legalcode",
+          "locator": "If You Share the Licensed Material",
+          "source_raw_url": "https://raw.githubusercontent.com/spdx/license-list-data/main/text/CC-BY-NC-4.0.txt",
+          "source_format": "text",
+          "locator_verified": "2026-10-18",
+          "extracted_words": 12
+        }
+      ]
+    },
+    {
+      "key": "cc-by-4.0",
+      "name": "Creative Commons Attribution 4.0",
+      "hub_tags": [
+        "cc-by-4.0"
+      ],
+      "url": "https://creativecommons.org/licenses/by/4.0/legalcode",
+      "clauses": [
+        {
+          "id": "ccby.attribution",
+          "kind": "ATTRIBUTION_NOTICE",
+          "effect": "OBLIGATION",
+          "applies_when": {
+            "always": true
+          },
+          "summary": "Give appropriate credit, link the licence and indicate changes.",
+          "section": "3.a",
+          "source_url": "https://creativecommons.org/licenses/by/4.0/legalcode",
+          "locator": "If You Share the Licensed Material",
+          "source_raw_url": "https://raw.githubusercontent.com/spdx/license-list-data/main/text/CC-BY-4.0.txt",
+          "source_format": "text",
+          "locator_verified": "2026-10-18",
+          "extracted_words": 12
+        }
+      ]
+    },
+    {
+      "key": "cc-by-sa-4.0",
+      "name": "Creative Commons Attribution-ShareAlike 4.0",
+      "hub_tags": [
+        "cc-by-sa-4.0"
+      ],
+      "url": "https://creativecommons.org/licenses/by-sa/4.0/legalcode",
+      "clauses": [
+        {
+          "id": "ccbysa.sharealike",
+          "kind": "SHARE_ALIKE",
+          "effect": "OBLIGATION",
+          "applies_when": {
+            "distributes_weights": true
+          },
+          "summary": "Adapted material must be shared under the same or a compatible licence.",
+          "section": "3.b",
+          "source_url": "https://creativecommons.org/licenses/by-sa/4.0/legalcode",
+          "locator": "ShareAlike|same License Elements",
+          "source_raw_url": "https://raw.githubusercontent.com/spdx/license-list-data/main/text/CC-BY-SA-4.0.txt",
+          "source_format": "text",
+          "locator_verified": "2026-10-18",
+          "extracted_words": 24
+        }
+      ]
+    },
+    {
+      "key": "openrail",
+      "name": "OpenRAIL family (creativeml-openrail-m, openrail-m, bigscience-openrail-m)",
+      "hub_tags": [
+        "creativeml-openrail-m",
+        "openrail",
+        "openrail++",
+        "bigscience-openrail-m"
+      ],
+      "url": "https://huggingface.co/spaces/CompVis/stable-diffusion-license",
+      "verify": true,
+      "clauses": [
+        {
+          "id": "openrail.use_restrictions_passdown",
+          "kind": "USE_RESTRICTION_PASSDOWN",
+          "effect": "OBLIGATION",
+          "applies_when": {
+            "distributes_weights": true
+          },
+          "summary": "Use-based restrictions (Attachment A) must be included as an enforceable provision in any agreement governing use or distribution of the model or its derivatives.",
+          "section": "Paragraph 4/5 (varies by variant)",
+          "source_url": "https://huggingface.co/spaces/CompVis/stable-diffusion-license",
+          "locator": null,
+          "source_raw_url": null,
+          "locator_verified": null
+        }
+      ]
+    },
+    {
+      "key": "unknown",
+      "name": "No licence declared",
+      "hub_tags": [],
+      "url": "",
+      "clauses": [
+        {
+          "id": "unknown.no_license",
+          "kind": "NO_LICENSE",
+          "effect": "NEEDS_COUNSEL",
+          "applies_when": {
+            "always": true
+          },
+          "summary": "No licence is declared at this node. Without a licence, reuse rights are unclear.",
+          "section": "",
+          "source_url": "",
+          "locator": null,
+          "source_raw_url": null,
+          "locator_verified": null
+        }
+      ]
+    },
+    {
+      "key": "other",
+      "name": "Custom or 'other' licence",
+      "hub_tags": [
+        "other"
+      ],
+      "url": "",
+      "clauses": [
+        {
+          "id": "other.custom",
+          "kind": "CUSTOM",
+          "effect": "NEEDS_COUNSEL",
+          "applies_when": {
+            "always": true
+          },
+          "summary": "The card declares a custom or 'other' licence. A person must read it.",
+          "section": "",
+          "source_url": "",
+          "locator": null,
+          "source_raw_url": null,
+          "locator_verified": null
+        }
+      ]
+    }
+  ],
+  "normalise": {
+    "_readme": "Map raw card/tag licence strings to keys above. Unmapped strings become 'other'. Missing becomes 'unknown'.",
+    "llama3": "llama3",
+    "llama3.1": "llama3_1",
+    "llama3.2": "llama3_2",
+    "llama3.3": "llama3_3",
+    "llama4": "llama4",
+    "gemma": "gemma",
+    "apache-2.0": "apache-2.0",
+    "mit": "mit",
+    "cc-by-nc-4.0": "cc-by-nc-4.0",
+    "cc-by-4.0": "cc-by-4.0",
+    "cc-by-sa-4.0": "cc-by-sa-4.0",
+    "creativeml-openrail-m": "openrail",
+    "openrail": "openrail",
+    "openrail++": "openrail",
+    "bigscience-openrail-m": "openrail",
+    "other": "other"
+  },
+  "split_regex": "(?<=[.;:])\\s+(?=[A-Z(\\\"“])|\\s(?=\\([a-z]\\)\\s)"
+}
