@@ -1,18 +1,42 @@
-"""ModelBrain API entrypoint. FalkorDB health wiring is G002."""
+"""ModelBrain API entrypoint."""
+
+from __future__ import annotations
+
+import logging
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-app = FastAPI(title="ModelBrain", version="0.1.0")
+from app.graph.db import connect, health_snapshot
+
+logging.basicConfig(level=logging.INFO)
+log = logging.getLogger("modelbrain")
+
+VERSION = "0.1.0"
+
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
+    try:
+        connect()
+    except Exception:
+        log.warning("starting with falkordb down")
+    yield
+
+
+app = FastAPI(title="ModelBrain", version=VERSION, lifespan=lifespan)
 
 
 @app.get("/api/health")
 def health() -> dict[str, object]:
+    snap = health_snapshot()
+    up = snap["falkordb"] == "up"
     return {
-        "ok": False,
-        "falkordb": "down",
-        "graphs": [],
-        "hub_models": 0,
+        "ok": up,
+        "falkordb": snap["falkordb"],
+        "graphs": snap["graphs"],
+        "hub_models": snap["hub_models"],
         "clauses": {"resolved": 0, "unresolved": 0},
         "hf": "degraded",
-        "version": "0.1.0",
+        "version": VERSION,
     }

@@ -5,7 +5,7 @@ This is the hour-by-hour summary. The complete, numbered work list with acceptan
 H0 = the moment the build starts. A = backend and graph. B = frontend, eval, video. Tick boxes as you go. Do not start a later block while an earlier block's acceptance criteria fail.
 
 ## Block 0 (H0-H1): scaffold and deploy "hello"
-- [ ] A: create the repo layout from BLUEPRINT.md section 13; `docker compose up` starts FalkorDB + API locally.
+- [x] A: create the repo layout from BLUEPRINT.md section 13; `docker compose up` starts FalkorDB + API locally. Done 18 Oct 2026.
 - [ ] A: Railway project with two services: `falkordb` (image `falkordb/falkordb:latest`, volume mounted at `/var/lib/falkordb/data` (verify the image's data path), `appendonly yes`) and `api` (Dockerfile in `services/api`). Private networking between them.
 - [ ] A: `GET /api/health` returns `{falkordb:"up"}` on the Railway URL. Run the schema block of `docs/queries.cypher` on startup (idempotent).
 - [ ] B: Vercel project for `apps/web`; env `NEXT_PUBLIC_API_URL`; home page renders and calls `/api/health`.
@@ -75,4 +75,4 @@ H0 = the moment the build starts. A = backend and graph. B = frontend, eval, vid
 - HF commits endpoint fields: `{id, title, message, date, authors}` (verified 18 Oct). Discussions: `{num, title, status, createdAt, author, ...}`.
 
 ## Questions for the owner
-- 
+- This machine already runs Homebrew Redis on port 6379, so `docker compose up` cannot publish FalkorDB on host port 6379. A local untracked `docker-compose.override.yml` publishes host port 6380 instead. The API container still uses `falkordb:6379` on the compose network, and the Browser stays on `localhost:3000`. Should the committed compose file keep 6379 (clean machines) and leave the override local? 
