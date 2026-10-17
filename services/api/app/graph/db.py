@@ -1,4 +1,4 @@
-"""FalkorDB connection. Read and write helpers are completed in G010."""
+"""FalkorDB connection, parameterised query helpers, and GRAPH.COPY."""
 
 from __future__ import annotations
 
@@ -43,6 +43,33 @@ def connect(tries: int = 10, delay_s: float = 2.0) -> FalkorDB:
                 time.sleep(delay_s)
     assert last is not None
     raise last
+
+
+def _database() -> FalkorDB:
+    if _db is None:
+        return connect()
+    return _db
+
+
+def graph(name: str):
+    return _database().select_graph(name)
+
+
+def query(name: str, cypher: str, params: dict[str, Any] | None = None):
+    return graph(name).query(cypher, params or {})
+
+
+def ro_query(name: str, cypher: str, params: dict[str, Any] | None = None):
+    return graph(name).ro_query(cypher, params or {})
+
+
+def copy_graph(source: str, destination: str) -> None:
+    """GRAPH.COPY. FalkorDB rejects the command when the destination already exists."""
+    _database().connection.execute_command("GRAPH.COPY", source, destination)
+
+
+def delete_graph(name: str) -> None:
+    _database().connection.execute_command("GRAPH.DELETE", name)
 
 
 def health_snapshot() -> dict[str, Any]:
