@@ -437,3 +437,22 @@ WITH m WHERE $license_key IS NOT NULL
 MATCH (l:License {key:$license_key})
 MERGE (m)-[d:DECLARES]->(l) ON CREATE SET d.source = 'gguf_meta', d.as_of_sha = $sha
 RETURN m.id, d.source
+
+// W10: mark foundation references (data/dna_references.json); they never get weight edges
+UNWIND $ids AS rid
+MATCH (m:Model {id: rid})
+SET m.dna_reference = true
+RETURN count(m) AS marked
+
+// W11: read stored fingerprints for the merge fit
+MATCH (m:Model) WHERE m.id IN $ids AND m.dna_status = 'OK'
+RETURN m.id AS id, m.dna AS dna, m.dna_sig AS sig
+
+// W12: models waiting for the weight resolver (fingerprinted, not a reference, no weight edge yet)
+MATCH (m:Model) WHERE m.dna_status = 'OK' AND NOT coalesce(m.dna_reference, false)
+  AND NOT (m)-[:DERIVED_FROM {method:'weights'}]->() AND NOT (m)-[:DERIVED_FROM {method:'weights_merge'}]->()
+RETURN m.id AS id ORDER BY m.created_at
+
+// W13: fingerprint state for the crawl (skip models already sampled)
+MATCH (m:Model) WHERE m.id IN $ids
+RETURN m.id AS id, m.sha AS sha, m.dna_status AS status

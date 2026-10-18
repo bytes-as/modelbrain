@@ -129,6 +129,69 @@ class HFClient:
             return HFResponse(200, stale, stale=True)
         raise HubUnavailable(last_error)
 
+    async def get_range(self, url: str, start: int, end: int) -> HFResponse:
+        """Fetch bytes [start, end] of a file, following the CDN redirect.
+
+        URLs are pinned to a commit sha, so ranges are cached without expiry.
+        """
+        if end < start:
+            raise ValueError("empty range")
+        key = f"range:{url}:{start}-{end}"
+        cached = self.cache.get(key, max_age_s=None)
+        if cached is not None:
+            return HFResponse(206, cached)
+
+        last_error = "Hugging Face file request failed."
+        for attempt in range(3):
+            await self.limiter.acquire()
+            want = end - start + 1
+            try:
+                async with self._http.stream(
+                    "GET",
+                    url,
+                    headers={"Range": f"bytes={start}-{end}"},
+                    follow_redirects=True,
+                    timeout=30.0,
+                ) as response:
+                    status = response.status_code
+                    retry_after = _retry_after(response, default=20)
+                    body = b""
+                    if status in (200, 206):
+                        # Never read more than requested, even if the server
+                        # ignores Range and starts sending the whole file.
+                        async for chunk in response.aiter_bytes():
+                            body += chunk
+                            if len(body) >= want:
+                                break
+                        body = body[:want]
+            except httpx.HTTPError as exc:
+                last_error = f"Hugging Face file request failed: {type(exc).__name__}"
+                if attempt >= 2:
+                    break
+                await self.sleep(float(2**attempt))
+                continue
+            if status == 429:
+                if attempt >= 2:
+                    raise HubUnavailable(
+                        "Hugging Face Hub rate limited the request.", retry_after_s=retry_after
+                    )
+                await self.sleep(float(retry_after))
+                continue
+            if status >= 500:
+                last_error = f"Hugging Face Hub returned {status}."
+                if attempt >= 2:
+                    break
+                await self.sleep(float(2**attempt))
+                continue
+            if status == 200 and start != 0:
+                # Range ignored: the bytes we read are from offset 0, not `start`.
+                return HFResponse(416, b"")
+            if status in (200, 206):
+                self.cache.put(key, body)
+                return HFResponse(206, body)
+            return HFResponse(status, b"")
+        raise HubUnavailable(last_error)
+
     async def get_json(self, url: str) -> object:
         response = await self.get(url)
         if response.status >= 400:

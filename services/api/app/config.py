@@ -30,6 +30,9 @@ ENV_KEYS: tuple[str, ...] = (
     "CORS_ORIGINS",
     "WATCH_INTERVAL_MINUTES",
     "SANDBOX_TTL_MINUTES",
+    "DNA_PER_TENSOR",
+    "DNA_DERIVED_MIN",
+    "DNA_RELATED_MIN",
     "NEXT_PUBLIC_API_URL",
 )
 
@@ -64,6 +67,9 @@ class Settings(BaseModel):
     cors_origins: list[str] = Field(default_factory=lambda: ["http://localhost:3001"])
     watch_interval_minutes: int = 10
     sandbox_ttl_minutes: int = 120
+    dna_per_tensor: int = 512
+    dna_derived_min: float = 0.60
+    dna_related_min: float = 0.25
     next_public_api_url: str = "http://localhost:8000"
 
 

@@ -433,6 +433,29 @@ MERGE (m)-[d:DECLARES]->(l) ON CREATE SET d.source = 'gguf_meta', d.as_of_sha = 
 RETURN m.id, d.source
 """
 
+W10 = """
+UNWIND $ids AS rid
+MATCH (m:Model {id: rid})
+SET m.dna_reference = true
+RETURN count(m) AS marked
+"""
+
+W11 = """
+MATCH (m:Model) WHERE m.id IN $ids AND m.dna_status = 'OK'
+RETURN m.id AS id, m.dna AS dna, m.dna_sig AS sig
+"""
+
+W12 = """
+MATCH (m:Model) WHERE m.dna_status = 'OK' AND NOT coalesce(m.dna_reference, false)
+  AND NOT (m)-[:DERIVED_FROM {method:'weights'}]->() AND NOT (m)-[:DERIVED_FROM {method:'weights_merge'}]->()
+RETURN m.id AS id ORDER BY m.created_at
+"""
+
+W13 = """
+MATCH (m:Model) WHERE m.id IN $ids
+RETURN m.id AS id, m.sha AS sha, m.dna_status AS status
+"""
+
 QUERIES = {
     "SCHEMA": SCHEMA,
     "I1": I1,
@@ -487,4 +510,8 @@ QUERIES = {
     "W7": W7,
     "W8": W8,
     "W9": W9,
+    "W10": W10,
+    "W11": W11,
+    "W12": W12,
+    "W13": W13,
 }

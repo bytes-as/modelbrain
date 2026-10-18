@@ -20,6 +20,7 @@ from app.mcp_server import mcp, mcp_http_app
 from app.observe import OriginAllowlistMiddleware, RequestIdMiddleware, configure_logging
 from app.routes.admin import router as admin_router
 from app.routes.algo import router as algo_router
+from app.routes.dna import router as dna_router
 from app.routes.eval import router as eval_router
 from app.routes.ingest import router as ingest_router
 from app.routes.models import router as models_router
@@ -47,6 +48,13 @@ async def lifespan(_app: FastAPI):
             ensure_tenants()
         except Exception:
             log.exception("tenant bootstrap failed")
+        try:
+            from app.engine.dna import ensure_index, mark_references
+
+            ensure_index("hub")
+            mark_references("hub")
+        except Exception:
+            log.exception("weight dna bootstrap failed")
         try:
             cleanup_expired()
         except Exception:
@@ -76,6 +84,7 @@ app.include_router(algo_router)
 app.include_router(admin_router)
 app.include_router(eval_router)
 app.include_router(tenants_router)
+app.include_router(dna_router)
 
 
 @app.get("/api/health")
