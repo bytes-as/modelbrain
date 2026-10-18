@@ -550,6 +550,17 @@ DELETE s
 RETURN 1 AS removed
 """
 
+X14 = """
+MATCH (m:Model {id: $id})
+RETURN m.sha AS sha, m.declared_license AS declared_license, coalesce(m.has_license_file, false) AS has_license_file,
+       coalesce(m.card_has_llama_notice, false) AS card_has_llama_notice
+"""
+
+X15 = """
+MATCH (d:Deployment) WHERE d.model_id = $id
+RETURN count(d) AS deployments
+"""
+
 QUERIES = {
     "SCHEMA": SCHEMA,
     "I1": I1,
@@ -623,4 +634,6 @@ QUERIES = {
     "X11": X11,
     "X12": X12,
     "X13": X13,
+    "X14": X14,
+    "X15": X15,
 }

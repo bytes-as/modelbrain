@@ -9,6 +9,9 @@ from pydantic import BaseModel, Field
 
 from app.engine import watcher
 from app.errors import ApiError
+from app.graph.db import ro_query
+from app.graph.queries import X15
+from app.graph.rows import as_rows
 from app.tenants.auth import require_admin, resolve_tenant
 
 router = APIRouter()
@@ -94,3 +97,54 @@ def compounding_state() -> dict:
     child, parent = watcher.DEMO_EDGE
     state = watcher.edge_state(child, parent)
     return {"child": child, "parent": parent, "edge": state}
+
+
+class CheckIn(BaseModel):
+    model_id: str
+    tenant: str | None = None
+
+
+async def _fresh_ingest(model_id: str) -> None:
+    """Re-ingest straight from the Hub, bypassing the response cache."""
+    import tempfile
+    from pathlib import Path
+
+    from app.agents.scout import ingest
+    from app.config import get_settings
+    from app.hf.cache import DiskCache
+    from app.hf.client import HFClient
+    from app.hf.live import LiveHub
+    from app.jobs.runner import _hub_resources
+
+    table, roots = _hub_resources()
+    with tempfile.TemporaryDirectory() as tmp:
+        client = HFClient(token=get_settings().hf_token, cache=DiskCache(Path(tmp)))
+        try:
+            await ingest(model_id, LiveHub(client), table=table, roots=roots, graph="hub")
+        finally:
+            await client.aclose()
+
+
+@router.post("/api/watch/check")
+async def watch_check(
+    body: CheckIn,
+    x_tenant_token: str | None = Header(default=None, alias="X-Tenant-Token"),
+    authorization: str | None = Header(default=None),
+) -> dict:
+    model_id = _check_model(body.model_id)
+    graphs: list[str] | None = None
+    if body.tenant:
+        graph = resolve_tenant(
+            body.tenant, token=x_tenant_token, authorization=authorization, write=True
+        )
+        rows = as_rows(ro_query(graph, X15, {"id": model_id}))
+        if not rows or int(rows[0]["deployments"]) == 0:
+            raise ApiError(
+                "NOT_ALLOWLISTED",
+                "Sandbox users can only check models their company deploys.",
+                hint="Pick a model from your deployments.",
+            )
+        graphs = [graph]
+    else:
+        require_admin(authorization)
+    return await watcher.check_now(model_id, _fresh_ingest, graphs=graphs)

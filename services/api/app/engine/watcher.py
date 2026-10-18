@@ -18,7 +18,7 @@ from typing import Any
 
 from app.config import get_settings
 from app.graph import db
-from app.graph.queries import D1, D2, P1, T3, T4, X1, X2, X3, X4, X6
+from app.graph.queries import D1, D2, P1, T3, T4, X1, X2, X3, X4, X6, X14
 from app.graph.rows import as_rows
 from app.graph.schema import graph_names
 from app.ids import new_id
@@ -248,3 +248,44 @@ def reset_compounding_demo(hub: str = "hub") -> dict[str, Any]:
     if not rows:
         return {"ok": False, "reason": "demo edge not in the hub yet; run the resolver first"}
     return {"ok": True, "child": child, "parent": parent, **rows[0]}
+
+
+# --- check now (FLOWS F9.1-6) -----------------------------------------------------
+
+WATCHED = ("sha", "declared_license", "has_license_file", "card_has_llama_notice")
+
+
+def model_state(model_id: str, hub: str = "hub") -> dict[str, Any] | None:
+    rows = as_rows(db.ro_query(hub, X14, {"id": model_id}))
+    return rows[0] if rows else None
+
+
+def diff_states(before: dict[str, Any] | None, after: dict[str, Any] | None) -> list[str]:
+    if before is None or after is None:
+        return []
+    return [
+        f"{key}: {before.get(key)!r} -> {after.get(key)!r}"
+        for key in WATCHED
+        if before.get(key) != after.get(key)
+    ]
+
+
+async def check_now(
+    model_id: str, reingest: Any, *, graphs: list[str] | None = None, hub: str = "hub"
+) -> dict[str, Any]:
+    """Re-read a model from the Hub (no cache), diff the facts, fan out only on a change."""
+    before = model_state(model_id, hub)
+    await reingest(model_id)
+    after = model_state(model_id, hub)
+    changes = diff_states(before, after)
+    result: dict[str, Any] = {
+        "model_id": model_id,
+        "changed": bool(changes),
+        "changes": changes,
+        "sha": (after or {}).get("sha"),
+    }
+    if changes:
+        result["fan_out"] = fan_out(
+            model_id, "upstream change: " + "; ".join(changes), graphs=graphs, hub=hub
+        )
+    return result

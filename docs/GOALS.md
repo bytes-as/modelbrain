@@ -98,7 +98,7 @@ Milestones: **M1** = G001-G019 (O1), **M2** = G020-G029 (O4), **M3 (core, never 
 
 ## 6. Watcher, fan-out, compounding, loop, CI (M6)
 - [ ] **G080** Watcher job (FLOWS F9.1-6): sha check, re-ingest, Snapshot, diff, descendants (D1), reopen (T3, T4), FanOut record. **Accept:** changing a fixture model's sha reopens Kestrel's ruling and creates a task for its owner. **Verify:** integration test.
-- [ ] **G081** `POST /api/watch/check` "check now". **Verify:** API call.
+- [x] **G081** `POST /api/watch/check` "check now". **Verify:** API call. Done 18 Oct 2026 (`POST /api/watch/check`, uncached re-ingest, diff, fan-out on change).
 - [ ] **G082** Approve/reject flow writes a new ruling with SUPERSEDES and a signed Event (FLOWS F9.8). **Verify:** integration test.
 - [x] **G083** Fix leverage (D2) shown on descendants and replay views. **Verify:** API call. Done 18 Oct 2026 (`GET /api/models/{id}/fix-leverage`, replay view).
 - [x] **G084** Xkev replay endpoint and page (FLOWS F11) with the real commits (`dfdcec1f9f`, `7ee73286de`, `213eb383f1`, `e8c2529775`) and discussion 12. **Accept:** page shows 9 of 9 children did not inherit the fix. **Verify:** Playwright. Done 18 Oct 2026 (`/replay/xkev`, `data/replay_xkev.json`, `tests/test_loop.py`).
@@ -111,7 +111,7 @@ Milestones: **M1** = G001-G019 (O1), **M2** = G020-G029 (O4), **M3 (core, never 
 - [ ] **G091** `POST /api/ci/check`. **Verify:** API test.
 - [ ] **G092** Watchlist file `data/watchlist.json` (Xkev, its children, meta-llama roots in the demo). **Verify:** watcher log.
 - [ ] **G093** Resolver runs after prewarm and nightly. **Verify:** `/api/admin/resolver/last`.
-- [ ] **G094** Sandbox users can run "check now" only for models in their sandbox's deployments. **Verify:** test.
+- [x] **G094** Sandbox users can run "check now" only for models in their sandbox's deployments. **Verify:** test. Done 18 Oct 2026 (sandbox token may only check its own deployments; 403 otherwise).
 - [ ] **G095** Eval re-run after M6 still has false ALLOW = 0. **Verify:** report.
 - [ ] **G096** All web pages in UI exist and link from the nav. **Verify:** Playwright crawl.
 - [x] **G097** Copy rules (UI "Copy rules") enforced: a test greps `apps/web` and API templates for "violat", "illegal", "infring". **Verify:** `pytest tests/test_copy_rules.py`. Done 18 Oct 2026 (`tests/test_copy_rules.py`).

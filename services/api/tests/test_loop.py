@@ -148,3 +148,34 @@ def test_compounding_demo_reset_then_one_visitor_flips_the_tier(graphs) -> None:
     _company(graphs["a"], child, "lena")
     result = watcher.confirm_edge(graphs["a"], child, parent, "lena", hub=graphs["hub"])
     assert result["tier_before"] == 1 and result["tier_after"] == 3
+
+
+def test_check_now_fans_out_only_on_a_change(graphs) -> None:
+    import asyncio
+
+    _hub(graphs["hub"])
+    db.query(
+        graphs["hub"],
+        "MATCH (m:Model {id:'up/mid'}) SET m.sha = 'aaa', m.has_license_file = false",
+    )
+    _company(graphs["a"], "down/leaf", "alice")
+
+    async def no_change(_model_id: str) -> None:
+        return None
+
+    async def licence_added(_model_id: str) -> None:
+        db.query(
+            graphs["hub"],
+            "MATCH (m:Model {id:'up/mid'}) SET m.sha = 'bbb', m.has_license_file = true",
+        )
+
+    quiet = asyncio.run(
+        watcher.check_now("up/mid", no_change, graphs=[graphs["a"]], hub=graphs["hub"])
+    )
+    assert quiet["changed"] is False and "fan_out" not in quiet
+    loud = asyncio.run(
+        watcher.check_now("up/mid", licence_added, graphs=[graphs["a"]], hub=graphs["hub"])
+    )
+    assert loud["changed"] is True
+    assert any(c.startswith("has_license_file") for c in loud["changes"])
+    assert [r["ruling_id"] for r in loud["fan_out"]["reopened"]] == ["rul_alice"]

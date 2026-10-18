@@ -539,3 +539,12 @@ RETURN s.name AS name, s.expires_at AS expires_at, s.token_hash AS token_hash, s
 MATCH (s:Sandbox {name: $name})
 DELETE s
 RETURN 1 AS removed
+
+// X14: (hub) the facts a watcher compares before and after a re-ingest
+MATCH (m:Model {id: $id})
+RETURN m.sha AS sha, m.declared_license AS declared_license, coalesce(m.has_license_file, false) AS has_license_file,
+       coalesce(m.card_has_llama_notice, false) AS card_has_llama_notice
+
+// X15: (tenant graph) does this company deploy a model (sandbox users may only check their own)
+MATCH (d:Deployment) WHERE d.model_id = $id
+RETURN count(d) AS deployments
