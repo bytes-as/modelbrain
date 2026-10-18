@@ -138,11 +138,11 @@ Milestones: **M1** = G001-G019 (O1), **M2** = G020-G029 (O4), **M3 (core, never 
 
 ## 8. Submission (M8)
 - [ ] **G115** Public GitHub repository with LICENSE (MIT, after the team agrees, rule 15). **Verify:** open the repo logged out.
-- [ ] **G116** README "Run locally" and "Deploy" sections complete (rule 10). **Verify:** G102.
-- [ ] **G117** README "Graph data model" with BLUEPRINT 5.1-5.3 tables and a diagram, plus a dependencies list (rule 9). **Verify:** README review.
-- [ ] **G118** README "Queries and algorithms": links `docs/queries.cypher`, explains Q1, Q2, R1, D1, P1, T3, A1-A4 in plain words, and a "Explore in FalkorDB Browser" walkthrough with two screenshots (hub lineage, tenant ruling trace). **Verify:** README review.
+- [x] **G116** README "Run locally" and "Deploy" sections complete (rule 10). **Verify:** G102. Done 18 Oct 2026: README Run locally (make targets) and Deploy (docs/DEPLOY.md); re-check the live URL after deploying.
+- [x] **G117** README "Graph data model" with BLUEPRINT 5.1-5.3 tables and a diagram, plus a dependencies list (rule 9). **Verify:** README review. Done 18 Oct 2026: README Graph data model tables, diagram, weight DNA nodes.
+- [x] **G118** README "Queries and algorithms": links `docs/queries.cypher`, explains Q1, Q2, R1, D1, P1, T3, A1-A4 in plain words, and a "Explore in FalkorDB Browser" walkthrough with two screenshots (hub lineage, tenant ruling trace). **Verify:** README review. Done 18 Oct 2026: README Queries and algorithms plus the FalkorDB capability table and W-queries.
 - [ ] **G119** Demo video (3 minutes) following BLUEPRINT section 15, uploaded and linked. **Verify:** link opens logged out.
-- [ ] **G120** README "Built with AI assistance" disclosure (Claude for research and specification, Cursor for implementation; humans wrote eval labels, reviewed code, verified sources) (rule 11). **Verify:** README review.
+- [x] **G120** README "Built with AI assistance" disclosure (Claude for research and specification, Cursor for implementation; humans wrote eval labels, reviewed code, verified sources) (rule 11). **Verify:** README review. Done 18 Oct 2026: README Built with AI assistance names Claude (research, spec, implementation from 18 Oct) and Cursor (first milestones).
 - [ ] **G121** Submission form completed before 18 Oct 2026, 23:00 IST: repo, video, live URL, tracks (Track 1 primary; Track 2; Track 3), team members registered (rule 1, 5, 7). **Verify:** confirmation screenshot.
 - [ ] **G122** `docs/EXPLAINER.md` rehearsed by every team member (rule 12). **Verify:** each member explains Q1, R1 and D1 aloud.
 - [ ] **G123** Blog post draft for the side prize, published after submission. *(cuttable)*

@@ -253,15 +253,25 @@ npm run dev -- -p 3001
 
 If something else is already listening on port 6379, publish FalkorDB on another host port in a `docker-compose.override.yml`. The API container still reaches it at `falkordb:6379` on the Compose network.
 
-API tests, against the FalkorDB service container:
+Common tasks are `make` targets:
 
-```bash
-docker compose run --rm -v "$PWD:/repo" -w /repo/services/api -e PYTHONPATH=/repo/services/api api pytest
-```
+| Target | What |
+|---|---|
+| `make up` / `make down` | start or stop FalkorDB and the API |
+| `make web` | the web app on port 3001 |
+| `make test` | API tests against the FalkorDB service container |
+| `make smoke` | 13 end-to-end checks (verdicts, lineage, replay, weight DNA, MCP, pages) |
+| `make eval` | re-run the frozen eval into `eval/report.json` |
+| `make crawl` | fingerprint the foundation references and demo findings |
+| `make demo-reset` | put the compounding demo back to its start state |
+| `make reset` | re-seed the fictional tenants (never the hub) |
+| `make export` / `make import` | snapshot or restore the graphs with `DUMP`/`RESTORE` |
+
+A fresh FalkorDB starts with only the fictional companies. Either run `make crawl` (about 25 minutes with `HF_TOKEN`) or restore an export.
 
 ## Deploy
 
-The intended deployment is the web app on Vercel and the API plus FalkorDB on Railway, with FalkorDB on private networking, a volume at `/var/lib/falkordb/data`, and `requirepass` set. That deployment is not up yet. Until it is, `docker compose up` is the way to run ModelBrain.
+One Railway project with three services: FalkorDB (private networking only, a volume at `/var/lib/falkordb/data`, `requirepass`), the API (`services/api/Dockerfile`, listens on `$PORT`) and the web app (`apps/web`). Step by step, including seeding production from a local export in seconds and the smoke test: [`docs/DEPLOY.md`](docs/DEPLOY.md). Judge-day operations: [`docs/RUNBOOK.md`](docs/RUNBOOK.md).
 
 ## What is in the repo
 
@@ -273,10 +283,14 @@ The intended deployment is the web app on Vercel and the API plus FalkorDB on Ra
 | [`docs/UI.md`](docs/UI.md) | Pages and copy |
 | [`docs/GOALS.md`](docs/GOALS.md) | The build list and acceptance tests |
 | [`docs/EXPLAINER.md`](docs/EXPLAINER.md) | Two-minute explanation of the graph |
+| [`docs/DEMO.md`](docs/DEMO.md) | The 3-minute demo script |
+| [`docs/DEPLOY.md`](docs/DEPLOY.md) / [`docs/RUNBOOK.md`](docs/RUNBOOK.md) | Deploying on Railway; judge-day operations |
+| [`docs/ADDENDUM_WEIGHT_DNA.md`](docs/ADDENDUM_WEIGHT_DNA.md) | The weight DNA specification and its evidence |
+| [`actions/modelbrain-check`](actions/modelbrain-check) | GitHub Action that gates pull requests |
 | [`data/`](data/) | Clause locators, EU country list, roots, demo tenants. No licence prose |
 | [`services/api`](services/api) | The API |
 | [`apps/web`](apps/web) | The web app |
-| [`eval/`](eval/) | Frozen eval set: 40 models, 80 labels. Written by an agent on 18 Oct 2026 at the owner's request, before the clause engine |
+| [`eval/`](eval/) | Frozen eval: 40 models, 160 cases (default and strict). Drafted by an agent on 18 Oct 2026 at the owner's request, before the clause engine; reviewed by a person. Latest run: false ALLOW 0, default accuracy 0.85 |
 
 ## Licence
 
