@@ -564,6 +564,20 @@ MATCH (d:Deployment) WHERE d.model_id = $id
 RETURN count(d) AS deployments
 """
 
+X16 = """
+MATCH p = (m:Model)-[:DERIVED_FROM*1..6]->(a:Model)
+WHERE all(r IN relationships(p) WHERE r.tier >= 1)
+MATCH (m)-[:DECLARES]->(ml:License), (a)-[:DECLARES]->(l:License)
+WHERE ml.key IN $permissive AND NOT l.key IN $permissive AND l.key <> 'unknown'
+RETURN DISTINCT m.id AS id
+"""
+
+X17 = """
+MATCH (m:Model)
+SET m.declared_differs = m.id IN $ids
+RETURN count(m) AS models
+"""
+
 QUERIES = {
     "SCHEMA": SCHEMA,
     "I1": I1,
@@ -639,4 +653,6 @@ QUERIES = {
     "X13": X13,
     "X14": X14,
     "X15": X15,
+    "X16": X16,
+    "X17": X17,
 }

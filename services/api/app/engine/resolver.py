@@ -120,25 +120,30 @@ def run_resolver(graph: str = "hub") -> dict[str, Any]:
     return report
 
 
+# Licence keys a card can carry that impose no field-of-use, geography or attribution terms
+# beyond a notice. A permissive card over a restrictive ancestor is a relabel.
+PERMISSIVE = (
+    "apache-2.0",
+    "mit",
+    "bsd-2-clause",
+    "bsd-3-clause",
+    "cc-by-4.0",
+    "cc-by-sa-4.0",
+    "cc0-1.0",
+    "wtfpl",
+    "unlicense",
+)
+
+
 def set_declared_differs(graph: str = "hub") -> int:
-    """G059: flag models whose declared licence differs from an inherited ancestor licence."""
-    rows = as_rows(
-        db.ro_query(
-            graph,
-            """
-            MATCH (m:Model)-[:DERIVED_FROM*1..6]->(a:Model)-[:DECLARES]->(l:License)
-            WHERE m.declared_license IS NOT NULL AND l.key IS NOT NULL
-              AND m.declared_license <> l.key
-            RETURN DISTINCT m.id AS id
-            """,
-        )
-    )
-    ids = {str(r["id"]) for r in rows if r.get("id")}
-    db.query(graph, "MATCH (m:Model) SET m.declared_differs = false")
-    for model_id in ids:
-        db.query(
-            graph,
-            "MATCH (m:Model {id: $id}) SET m.declared_differs = true",
-            {"id": model_id},
-        )
+    """G059: flag models whose declared licence differs from an inherited ancestor licence.
+
+    Compares normalised licence keys (the card's raw string, e.g. "llama3.1", never matched
+    the key "llama3_1", so nearly every model was flagged), over trusted edges only.
+    """
+    from app.graph.queries import X16, X17
+
+    rows = as_rows(db.ro_query(graph, X16, {"permissive": list(PERMISSIVE)}))
+    ids = sorted({str(r["id"]) for r in rows if r.get("id")})
+    db.query(graph, X17, {"ids": ids})
     return len(ids)

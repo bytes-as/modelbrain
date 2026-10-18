@@ -84,3 +84,38 @@ def test_resolver_infers_parent_and_strict_cannot_determine() -> None:
             db.delete_graph(graph)
         except Exception:
             pass
+
+
+def test_declared_differs_compares_licence_keys_over_trusted_edges() -> None:
+    from app.engine.resolver import set_declared_differs
+
+    db.connect(tries=5, delay_s=0.5)
+    graph = f"g059_{uuid4().hex[:8]}"
+    try:
+        db.query(
+            graph,
+            "CREATE (l31:License {key:'llama3_1'}), (ap:License {key:'apache-2.0'}),"
+            " (base:Model {id:'meta/base', declared_license:'llama3.1'})-[:DECLARES]->(l31),"
+            " (inst:Model {id:'meta/inst', declared_license:'llama3.1'})-[:DECLARES]->(l31),"
+            " (relabel:Model {id:'x/relabel', declared_license:'apache-2.0'})-[:DECLARES]->(ap),"
+            " (weak:Model {id:'y/weak', declared_license:'apache-2.0'})-[:DECLARES]->(ap),"
+            " (inst)-[:DERIVED_FROM {tier:2}]->(base),"
+            " (relabel)-[:DERIVED_FROM {tier:1}]->(inst),"
+            " (weak)-[:DERIVED_FROM {tier:0}]->(base),"
+            " (l33:License {key:'llama3_3'}),"
+            " (newer:Model {id:'meta/newer', declared_license:'llama3.3'})-[:DECLARES]->(l33),"
+            " (newer)-[:DERIVED_FROM {tier:2}]->(base)",
+        )
+        assert set_declared_differs(graph) == 1
+        flags = dict(
+            db.ro_query(graph, "MATCH (m:Model) RETURN m.id, m.declared_differs").result_set
+        )
+        assert flags == {
+            "meta/base": False,
+            "meta/inst": False,
+            "x/relabel": True,
+            "y/weak": False,
+            "meta/newer": False,  # a newer licence in the same family is not a relabel
+        }
+    finally:
+        db.delete_graph(graph)

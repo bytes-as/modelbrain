@@ -551,3 +551,15 @@ RETURN m.sha AS sha, m.declared_license AS declared_license, coalesce(m.has_lice
 // X15: (tenant graph) does this company deploy a model (sandbox users may only check their own)
 MATCH (d:Deployment) WHERE d.model_id = $id
 RETURN count(d) AS deployments
+
+// X16: (hub) relabels: the card declares a permissive licence but a trusted ancestor (tier >= 1) carries a restrictive one
+MATCH p = (m:Model)-[:DERIVED_FROM*1..6]->(a:Model)
+WHERE all(r IN relationships(p) WHERE r.tier >= 1)
+MATCH (m)-[:DECLARES]->(ml:License), (a)-[:DECLARES]->(l:License)
+WHERE ml.key IN $permissive AND NOT l.key IN $permissive AND l.key <> 'unknown'
+RETURN DISTINCT m.id AS id
+
+// X17: (hub) set the declared_differs flag for every model in one pass
+MATCH (m:Model)
+SET m.declared_differs = m.id IN $ids
+RETURN count(m) AS models
