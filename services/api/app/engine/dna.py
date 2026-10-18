@@ -19,7 +19,7 @@ from typing import Any
 
 from app.config import get_settings
 from app.graph import db
-from app.graph.queries import R3, W0, W1, W1B, W2, W3, W7, W10, W11, W12, W13, W14, W15, X5
+from app.graph.queries import R3, W0, W1, W1B, W2, W3, W7, W10, W11, W12, W13, W14, W15, X5, X21
 from app.graph.rows import as_rows
 from app.hf.cache import DiskCache
 from app.hf.client import HFClient, HubUnavailable
@@ -281,6 +281,9 @@ def resolve_model(graph: str, model_id: str) -> dict[str, Any] | None:
 
 def run_dna_resolver(graph: str = "hub") -> dict[str, Any]:
     started = time.monotonic()
+    backwards = as_rows(db.query(graph, X21))
+    if backwards and int(backwards[0]["removed"]):
+        log.warning("removed backwards weight edges", extra={"count": int(backwards[0]["removed"])})
     report: dict[str, Any] = {
         "graph": graph,
         "edges_created": 0,

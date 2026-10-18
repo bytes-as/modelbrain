@@ -391,6 +391,7 @@ ORDER BY sim DESC, is_root DESC, created_at ASC LIMIT 5
 
 // W3: write or corroborate a single-parent weight edge; upgrades a weaker inferred edge, never changes a declared one
 MATCH (c:Model {id:$child}), (p:Model {id:$parent})
+WHERE NOT (p)-[:DERIVED_FROM*1..6]->(c)
 MERGE (c)-[e:DERIVED_FROM]->(p)
 ON CREATE SET e.relation = 'inferred', e.source = 'inferred', e.method = 'weights', e.conf = $sim, e.tier = $tier,
   e.evidence = $evidence, e.confirmations = 0, e.confirmers = []
@@ -423,6 +424,7 @@ MATCH (m:Model) RETURN coalesce(m.dna_status, 'NOT_RUN') AS status, count(m) AS 
 MATCH (c:Model {id:$child})
 UNWIND $parents AS pr
 MATCH (p:Model {id:pr.id})
+WHERE NOT (p)-[:DERIVED_FROM*1..6]->(c)
 MERGE (c)-[e:DERIVED_FROM]->(p)
 ON CREATE SET e.relation = 'merge', e.source = 'inferred', e.method = 'weights_merge', e.conf = pr.r2, e.tier = $tier,
   e.share = pr.share, e.evidence = pr.evidence, e.confirmations = 0, e.confirmers = []
@@ -600,3 +602,11 @@ OPTIONAL MATCH (d)-[:RESULTED_IN]->(o:Outcome)
 RETURN d.num AS num, d.title AS title, d.status AS status, d.opened_at AS opened_at, d.is_pr AS is_pr,
        d.url AS url, o.kind AS outcome, o.days AS days
 ORDER BY d.num DESC
+
+// X21: (hub) remove inferred weight edges that point from an older model to a newer one (never a valid parent)
+MATCH (c:Model)-[e:DERIVED_FROM]->(p:Model)
+WHERE e.source = 'inferred' AND e.method IN ['weights', 'weights_merge']
+  AND c.created_at IS NOT NULL AND p.created_at IS NOT NULL AND c.created_at < p.created_at
+WITH collect(e) AS bad
+FOREACH (x IN bad | DELETE x)
+RETURN size(bad) AS removed

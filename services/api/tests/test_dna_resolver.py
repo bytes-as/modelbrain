@@ -362,3 +362,18 @@ def test_one_query_from_weights_to_clauses(graph: str) -> None:
     assert rows[0]["weights_parent"] == "meta/base"
     assert rows[0]["license"] == "llama3_1"
     assert sorted(rows[0]["clauses"]) == ["llama3_1.aup", "llama3_1.mau_700m"]
+
+
+def test_weight_edges_never_close_a_cycle(graph: str) -> None:
+    from app.graph.queries import W3
+
+    _model(graph, "u/mirror", "2024-09-25")
+    _model(graph, "x/finetune", "2024-11-19")
+    params = {"sim": 0.9998, "tier": 1, "evidence": "weights"}
+    db.query(graph, W3, {"child": "x/finetune", "parent": "u/mirror", **params})
+    back = as_rows(db.query(graph, W3, {"child": "u/mirror", "parent": "x/finetune", **params}))
+    assert back == []
+    edges = as_rows(
+        db.ro_query(graph, "MATCH (a)-[:DERIVED_FROM]->(b) RETURN a.id AS a, b.id AS b")
+    )
+    assert edges == [{"a": "x/finetune", "b": "u/mirror"}]

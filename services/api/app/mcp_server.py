@@ -30,7 +30,8 @@ def _format_can_i_use(decided: dict[str, Any], hq: str) -> str:
         line1 += f" (EU company; {reason})" if reason else " (EU company)"
     lines = [line1]
     if decided.get("paths"):
-        lines.append("Path: " + " -> ".join(decided["paths"][0]["path"]))
+        deepest = max(decided["paths"], key=lambda p: len(p["path"]))
+        lines.append("Path: " + " -> ".join(deepest["path"]))
     for hit in (decided.get("blocking") or decided.get("obligations") or [])[:3]:
         lines.append(f"- {hit.get('clause_id')}: {hit.get('summary')} ({hit.get('source_url')})")
     base = get_settings().next_public_api_url.replace(":8000", ":3001")
@@ -67,6 +68,21 @@ async def can_i_use(
         "distributes_weights": distributes_weights,
         "end_user_only": False,
     }
+    import asyncio
+    import re
+
+    if not re.match(r"^[\w.-]+/[\w.-]+$", model_id):
+        return "VERDICT: INVALID_INPUT (model_id must look like owner/name)"
+    from app.routes.verdict import _needs_ingest
+
+    if _needs_ingest(model_id):
+        # Agents ask about models we have never seen: ingest (and fingerprint) first.
+        from app.jobs.runner import _ingest_once
+
+        try:
+            await asyncio.wait_for(_ingest_once(model_id), timeout=45.0)
+        except Exception as exc:
+            log.warning("mcp ingest failed for %s: %s", model_id, type(exc).__name__)
     decided = verdict_from_graph(model_id, context, graph="hub", min_tier=2 if strict else 1)
     if tenant:
         try:

@@ -122,6 +122,7 @@ ORDER BY sim DESC, is_root DESC, created_at ASC LIMIT 5
 
 // W3: write or corroborate a single-parent weight edge (never changes a declared edge's source or tier)
 MATCH (c:Model {id:$child}), (p:Model {id:$parent})
+WHERE NOT (p)-[:DERIVED_FROM*1..6]->(c)
 MERGE (c)-[e:DERIVED_FROM]->(p)
 ON CREATE SET e.relation = 'inferred', e.source = 'inferred', e.method = 'weights', e.conf = $sim, e.tier = $tier,
   e.evidence = $evidence, e.confirmations = 0, e.confirmers = []
@@ -154,6 +155,7 @@ MATCH (m:Model) RETURN coalesce(m.dna_status, 'NOT_RUN') AS status, count(m) AS 
 MATCH (c:Model {id:$child})
 UNWIND $parents AS pr
 MATCH (p:Model {id:pr.id})
+WHERE NOT (p)-[:DERIVED_FROM*1..6]->(c)
 MERGE (c)-[e:DERIVED_FROM]->(p)
 ON CREATE SET e.relation = 'merge', e.source = 'inferred', e.method = 'weights_merge', e.conf = pr.r2, e.tier = $tier,
   e.share = pr.share, e.evidence = pr.evidence, e.confirmations = 0, e.confirmers = []

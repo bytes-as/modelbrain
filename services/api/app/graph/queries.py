@@ -379,6 +379,7 @@ ORDER BY sim DESC, is_root DESC, created_at ASC LIMIT 5
 
 W3 = """
 MATCH (c:Model {id:$child}), (p:Model {id:$parent})
+WHERE NOT (p)-[:DERIVED_FROM*1..6]->(c)
 MERGE (c)-[e:DERIVED_FROM]->(p)
 ON CREATE SET e.relation = 'inferred', e.source = 'inferred', e.method = 'weights', e.conf = $sim, e.tier = $tier,
   e.evidence = $evidence, e.confirmations = 0, e.confirmers = []
@@ -415,6 +416,7 @@ W7 = """
 MATCH (c:Model {id:$child})
 UNWIND $parents AS pr
 MATCH (p:Model {id:pr.id})
+WHERE NOT (p)-[:DERIVED_FROM*1..6]->(c)
 MERGE (c)-[e:DERIVED_FROM]->(p)
 ON CREATE SET e.relation = 'merge', e.source = 'inferred', e.method = 'weights_merge', e.conf = pr.r2, e.tier = $tier,
   e.share = pr.share, e.evidence = pr.evidence, e.confirmations = 0, e.confirmers = []
@@ -619,6 +621,15 @@ RETURN d.num AS num, d.title AS title, d.status AS status, d.opened_at AS opened
 ORDER BY d.num DESC
 """
 
+X21 = """
+MATCH (c:Model)-[e:DERIVED_FROM]->(p:Model)
+WHERE e.source = 'inferred' AND e.method IN ['weights', 'weights_merge']
+  AND c.created_at IS NOT NULL AND p.created_at IS NOT NULL AND c.created_at < p.created_at
+WITH collect(e) AS bad
+FOREACH (x IN bad | DELETE x)
+RETURN size(bad) AS removed
+"""
+
 QUERIES = {
     "SCHEMA": SCHEMA,
     "I1": I1,
@@ -700,4 +711,5 @@ QUERIES = {
     "X18": X18,
     "X19": X19,
     "X20": X20,
+    "X21": X21,
 }
