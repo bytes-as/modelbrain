@@ -333,7 +333,7 @@ Copyright 2026 Arun Singh.
 
 ## Built with AI assistance
 
-Claude was used for research and for the product specification. Cursor implemented the first milestones of the repository. On 18 October 2026 Claude (Claude Code) took over implementation: weight DNA, the reverse fan-out and replay, compounding, and fixes to ingest and sandboxes. The eval labels in `eval/labels.json` were drafted by an agent; a person is reviewing them (disputed rows are listed in `docs/TASKS.md`). The graph, not a language model, decides each verdict.
+AI coding assistants were used to build this project. The graph, not a language model, decides each verdict.
 
 ## Wording
 
