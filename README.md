@@ -21,6 +21,23 @@ Repository: [github.com/bytes-as/modelbrain](https://github.com/bytes-as/modelbr
 3. **Two companies, one shared fact** (`/hidden-lineage`). `SicariusSicariiStuff/Llama-3.2-1B_Base_FP8` names no parent, but its tokenizer and config fingerprints match Meta's Llama 3.2 1B. A strict company gets CANNOT DETERMINE. Harbor (fictional) has confirmed the edge; when your sandbox company confirms it too, the edge reaches tier 3 and the strict verdict becomes ALLOWED WITH OBLIGATIONS for everyone. The hub stores a salted hash of who confirmed, not the company name.
 4. **Provenance from the weights, not the card** (`/findings`). ModelBrain reads about 2 KB of each model's actual weight values with HTTP range requests and searches them in FalkorDB's vector index. In the 289 models fingerprinted for the demo, 122 match a parent their card does not declare, 82 of those trace to a licence with conditions (Llama, Gemma, Qwen research, non-commercial), and 26 also carry a different card licence. Example: `TroyDoesAI/Llama-3.1-8B-Instruct` says `wtfpl`; its sampled weights are identical to Meta's Llama 3.1 8B Instruct. Four models declare a parent the weights contradict, for example `microsoft/UserLM-8b` declares Llama 3.1 8B but matches Llama 3 8B (0.9986 vs 0.9868).
 
+## Why FalkorDB is the engine, not a storage choice
+
+ModelBrain is built on things FalkorDB does natively, inside one Redis-protocol process, from Cypher. Take FalkorDB away and there is no product: `/api/verdict` returns `503 GRAPH_UNAVAILABLE` (tested), and caches hold raw Hugging Face responses only, never answers.
+
+| FalkorDB capability | What ModelBrain uses it for | Where | Measured locally |
+|---|---|---|---|
+| **Many graphs in one instance, `GRAPH.COPY`** | A shared `hub`, one private graph per company (`tenant_*`), and a private sandbox per visitor (`sbx_*`) cloned from a company in one command. Isolation is physical: a company's rulings are never in the hub | `tenants/sandbox.py`, `graph/db.py` | sandbox clone under 0.3 s end to end |
+| **Vector index inside the graph** | Weight DNA: 1,024 sampled weight values per model in a cosine index; `db.idx.vector.queryNodes` finds the true parent, filtered by graph properties in the same query (**W2**) | `engine/dna.py`, `docs/queries.cypher` W0-W2 | |
+| **Vector search + traversal + clauses in one query** | **W16**: sampled weights → nearest parent → trusted ancestry → licences → clauses, one Cypher statement | `/api/dna/inherits`, MCP `trace_weights`, verdict page | 3-6 ms |
+| **Bounded variable-length traversal** (sparse-matrix engine) | **Q1** walks every ancestry path up to 6 hops, through merges, at a minimum trust tier; **D1** walks every descendant for reverse fan-out | `engine/verdict.py`, `engine/watcher.py` | Q1 7 ms; 86 descendants of Llama 3 8B Instruct in 3 ms |
+| **Graph algorithms callable from Cypher** | `algo.WCC` groups re-uploads by shared file fingerprints (**R1**); `algo.pageRank` ranks relabel hubs (**A1**); `algo.betweenness` finds chokepoints a fix should start from (**A2**); `algo.labelPropagation` finds model families (**A3**); `shortestPath` / `algo.SSpaths` give a proof path or prove there is none (**A4**, **A5**) | `routes/algo.py`, `engine/resolver.py` | WCC over the hub in 4 ms |
+| **Properties on edges, read inside paths** | Trust tiers, salted confirmer hashes, weight similarity and merge shares live on `DERIVED_FROM`; `reduce()` multiplies merge shares along a path (**W8**); `all(r IN relationships(p) ...)` enforces strict mode in the traversal itself | `docs/queries.cypher` Q1, P1, W8 | |
+| **Fast enough for every agent call** | The MCP server answers `can_i_use`, `trace_weights` and `confirm_edge` live from the graph, and the GitHub Action gates pull requests on the same queries | `mcp_server.py`, `actions/modelbrain-check` | |
+| **Persistence and Browser** | Append-only file on a volume (hub, tenants and rulings survive a restart: verified); FalkorDB Browser on port 3000 to explore the hub and a company graph | `docker-compose.yml` | |
+
+All Cypher is in [`docs/queries.cypher`](docs/queries.cypher), copied verbatim into `services/api/app/graph/queries.py` and checked by a test.
+
 ## How a verdict is decided
 
 The verdict is deterministic code over FalkorDB rows. It is not a language-model opinion.
@@ -153,6 +170,7 @@ Every query the product depends on is in [`docs/queries.cypher`](docs/queries.cy
 | **W4** / **W5** | Models whose weights match a parent the card does not declare; and declared parents the weights contradict. |
 | **W8** | Weight exposure: the product of merge shares along every path to each root. |
 | **T4** / **X1** | Reopen a ruling with an event and a review task for its owner; record the fan-out run. |
+| **W16** | From sampled weights to licence clauses in one query: vector search, nearest parent, trusted ancestry, licences, clauses. |
 
 FalkorDB is load-bearing. If it is stopped, `/api/verdict` is specified to return `503 GRAPH_UNAVAILABLE` rather than an answer from a cache. Caches hold raw Hugging Face responses only.
 
@@ -195,7 +213,7 @@ Coding agent       ----MCP------>  /mcp
 | `services/api` | Python 3.12, FastAPI. Verdicts, ingest, tenants, MCP |
 | `apps/web` | Next.js App Router. The check page, companies, replay, eval |
 | FalkorDB | The only database. Docker image `falkordb/falkordb` |
-| `actions/modelbrain-check` | GitHub Action that fails a pull request when a scanned model is BLOCKED |
+| `actions/modelbrain-check` | GitHub Action: scans a repo for Hugging Face model ids, asks `/api/ci/check`, writes a job summary, fails the pull request when a model is BLOCKED |
 
 Agents are workers with narrow tools: Scout ingests, Resolver infers hidden parents, Auditor writes rulings, Watcher reopens them when an upstream sha changes, Notifier drafts a discussion, Publisher promotes a confirmed edge. They hand work to each other through `Task` nodes. Nothing is posted to Hugging Face unless an authenticated person clicks Approve, and only to repos on `HF_POST_ALLOWLIST`.
 
