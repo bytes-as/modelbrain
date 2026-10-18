@@ -161,24 +161,37 @@ export function CompaniesView() {
 
   useEffect(() => {
     const base = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
-    fetch(`${base}/api/tenants`)
+    let own: { tenant: string; token: string } | null = null;
+    try {
+      own = JSON.parse(sessionStorage.getItem("modelbrain_sandbox") ?? "null");
+    } catch {
+      own = null;
+    }
+    const auth: Record<string, string> = own?.token ? { "X-Tenant-Token": own.token } : {};
+    fetch(`${base}/api/tenants`, { headers: auth })
       .then(async (response) => {
         if (!response.ok) throw new Error("tenants");
         const listed = (await response.json()) as Tenant[];
-        const fixed = listed.filter(
-          (item) => item.kind !== "sandbox" || item.name.startsWith("sbx_"),
+        // The two demo companies, plus this visitor's own sandbox when it is still alive.
+        const chosen = listed.filter(
+          (item) => item.kind === "fixed" || (item.kind === "sandbox" && item.name === own?.tenant),
         );
-        // Prefer fixed tenants for the two-column demo; include caller's sandbox if present.
-        const chosen = listed.filter((item) => item.kind === "fixed" || item.kind === "sandbox");
-        setTenants(chosen.length ? chosen : fixed);
-        const overviews = await Promise.all(
-          (chosen.length ? chosen : fixed).map(async (tenant) => {
-            const next = await fetch(`${base}/api/tenants/${tenant.name}/overview`);
+        const settled = await Promise.allSettled(
+          chosen.map(async (tenant) => {
+            const next = await fetch(`${base}/api/tenants/${tenant.name}/overview`, {
+              headers: tenant.kind === "sandbox" ? auth : {},
+            });
             if (!next.ok) throw new Error(tenant.name);
             return [tenant.name, (await next.json()) as Overview] as const;
           }),
         );
-        setColumns(Object.fromEntries(overviews));
+        const loaded = settled.flatMap((result) =>
+          result.status === "fulfilled" ? [result.value] : [],
+        );
+        if (loaded.length === 0) throw new Error("overviews");
+        const names = new Set(loaded.map(([name]) => name));
+        setTenants(chosen.filter((tenant) => names.has(tenant.name)));
+        setColumns(Object.fromEntries(loaded));
       })
       .catch(() => setError("Could not load the companies."));
   }, []);

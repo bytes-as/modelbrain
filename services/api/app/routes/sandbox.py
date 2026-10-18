@@ -6,7 +6,7 @@ from fastapi import APIRouter, Header, Query
 from pydantic import BaseModel
 
 from app.tenants import sandbox as sandbox_mod
-from app.tenants.auth import list_sandbox_registry, resolve_tenant
+from app.tenants.auth import list_sandbox_registry, resolve_tenant, token_hash
 from app.tenants.bootstrap import list_tenants, overview
 from app.tenants.conversations import list_conversations
 from app.tenants.rulings import decision_trace
@@ -43,7 +43,11 @@ def get_tenants(
     x_tenant_token: str | None = Header(default=None, alias="X-Tenant-Token"),
 ) -> list[dict[str, object]]:
     found = list_tenants()
+    # Only the caller's own sandbox: other visitors' sandboxes are private and short-lived.
+    mine = token_hash(x_tenant_token) if x_tenant_token else None
     for name, record in list_sandbox_registry().items():
+        if mine is None or record.get("token_hash") != mine:
+            continue
         found.append(
             {
                 "name": name,

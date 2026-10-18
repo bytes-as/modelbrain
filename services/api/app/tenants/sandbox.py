@@ -101,8 +101,10 @@ def cleanup_expired() -> int:
     """Delete expired sandboxes, and sandbox graphs nobody can reach any more."""
     now = int(time.time() * 1000)
     removed = 0
+    graphs = {str(name) for name in db.list_graphs()}
     for name, record in list(list_sandbox_registry().items()):
-        if int(record["expires_at"]) < now:
+        # Expired, or registered without a graph (e.g. a hub restored from another instance).
+        if int(record["expires_at"]) < now or name not in graphs:
             delete_sandbox(name)
             removed += 1
     live = set(list_sandbox_registry())

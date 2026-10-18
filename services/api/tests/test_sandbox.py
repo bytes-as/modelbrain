@@ -71,3 +71,32 @@ def test_sandbox_survives_a_restart_and_orphans_are_removed() -> None:
         delete_sandbox(name)
         if orphan in db.list_graphs():
             db.delete_graph(orphan)
+
+
+def test_tenant_list_shows_only_the_callers_sandbox() -> None:
+    client = TestClient(app)
+    mine = client.post("/api/sandbox", json={"template": "kestrel"}).json()
+    other = client.post("/api/sandbox", json={"template": "harbor"}).json()
+
+    anonymous = {t["name"] for t in client.get("/api/tenants").json()}
+    assert "tenant_kestrel" in anonymous
+    assert mine["tenant"] not in anonymous and other["tenant"] not in anonymous
+
+    listed = client.get("/api/tenants", headers={"X-Tenant-Token": mine["token"]}).json()
+    names = {t["name"] for t in listed}
+    assert mine["tenant"] in names
+    assert other["tenant"] not in names
+
+
+def test_registry_entry_without_a_graph_is_dropped() -> None:
+    import time
+
+    from app.tenants import auth
+    from app.tenants.sandbox import cleanup_expired
+
+    ghost = "sbx_0000ghost"
+    auth.restore_sandbox(
+        ghost, "hash", template="kestrel", expires_at=int(time.time() * 1000) + 3_600_000
+    )
+    cleanup_expired()
+    assert ghost not in auth.list_sandbox_registry()
