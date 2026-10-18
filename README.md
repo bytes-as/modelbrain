@@ -290,7 +290,7 @@ One Railway project with three services: FalkorDB (private networking only, a vo
 | [`data/`](data/) | Clause locators, EU country list, roots, demo tenants. No licence prose |
 | [`services/api`](services/api) | The API |
 | [`apps/web`](apps/web) | The web app |
-| [`eval/`](eval/) | Frozen eval: 40 models, 160 cases (default and strict). Drafted by an agent on 18 Oct 2026 at the owner's request, before the clause engine; reviewed by a person. Latest run: false ALLOW 0, default accuracy 0.85 |
+| [`eval/`](eval/) | Frozen eval: 40 models, 160 cases (default and strict). Drafted by an agent on 18 Oct 2026 at the owner's request, before the clause engine; human review pending (disputed rows in `docs/TASKS.md`). Latest run: false ALLOW 0, default accuracy 0.85 |
 
 ## Licence
 
@@ -302,7 +302,7 @@ Copyright 2026 Arun Singh.
 
 ## Built with AI assistance
 
-Claude was used for research and for the product specification. Cursor implemented the first milestones of the repository. On 18 October 2026 Claude (Claude Code) took over implementation: weight DNA, the reverse fan-out and replay, compounding, and fixes to ingest and sandboxes. The eval labels in `eval/labels.json` were drafted by an agent and are reviewed by a person. The graph, not a language model, decides each verdict.
+Claude was used for research and for the product specification. Cursor implemented the first milestones of the repository. On 18 October 2026 Claude (Claude Code) took over implementation: weight DNA, the reverse fan-out and replay, compounding, and fixes to ingest and sandboxes. The eval labels in `eval/labels.json` were drafted by an agent; a person is reviewing them (disputed rows are listed in `docs/TASKS.md`). The graph, not a language model, decides each verdict.
 
 ## Wording
 
