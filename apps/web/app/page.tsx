@@ -1,3 +1,5 @@
+import { CheckForm } from "./components/check-form";
+
 export default function HomePage() {
   return (
     <main>
@@ -6,6 +8,7 @@ export default function HomePage() {
         Paste any Hugging Face model id. We follow its real ancestry in FalkorDB and tell you what
         its upstream licences require for your company.
       </p>
+      <CheckForm />
     </main>
   );
 }
