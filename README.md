@@ -90,6 +90,20 @@ Wording on every finding: "metadata and weights disagree" and "obligations of th
 | **LLM gateway** | Optional OpenRouter phrasing for explanations and drafts; the graph still decides | Built; no key configured, so templates are used |
 | **Multi-LLM card-only baseline** | `eval/baseline_llm.py` asks LLMs for verdicts from card metadata only | Built; not run (needs an OpenRouter key) |
 
+## Use it from an agent or CI
+
+```bash
+claude mcp add --transport http modelbrain http://localhost:8000/mcp
+```
+
+Ask the agent to add a model to your code; it calls `can_i_use` first. A recorded session with Claude Code: asked to add `OPEA/Llama-3.2V-11B-cot-int4-sym-inc` for a German company, it called `can_i_use`, got BLOCKED with the path to Meta's Llama 3.2 Vision and the EU clause, and did not add the model. Other tools: `trace_weights`, `where_can_i_run`, `explain`, `lineage`, `proof_path`, `relabel_hubs`, `chokepoints`, `families`, `confirm_edge`, `watch`.
+
+In CI, `actions/modelbrain-check` scans a pull request for model ids and fails the check on BLOCKED.
+
+## Eval
+
+160 frozen cases (40 models, default and strict mode, an EU and a US company). Labels hash: `8794f109bc8445d7b873379b17081d588e8782c82dff82bc7d374710c652d92d` (`eval/labels.sha256`). Latest run: false ALLOW 0, default accuracy 0.85; a scanner that reads only the declared licence matches 35%. Results are on `/eval`; the 12 cases where label and rules disagree are listed in `docs/TASKS.md`.
+
 ## Graph data model
 
 FalkorDB cannot query across graphs, so the application joins them. The **hub** answers "what does this model inherit?" A **tenant** graph answers "who uses it, under which context, and what did we decide?" One FalkorDB instance holds all of them.
