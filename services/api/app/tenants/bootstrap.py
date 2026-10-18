@@ -45,8 +45,11 @@ def ensure_tenants() -> None:
             pass
         db.query(graph, _script(root / filename))
     from app.graph.schema import apply_schema
+    from app.tenants.playbooks import seed_playbooks
 
     apply_schema()
+    for graph in TENANTS:
+        seed_playbooks(graph)
     _seed_rulings()
 
 

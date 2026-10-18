@@ -14,13 +14,16 @@ from app.graph.db import connect, health_snapshot, ro_query
 from app.graph.queries import C4
 from app.graph.rows import as_rows
 from app.graph.schema import apply_schema
-from app.observe import OriginAllowlistMiddleware, RequestIdMiddleware, configure_logging
 from app.jobs.runner import schedule_prewarm
+from app.mcp_server import mcp, mcp_http_app
+from app.observe import OriginAllowlistMiddleware, RequestIdMiddleware, configure_logging
+from app.routes.algo import router as algo_router
 from app.routes.ingest import router as ingest_router
 from app.routes.models import router as models_router
-from app.routes.tenants import router as tenants_router
+from app.routes.sandbox import router as tenants_router
 from app.routes.verdict import router as verdict_router
 from app.tenants.bootstrap import ensure_tenants
+from app.tenants.sandbox import cleanup_expired
 
 configure_logging()
 log = logging.getLogger("modelbrain")
@@ -41,8 +44,15 @@ async def lifespan(_app: FastAPI):
             ensure_tenants()
         except Exception:
             log.exception("tenant bootstrap failed")
+        try:
+            cleanup_expired()
+        except Exception:
+            log.warning("sandbox cleanup failed")
         schedule_prewarm()
-    yield
+    # MCP session manager (required for streamable HTTP)
+    mcp.streamable_http_app()
+    async with mcp.session_manager.run():
+        yield
 
 
 app = FastAPI(title="ModelBrain", version=VERSION, lifespan=lifespan)
@@ -59,6 +69,7 @@ install_error_handlers(app)
 app.include_router(verdict_router)
 app.include_router(ingest_router)
 app.include_router(models_router)
+app.include_router(algo_router)
 app.include_router(tenants_router)
 
 
@@ -86,3 +97,8 @@ def health() -> dict[str, object]:
         "hf": "degraded",
         "version": VERSION,
     }
+
+
+# Mount MCP last. FastMCP's app already serves `/mcp`
+# (BLUEPRINT: mount at "/", not under another /mcp prefix).
+app.mount("/", mcp_http_app())

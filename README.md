@@ -104,6 +104,16 @@ A changed answer is a new ruling that `SUPERSEDES` the old one.
 
 Demo tenants, both fictional: **Kestrel Analytics GmbH** (Germany) and **Harbor Apps Inc.** (United States).
 
+### Memory (Track 2)
+
+| Kind | Where it lives | Example query |
+|---|---|---|
+| **Episodic** | `Ruling` and `Event` history on the tenant graph | `MATCH (r:Ruling)<-[:ON]-(e:Event) RETURN r.verdict, e.kind, e.at ORDER BY e.at DESC LIMIT 20` |
+| **Semantic** | Hub facts: models, licences, clauses, fingerprints | `MATCH (m:Model)-[:DECLARES]->(l:License) RETURN m.id, l.key LIMIT 20` |
+| **Procedural** | `(:Playbook)` nodes per task kind, linked by `(Task)-[:FOLLOWS]->(Playbook)` | `MATCH (t:Task)-[:FOLLOWS]->(p:Playbook) RETURN t.kind, t.state, p.steps` |
+
+Conversation turns for MCP and web checks with a tenant are stored as `(Conversation)-[:HAS_TURN]->(Turn)` and `(Turn)-[:PRODUCED]->(Ruling)` when a ruling is written.
+
 ## Queries and algorithms
 
 Every query the product depends on is in [`docs/queries.cypher`](docs/queries.cypher) and copied into `services/api/app/graph/queries.py`. Paths are bounded (`*0..6` or `*1..6`). Reads use `ro_query`. Writes `MERGE` on ids.

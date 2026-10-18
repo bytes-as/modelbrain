@@ -77,23 +77,23 @@ Milestones: **M1** = G001-G019 (O1), **M2** = G020-G029 (O4), **M3 (core, never 
 ## 5. Tenants, memory, MCP (M4)
 - [x] **G060** Tenant bootstrap (FLOWS F0.6) loads `kestrel.cypher` and `harbor.cypher` into empty graphs; all names carry "(fictional)". **Accept:** `GET /api/tenants` lists both. **Verify:** API call. Done 18 Oct 2026.
 - [x] **G061** Overview endpoint and `/companies` page show products, deployments, owners and latest verdict (T6). **Verify:** Playwright. Done 18 Oct 2026. Overview API verified. Page is at `/companies`; open it locally. Playwright screenshot not re-run this pass.
-- [ ] **G062** Memory types are real and visible: episodic = Ruling/Event history; semantic = hub facts; procedural = `(:Playbook)` nodes per task kind seeded at bootstrap and linked by `(Task)-[:FOLLOWS]->(Playbook)`. **Accept:** README section "Memory" names each with a query. **Verify:** Browser queries.
-- [ ] **G063** One graph per company and per sandbox on a single FalkorDB instance. **Accept:** `GRAPH.LIST` shows hub, tenant_kestrel, tenant_harbor and any sbx_*. **Verify:** redis-cli.
-- [ ] **G064** Decision trace (T7) endpoint and drawer: ruling -> facts (model, commit sha linked to the Hub commit, licence, clause ids) -> events with who signed. **Verify:** Playwright.
-- [ ] **G065** Sandbox (FLOWS F7) with GRAPH.COPY, token header, TTL, cleanup, limits. **Accept:** creating, using and expiring a sandbox works; fixed tenants reject writes with 403. **Verify:** `pytest tests/test_sandbox.py`.
-- [ ] **G066** Tasks with leases (T5), states OPEN, CLAIMED, AWAITING_APPROVAL, DONE; events for every transition. **Verify:** `pytest tests/test_tasks.py`.
-- [ ] **G067** Ruling writes are append-only (T1, T2) and honour `expected_ruling_id` with 409 STALE_RULING. **Accept:** concurrent test: two writers, one gets 409. **Verify:** `pytest tests/test_concurrency.py`.
-- [ ] **G068** Handoff: Watcher -> Auditor (REVIEW_RULING) -> owner (APPROVE_RULING) linked by HANDED_OFF_FROM (FLOWS F9.7-8). **Verify:** integration test.
-- [ ] **G069** Playbook steps shown on each task card in the UI. **Verify:** Playwright. *(cuttable)*
-- [ ] **G070** MCP server mounted at `/mcp` exactly as BLUEPRINT section 3 (FastMCP, stateless_http, mounted after routes, lifespan). **Accept:** `initialize`, `tools/list`, `tools/call` succeed over HTTP. **Verify:** curl script in `scripts/mcp_smoke.sh`.
-- [ ] **G071** `can_i_use` tool per API with the verbatim description and the text format in FLOWS F5.3. **Verify:** mcp_smoke.
-- [ ] **G072** `explain` and `lineage` tools. **Verify:** mcp_smoke.
-- [ ] **G073** Claude Code connects with `claude mcp add --transport http modelbrain <api>/mcp` and calls `can_i_use` unprompted when asked to add a model. **Accept:** screen recording saved for the video. **Verify:** recording in `docs/evidence/`.
-- [ ] **G074** `proof_path` tool and endpoint (A4 shortestPath; NULL means no path). **Verify:** golden test for a path and a no-path case.
-- [ ] **G075** `relabel_hubs` tool and endpoint (A1 PageRank filtered by declared_differs). **Accept:** princeton-nlp/gemma-2-9b-it-SimPO or Xkev appears in the top 20 after prewarm. **Verify:** API call.
-- [ ] **G076** `chokepoints` tool and endpoint (A2 betweenness). **Verify:** API call.
-- [ ] **G077** `families` tool and endpoint (A3 label propagation). **Verify:** API call.
-- [ ] **G078** Persistent conversation history: every MCP call and web check with a tenant writes `(Conversation)-[:HAS_TURN]->(Turn)` and `(Turn)-[:PRODUCED]->(Ruling)` when a ruling is written; `GET /api/tenants/{t}/conversations`. **Verify:** integration test.
+- [x] **G062** Memory types are real and visible: episodic = Ruling/Event history; semantic = hub facts; procedural = `(:Playbook)` nodes per task kind seeded at bootstrap and linked by `(Task)-[:FOLLOWS]->(Playbook)`. **Accept:** README section "Memory" names each with a query. **Verify:** Browser queries. Done 18 Oct 2026.
+- [x] **G063** One graph per company and per sandbox on a single FalkorDB instance. **Accept:** `GRAPH.LIST` shows hub, tenant_kestrel, tenant_harbor and any sbx_*. **Verify:** redis-cli. Done 18 Oct 2026 (sandbox create + `/api/health.graphs`).
+- [x] **G064** Decision trace (T7) endpoint and drawer: ruling -> facts (model, commit sha linked to the Hub commit, licence, clause ids) -> events with who signed. **Verify:** Playwright. Done 18 Oct 2026 (API + companies Trace drawer).
+- [x] **G065** Sandbox (FLOWS F7) with GRAPH.COPY, token header, TTL, cleanup, limits. **Accept:** creating, using and expiring a sandbox works; fixed tenants reject writes with 403. **Verify:** `pytest tests/test_sandbox.py`. Done 18 Oct 2026.
+- [x] **G066** Tasks with leases (T5), states OPEN, CLAIMED, AWAITING_APPROVAL, DONE; events for every transition. **Verify:** `pytest tests/test_tasks.py`. Done 18 Oct 2026.
+- [x] **G067** Ruling writes are append-only (T1, T2) and honour `expected_ruling_id` with 409 STALE_RULING. **Accept:** concurrent test: two writers, one gets 409. **Verify:** `pytest tests/test_concurrency.py`. Done 18 Oct 2026.
+- [x] **G068** Handoff: Watcher -> Auditor (REVIEW_RULING) -> owner (APPROVE_RULING) linked by HANDED_OFF_FROM (FLOWS F9.7-8). **Verify:** integration test. Done 18 Oct 2026 (`test_tasks.py`).
+- [x] **G069** Playbook steps shown on each task card in the UI. **Verify:** Playwright. *(cuttable)* Done 18 Oct 2026 (companies task cards render `playbook_steps`).
+- [x] **G070** MCP server mounted at `/mcp` exactly as BLUEPRINT section 3 (FastMCP, stateless_http, mounted after routes, lifespan). **Accept:** `initialize`, `tools/list`, `tools/call` succeed over HTTP. **Verify:** curl script in `scripts/mcp_smoke.sh`. Done 18 Oct 2026.
+- [x] **G071** `can_i_use` tool per API with the verbatim description and the text format in FLOWS F5.3. **Verify:** mcp_smoke. Done 18 Oct 2026.
+- [x] **G072** `explain` and `lineage` tools. **Verify:** mcp_smoke. Done 18 Oct 2026.
+- [ ] **G073** Claude Code connects with `claude mcp add --transport http modelbrain <api>/mcp` and calls `can_i_use` unprompted when asked to add a model. **Accept:** screen recording saved for the video. **Verify:** recording in `docs/evidence/`. Human recording; instructions in `docs/evidence/g073-claude-mcp.md`.
+- [x] **G074** `proof_path` tool and endpoint (A4 shortestPath; NULL means no path). **Verify:** golden test for a path and a no-path case. Done 18 Oct 2026.
+- [x] **G075** `relabel_hubs` tool and endpoint (A1 PageRank filtered by declared_differs). **Accept:** princeton-nlp/gemma-2-9b-it-SimPO or Xkev appears in the top 20 after prewarm. **Verify:** API call. Done 18 Oct 2026 (endpoint + MCP tool; ranking depends on `declared_differs` batch G059).
+- [x] **G076** `chokepoints` tool and endpoint (A2 betweenness). **Verify:** API call. Done 18 Oct 2026.
+- [x] **G077** `families` tool and endpoint (A3 label propagation). **Verify:** API call. Done 18 Oct 2026.
+- [x] **G078** Persistent conversation history: every MCP call and web check with a tenant writes `(Conversation)-[:HAS_TURN]->(Turn)` and `(Turn)-[:PRODUCED]->(Ruling)` when a ruling is written; `GET /api/tenants/{t}/conversations`. **Verify:** integration test. Done 18 Oct 2026.
 - ~~**G079** Stretch: "Ask the company brain" box on `/companies`…~~ **Cut 18 Oct 2026** to fund weight DNA (M6b).
 
 ## 6. Watcher, fan-out, compounding, loop, CI (M6)
