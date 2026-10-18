@@ -84,11 +84,9 @@ def test_residency_proof_with_and_without_an_eu_provider(hub: str) -> None:
     none = asyncio.run(
         hosted.where_can_i_run("meta-llama/Llama-3.2-11B-Vision-Instruct", "EU", hub, refresh=False)
     )
-    assert none["residency"] == {
-        "requested": "EU",
-        "ok": False,
-        "proof": "no provider serves this model from an allowed datacenter",
-    }
+    assert none["residency"]["ok"] is False
+    assert none["residency"]["proof"] == "no provider serves this model from an allowed datacenter"
+    assert none["residency"]["unverified_providers"] == []
     assert {p["slug"] for p in none["hosted"][0]["providers"]} == {"us-host"}
 
 

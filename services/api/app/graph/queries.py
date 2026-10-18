@@ -678,6 +678,28 @@ RETURN d.id AS id, d.model_id AS model_id, d.target_repo AS target_repo, d.title
 ORDER BY d.created_at DESC LIMIT $limit
 """
 
+X29 = """
+MATCH (m:Model)-[d:DECLARES {source: 'matched_text'}]->(:License)
+MATCH (o:License {key: 'other'})
+DELETE d
+MERGE (m)-[:DECLARES]->(o)
+RETURN count(m) AS restored
+"""
+
+X30 = """
+MATCH (:HostedModel {id: $or_id})-[r:IS]->(:Model)
+DELETE r
+RETURN count(r) AS dropped
+"""
+
+X31 = """
+MATCH (m:Model)
+WHERE m.sha IS NULL AND m.dna_status IS NULL AND NOT (m)--()
+WITH collect(m) AS orphans
+FOREACH (x IN orphans | DELETE x)
+RETURN size(orphans) AS removed
+"""
+
 QUERIES = {
     "SCHEMA": SCHEMA,
     "I1": I1,
@@ -767,4 +789,7 @@ QUERIES = {
     "X26": X26,
     "X27": X27,
     "X28": X28,
+    "X29": X29,
+    "X30": X30,
+    "X31": X31,
 }

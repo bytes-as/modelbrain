@@ -651,3 +651,22 @@ MATCH (d:Draft)
 RETURN d.id AS id, d.model_id AS model_id, d.target_repo AS target_repo, d.title AS title, d.body AS body,
        d.state AS state, d.posted_url AS posted_url, d.created_at AS created_at
 ORDER BY d.created_at DESC LIMIT $limit
+
+// X29: (hub) undo licence-text matches (restore the 'other' declaration) so matching can re-run
+MATCH (m:Model)-[d:DECLARES {source: 'matched_text'}]->(:License)
+MATCH (o:License {key: 'other'})
+DELETE d
+MERGE (m)-[:DECLARES]->(o)
+RETURN count(m) AS restored
+
+// X30: (hub) drop a hosted model's link to its weights before re-linking it to the canonical id
+MATCH (:HostedModel {id: $or_id})-[r:IS]->(:Model)
+DELETE r
+RETURN count(r) AS dropped
+
+// X31: (hub) remove placeholder Model nodes nothing points to any more (never ingested, no edges)
+MATCH (m:Model)
+WHERE m.sha IS NULL AND m.dna_status IS NULL AND NOT (m)--()
+WITH collect(m) AS orphans
+FOREACH (x IN orphans | DELETE x)
+RETURN size(orphans) AS removed

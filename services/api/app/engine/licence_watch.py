@@ -20,7 +20,7 @@ from typing import Any
 from app.engine.watcher import company_graphs
 from app.fetch import Fetcher, normalise
 from app.graph import db
-from app.graph.queries import L1, L2, T4, T8, X24, X25
+from app.graph.queries import L1, L2, T4, T8, X24, X25, X29
 from app.graph.rows import as_rows
 from app.ids import new_id
 from app.paths import repo_root
@@ -59,14 +59,39 @@ def locators() -> dict[str, list[str]]:
     return found
 
 
+# Each licence's own name must appear verbatim: clause locators alone ("copy of this
+# Agreement") are generic and matched unrelated custom licences.
+NAME_PHRASES: dict[str, tuple[str, ...]] = {
+    "llama3": ("meta llama 3 community license",),
+    "llama3_1": ("llama 3.1 community license",),
+    "llama3_2": ("llama 3.2 community license",),
+    "llama3_3": ("llama 3.3 community license",),
+    "llama4": ("llama 4 community license",),
+    "gemma": ("gemma terms of use",),
+    "apache-2.0": ("apache license", "version 2.0"),
+    "mit": ("mit license",),
+    "cc-by-nc-4.0": ("attribution-noncommercial 4.0",),
+    "cc-by-4.0": ("attribution 4.0 international",),
+    "cc-by-sa-4.0": ("attribution-sharealike 4.0",),
+}
+
+
 def match_licence(text: str) -> str | None:
     low = normalise(text).lower()
     best: tuple[int, str] | None = None
     for key, phrases in locators().items():
+        names = NAME_PHRASES.get(key)
+        if not names or not all(name in low for name in names):
+            continue
         hits = sum(1 for phrase in phrases if phrase and phrase in low)
-        if hits >= MIN_LOCATORS and (best is None or hits > best[0]):
+        if hits >= min(MIN_LOCATORS, len(phrases)) and (best is None or hits > best[0]):
             best = (hits, key)
     return best[1] if best else None
+
+
+def undo_matches(hub: str = "hub") -> int:
+    rows = as_rows(db.query(hub, X29))
+    return int(rows[0]["restored"]) if rows else 0
 
 
 def _sha(text: str) -> str:

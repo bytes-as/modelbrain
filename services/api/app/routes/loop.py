@@ -207,7 +207,8 @@ async def resolve_custom(authorization: str | None = Header(default=None)) -> di
 
     client = HFClient(token=get_settings().hf_token, cache=DiskCache(Path("/tmp/modelbrain-hf")))
     try:
-        return await licence_watch.resolve_custom_licences(client)
+        undone = licence_watch.undo_matches()
+        return {"undone": undone} | await licence_watch.resolve_custom_licences(client)
     finally:
         await client.aclose()
 

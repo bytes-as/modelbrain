@@ -66,8 +66,10 @@ def test_text_change_reopens_rulings_resting_on_its_clauses(graphs) -> None:
 
 def test_custom_licence_text_matches_by_locators() -> None:
     phrases = licence_watch.locators()["llama3_2"]
-    text = "Preamble. " + " ... ".join(phrases[:2]) + " ... end."
+    text = "LLAMA 3.2 COMMUNITY LICENSE AGREEMENT. " + " ... ".join(phrases[:2]) + " ... end."
     assert licence_watch.match_licence(text) == "llama3_2"
+    # Generic clause wording without the licence's own name is not a match.
+    assert licence_watch.match_licence("Our own licence. " + " ... ".join(phrases[:3])) is None
     assert licence_watch.match_licence("An entirely bespoke licence with its own terms.") is None
 
 

@@ -15,7 +15,7 @@ from typing import Any
 
 from app.config import get_settings
 from app.graph import db
-from app.graph.queries import O1, O2, O3, O4, X23
+from app.graph.queries import O1, O2, O3, O4, X23, X30, X31
 from app.graph.rows import as_rows
 from app.hf.cache import DiskCache
 from app.hf.client import HFClient
@@ -58,16 +58,36 @@ async def sync_catalog(graph: str = "hub") -> dict[str, Any]:
             )
             report["providers"] += 1
         models = await client.get_json(f"{OR}/models")
-        for m in (models or {}).get("data", []) if isinstance(models, dict) else []:
-            hf_id = m.get("hugging_face_id")
-            if not hf_id or "/" not in str(hf_id):
-                continue
-            db.query(
-                graph,
-                O2,
-                {"or_id": m["id"], "name": m.get("name") or m["id"], "hf_id": hf_id, "now": now},
-            )
-            report["hosted_models"] += 1
+        from app.agents.scout import canonical_id
+        from app.hf.live import LiveHub
+
+        hub_client = HFClient(
+            token=get_settings().hf_token, cache=DiskCache(Path("/tmp/modelbrain-hf"))
+        )
+        try:
+            source = LiveHub(hub_client)
+            for m in (models or {}).get("data", []) if isinstance(models, dict) else []:
+                hf_id = m.get("hugging_face_id")
+                if not hf_id or "/" not in str(hf_id):
+                    continue
+                # OpenRouter may list a renamed repo under its old id; link the canonical model.
+                canonical = await canonical_id(source, str(hf_id))
+                db.query(graph, X30, {"or_id": m["id"]})
+                db.query(
+                    graph,
+                    O2,
+                    {
+                        "or_id": m["id"],
+                        "name": m.get("name") or m["id"],
+                        "hf_id": canonical,
+                        "now": now,
+                    },
+                )
+                report["hosted_models"] += 1
+        finally:
+            await hub_client.aclose()
+        removed = as_rows(db.query(graph, X31))
+        report["orphans_removed"] = int(removed[0]["removed"]) if removed else 0
     finally:
         await client.aclose()
     _last_sync.clear()
@@ -131,10 +151,20 @@ async def where_can_i_run(
     result: dict[str, Any] = {"model_id": hf_id, "hosted": out}
     if allowed is not None:
         any_ok = any(item["allowed"] for item in out)
+        unknown = sorted(
+            {p["slug"] for item in out for p in item["providers"] if not p.get("datacenters")}
+        )
+        proof = None
+        if not any_ok:
+            proof = "no provider serves this model from an allowed datacenter"
+            if unknown:
+                # Only some providers publish datacenter countries; say what we could not check.
+                proof += f" ({len(unknown)} serving provider(s) publish no datacenter list)"
         result["residency"] = {
             "requested": residency,
             "ok": any_ok,
-            "proof": None if any_ok else "no provider serves this model from an allowed datacenter",
+            "proof": proof,
+            "unverified_providers": unknown,
         }
     return result
 
