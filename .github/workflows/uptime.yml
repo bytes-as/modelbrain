@@ -1,0 +1,38 @@
+name: uptime
+
+# G112: check the live deployment every 30 minutes during judging. A failed scheduled
+# run emails the repository owner, which is the alert.
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  health:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      API: https://api-production-fc09a.up.railway.app
+      WEB: https://web-production-8d8cb.up.railway.app
+    steps:
+      - name: API health (FalkorDB up)
+        run: |
+          body=$(curl -fsS --retry 3 --retry-delay 10 -m 20 "$API/api/health")
+          echo "$body"
+          echo "$body" | python3 -c "import sys, json; d = json.load(sys.stdin); sys.exit(0 if d.get('falkordb') == 'up' else 1)"
+      - name: Verdict answers from the graph
+        run: |
+          curl -fsS --retry 3 --retry-delay 10 -m 60 -X POST "$API/api/verdict" \
+            -H 'content-type: application/json' \
+            -d '{"model_id":"OPEA/Llama-3.2V-11B-cot-int4-sym-inc","context":{"hq_country":"DE","markets":["DE"],"commercial":true}}' \
+            | python3 -c "import sys, json; v = json.load(sys.stdin).get('verdict'); print(v); sys.exit(0 if v == 'BLOCKED' else 1)"
+      - name: Web app
+        run: |
+          for page in / /findings /companies; do
+            code=$(curl -s -o /dev/null -w '%{http_code}' --retry 3 -m 30 "$WEB$page")
+            echo "$page $code"
+            [ "$code" = 200 ]
+          done
