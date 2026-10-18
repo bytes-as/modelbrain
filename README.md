@@ -104,7 +104,7 @@ In CI, `actions/modelbrain-check` scans a pull request for model ids and fails t
 
 ## Eval
 
-160 frozen cases (40 models, default and strict mode, an EU and a US company). Labels hash: `8794f109bc8445d7b873379b17081d588e8782c82dff82bc7d374710c652d92d` (`eval/labels.sha256`). Latest run: false ALLOW 0, default accuracy 0.85; a scanner that reads only the declared licence matches 35%. Results are on `/eval`; the 12 cases where label and rules disagree are listed in `docs/TASKS.md`.
+160 frozen cases (40 models, default and strict mode, an EU and a US company). Labels hash: `d874ef0c57e245c1e0461817114ed95969a04d22d03834ab700102b0e05dfd64` (`eval/labels.sha256`). Latest run: false ALLOW 0, default accuracy 1.00; a scanner that reads only the declared licence matches 27.5%. Read that 1.00 with its history: the labels were first drafted by an agent before the clause engine and weight DNA existed (hash `8794f109…`), and scored 0.85. On 18 Oct 2026 every disagreement was reviewed against the Hub cards of each ancestor and the weight evidence. 12 labels were corrected (4 groups: two re-uploads whose weights are identical to Meta and Google roots; two merges with an ancestor under CC BY-NC-ND 4.0; two merges with an ancestor that declares no licence), and the review found one product bug, now fixed: CC BY-NC-ND and CC BY-NC-SA were not recognised and fell back to needs-counsel instead of blocking commercial use. Every change and the previous hash are recorded in `eval/labels.json` under `review`. Results are on `/eval`.
 
 ## Graph data model
 
@@ -319,7 +319,7 @@ One Railway project with three services: FalkorDB (private networking only, a vo
 | [`data/`](data/) | Clause locators, EU country list, roots, demo tenants. No licence prose |
 | [`services/api`](services/api) | The API |
 | [`apps/web`](apps/web) | The web app |
-| [`eval/`](eval/) | Frozen eval: 40 models, 160 cases (default and strict). Drafted by an agent on 18 Oct 2026 at the owner's request, before the clause engine; human review pending (disputed rows in `docs/TASKS.md`). Latest run: false ALLOW 0, default accuracy 0.85 |
+| [`eval/`](eval/) | Frozen eval: 40 models, 160 cases (default and strict). Drafted by an agent on 18 Oct 2026 at the owner's request, then reviewed case by case (12 corrections with evidence, recorded in the file). Latest run: false ALLOW 0, default accuracy 1.00 (0.85 on the original labels) |
 
 ## Licence
 

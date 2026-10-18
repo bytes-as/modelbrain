@@ -28,4 +28,8 @@ def get_eval() -> dict:
             "rows": [],
             "note": "Run python eval/run_eval.py --api <url> to populate.",
         }
-    return json.loads(path.read_text())
+    report = json.loads(path.read_text())
+    dna = repo_root() / "eval" / "dna_report.json"
+    if dna.is_file():
+        report["dna"] = json.loads(dna.read_text())
+    return report

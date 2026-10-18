@@ -18,6 +18,17 @@ type Report = {
   accuracy_default?: number;
   cases?: number;
   baselines?: { declared_licence_only?: { match_rate?: number } };
+  dna?: {
+    derived_pairs: number;
+    unrelated_pairs: number;
+    lowest_derived: number | null;
+    highest_unrelated: number | null;
+    thresholds: { DNA_DERIVED_MIN: number; DNA_RELATED_MIN: number };
+    false_links_at_derived_min: number;
+    false_links_at_related_min: number;
+    missed_derived_at_derived_min: number;
+    rows: { a: string; b: string; expect: string; sim: number | null }[];
+  };
   rows?: {
     model_id: string;
     context: string;
@@ -147,6 +158,65 @@ export default function EvalPage() {
               </div>
             </Part>
           </>
+        ) : null}
+
+        {report?.dna ? (
+          <Part
+            n="3"
+            title="Weight DNA calibration"
+            note={`${report.dna.derived_pairs} pairs where the card declares the parent, and ${report.dna.unrelated_pairs} pairs of unrelated models with the same tensor shapes. Similarity is computed by FalkorDB (vec.cosineDistance) over the stored fingerprints.`}
+            testId="dna-calibration"
+          >
+            <dl className="grid grid-cols-2 border-t border-white/15 md:grid-cols-4">
+              {[
+                ["Lowest derived", report.dna.lowest_derived?.toFixed(3) ?? "–"],
+                ["Highest unrelated", report.dna.highest_unrelated?.toFixed(3) ?? "–"],
+                [
+                  `False links at ${report.dna.thresholds.DNA_DERIVED_MIN}`,
+                  String(report.dna.false_links_at_derived_min),
+                ],
+                [
+                  `False links at ${report.dna.thresholds.DNA_RELATED_MIN}`,
+                  String(report.dna.false_links_at_related_min),
+                ],
+              ].map(([label, value]) => (
+                <div key={label} className="border-b border-white/10 py-4 pr-4">
+                  <dt className="font-mono text-[11px] uppercase tracking-[0.14em] text-muted">
+                    {label}
+                  </dt>
+                  <dd className="mt-1 font-serif text-3xl font-light tabular-nums">{value}</dd>
+                </div>
+              ))}
+            </dl>
+            <div className="ledger-wrap mt-6">
+              <table className="ledger min-w-[760px]">
+                <thead>
+                  <tr>
+                    <th>Model</th>
+                    <th>Compared with</th>
+                    <th>Pair</th>
+                    <th className="num">Cosine</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {report.dna.rows.map((row) => (
+                    <tr key={`${row.a}-${row.b}`}>
+                      <td>
+                        <ModelRef id={row.a} hub={false} />
+                      </td>
+                      <td>
+                        <ModelRef id={row.b} hub={false} />
+                      </td>
+                      <td>
+                        <Tag>{row.expect}</Tag>
+                      </td>
+                      <td className="num">{row.sim?.toFixed(4) ?? "–"}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </Part>
         ) : null}
 
         <Disclaimer />

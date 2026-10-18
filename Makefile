@@ -2,7 +2,7 @@
 API ?= http://localhost:8000
 WEB ?= http://localhost:3001
 
-.PHONY: up down web test smoke eval seed reset crawl demo-reset export import
+.PHONY: up down web test smoke eval dna-eval seed reset crawl demo-reset export import
 
 up:            ## start FalkorDB and the API
 	docker compose up -d --build
@@ -21,6 +21,9 @@ smoke:         ## health, verdicts, replay, weight DNA, MCP and pages
 
 eval:          ## re-run the frozen eval and write eval/report.json
 	ADMIN_TOKEN=$$(grep '^ADMIN_TOKEN=' .env | cut -d= -f2-) python3 -I eval/run_eval.py --api $(API)
+
+dna-eval:      ## weight DNA calibration (G143): score eval/dna_labels.json in FalkorDB
+	docker compose run --rm --no-deps -v "$(CURDIR):/repo" -w /repo api python eval/run_dna_eval.py --host falkordb
 
 seed:          ## re-create missing demo tenants (restart runs the bootstrap)
 	docker compose restart api

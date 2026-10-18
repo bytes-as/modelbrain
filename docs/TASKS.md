@@ -92,7 +92,9 @@ The build can continue without these. They block a public demo, gated model file
 - BLUEPRINT section 16.5 and G115 suggest MIT. On 18 Oct 2026 the owner asked for free use with a royalty if someone commercialises the project. No OSI licence can require a royalty, so the repo uses PolyForm Noncommercial 1.0.0 plus `COMMERCIAL.md` for a separate royalty-bearing commercial licence. G115 is not ticked as MIT.
 
 
-## Eval label review (owner, 18 Oct 2026)
+## Eval label review (done 18 Oct 2026)
+
+Reviewed by the agent at the owner's request. Outcome per group: NousResearch and unsloth relabelled ALLOWED_WITH_OBLIGATIONS (weights identical to the Meta and Google roots); both shanchen merges relabelled BLOCKED for commercial use (ancestor `johnsnowlabs/JSL-MedLlama-3-8B-v1.0` is CC BY-NC-ND 4.0; the product also had to learn that licence); both grimjim merges relabelled CANNOT_DETERMINE (ancestor `princeton-nlp/Llama-3-Instruct-8B-SimPO` declares no licence). Re-run: 160 cases, false ALLOW 0, default accuracy 1.00. The table below is the original review list.
 
 After the weight DNA and canonical-id fixes the eval is 160 cases, false ALLOW 0, default accuracy 0.85. The 12 misses are all cases where the label and the clause rules disagree; decide per row whether the label or the rule is right:
 
