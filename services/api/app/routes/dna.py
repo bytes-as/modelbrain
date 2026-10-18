@@ -54,6 +54,7 @@ def exposure(owner: str, name: str, strict: bool = False) -> list[dict[str, obje
 class CrawlRequest(BaseModel):
     model_ids: list[str] = Field(default_factory=list, max_length=3000)
     include_scout_findings: bool = True
+    include_gguf: int = Field(default=0, ge=0, le=300)
     force: bool = False
 
 
@@ -74,6 +75,8 @@ async def start_crawl(body: CrawlRequest, authorization: str | None = Header(def
     ids = [m for m in body.model_ids if MODEL_ID.match(m)]
     if body.include_scout_findings:
         ids += [m for m in dna.scout_findings_ids() if m not in ids]
+    if body.include_gguf:
+        ids += [m for m in await dna.popular_gguf_repos(body.include_gguf) if m not in ids]
     _crawl_task = asyncio.create_task(dna.crawl(ids, ingest=_ingest, force=body.force))
     return {"state": "started", "queued": len(ids)}
 

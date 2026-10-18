@@ -630,6 +630,12 @@ FOREACH (x IN bad | DELETE x)
 RETURN size(bad) AS removed
 """
 
+X22 = """
+MATCH (m:Model {id: $id})
+SET m.vocab_dna = $vocab
+RETURN m.id AS id
+"""
+
 QUERIES = {
     "SCHEMA": SCHEMA,
     "I1": I1,
@@ -712,4 +718,5 @@ QUERIES = {
     "X19": X19,
     "X20": X20,
     "X21": X21,
+    "X22": X22,
 }

@@ -19,11 +19,30 @@ from typing import Any
 
 from app.config import get_settings
 from app.graph import db
-from app.graph.queries import R3, W0, W1, W1B, W2, W3, W7, W10, W11, W12, W13, W14, W15, X5, X21
+from app.graph.queries import (
+    R3,
+    W0,
+    W1,
+    W1B,
+    W2,
+    W3,
+    W7,
+    W9,
+    W10,
+    W11,
+    W12,
+    W13,
+    W14,
+    W15,
+    X5,
+    X14,
+    X21,
+    X22,
+)
 from app.graph.rows import as_rows
 from app.hf.cache import DiskCache
 from app.hf.client import HFClient, HubUnavailable
-from app.hf.dna import ERROR, OK, DnaError, DnaResult, Sampler, validate_vector
+from app.hf.dna import ERROR, NO_SAFETENSORS, OK, DnaError, DnaResult, Sampler, validate_vector
 from app.paths import repo_root
 
 log = logging.getLogger("modelbrain.dna")
@@ -372,7 +391,51 @@ async def fingerprint_into_graph(
     sampler: Sampler, graph: str, model_id: str, sha: str, *, source_repo: str | None = None
 ) -> str:
     result = await sampler.fingerprint(source_repo or model_id, "main" if source_repo else sha)
+    if result.status == NO_SAFETENSORS and not source_repo:
+        gguf_status = await _fingerprint_gguf_repo(sampler, graph, model_id, sha)
+        if gguf_status is not None:
+            return gguf_status
     return write_result(graph, model_id, result)
+
+
+async def _fingerprint_gguf_repo(
+    sampler: Sampler, graph: str, model_id: str, sha: str
+) -> str | None:
+    """No safetensors: fall back to the repo's GGUF file (ADDENDUM section 5)."""
+    from app.hf.gguf import fingerprint_gguf, pick_file
+    from app.hf.parse import normalise_license
+    from app.jobs.runner import _hub_resources
+
+    info = await sampler.client.get_json(f"https://huggingface.co/api/models/{model_id}")
+    siblings = info.get("siblings", []) if isinstance(info, dict) else []
+    filename = pick_file(siblings)
+    if not filename:
+        return None
+    found = await fingerprint_gguf(sampler.client, model_id, sha, filename, sampler.per_tensor)
+    status = write_result(graph, model_id, found.dna)
+    state = as_rows(db.ro_query(graph, X14, {"id": model_id}))
+    card_licence = state[0].get("declared_license") if state else None
+    key = None
+    if found.license and not card_licence:
+        table, _roots = _hub_resources()
+        _raw, normalised = normalise_license(found.license, table)
+        key = normalised if normalised not in ("unknown", "other") else None
+    db.query(
+        graph,
+        W9,
+        {
+            "id": model_id,
+            "format": "gguf",
+            "file": filename,
+            "gguf_license": found.license,
+            "basename": found.basename,
+            "license_key": key,
+            "sha": sha,
+        },
+    )
+    if found.vocab:
+        db.query(graph, X22, {"id": model_id, "vocab": found.vocab})
+    return status
 
 
 async def after_ingest(
@@ -536,6 +599,29 @@ async def _ensure_mirror_edge(graph: str, mirror: str, official: str, ingest: An
             "evidence": evidence,
         },
     )
+
+
+async def popular_gguf_repos(limit: int) -> list[str]:
+    """Most-downloaded GGUF repos on the Hub (the files people run in Ollama and LM Studio)."""
+    client = _client()
+    found: list[str] = []
+    try:
+        url = (
+            "https://huggingface.co/api/models?filter=gguf&sort=downloads&direction=-1"
+            f"&limit={min(limit, 100)}"
+        )
+        while url and len(found) < limit:
+            response = await client.get(url)
+            if response.status != 200:
+                break
+            for item in response.json():
+                model_id = item.get("id") if isinstance(item, dict) else None
+                if isinstance(model_id, str):
+                    found.append(model_id)
+            url = ""  # one page of up to 100 is enough for the demo crawl
+    finally:
+        await client.aclose()
+    return found[:limit]
 
 
 def scout_findings_ids() -> list[str]:

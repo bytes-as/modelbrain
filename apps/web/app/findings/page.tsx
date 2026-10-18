@@ -131,6 +131,11 @@ export default function FindingsPage() {
                 <tr key={`${row.model}-${row.weights_parent}`} className="border-t border-white/10">
                   <td className="py-2 pr-4">
                     <ModelLink id={row.model} />
+                    {row.format === "gguf" ? (
+                      <span className="ml-2 rounded border border-white/20 px-1 text-xs text-muted">
+                        GGUF
+                      </span>
+                    ) : null}
                   </td>
                   <td className="py-2 pr-4">{row.card_license ?? "none"}</td>
                   <td className="py-2 pr-4">

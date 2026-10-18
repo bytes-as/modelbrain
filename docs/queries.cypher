@@ -610,3 +610,8 @@ WHERE e.source = 'inferred' AND e.method IN ['weights', 'weights_merge']
 WITH collect(e) AS bad
 FOREACH (x IN bad | DELETE x)
 RETURN size(bad) AS removed
+
+// X22: (hub) record a model's vocabulary fingerprint (same hash for tokenizer.json and GGUF token lists)
+MATCH (m:Model {id: $id})
+SET m.vocab_dna = $vocab
+RETURN m.id AS id
