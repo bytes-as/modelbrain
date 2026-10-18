@@ -2,11 +2,22 @@
 
 from __future__ import annotations
 
+import pytest
 from fastapi.testclient import TestClient
 
 from app.errors import ApiError
 from app.main import app
 from app.tenants.auth import resolve_tenant
+
+
+@pytest.fixture(autouse=True, scope="module")
+def _demo_tenants() -> None:
+    """Sandboxes copy a fictional tenant; seed them on an empty FalkorDB (as in CI)."""
+    from app.graph import db
+    from app.tenants.bootstrap import ensure_tenants
+
+    db.connect(tries=5, delay_s=0.5)
+    ensure_tenants()
 
 
 def test_sandbox_create_and_fixed_tenant_readonly() -> None:
