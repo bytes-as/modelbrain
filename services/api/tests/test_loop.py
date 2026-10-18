@@ -247,6 +247,11 @@ def test_watch_once_checks_watchlist_and_deployments(monkeypatch) -> None:
         }
 
     monkeypatch.setattr(watcher, "check_now", fake_check)
+
+    async def no_discussions(_hub="hub"):
+        return {"models": 0, "discussions": 0, "outcomes": 0}
+
+    monkeypatch.setattr(watcher, "refresh_discussions", no_discussions)
     db.connect(tries=5, delay_s=0.5)
     report = asyncio.run(watcher.watch_once(None))
     assert "Xkev/Llama-3.2V-11B-cot" in checked
@@ -255,3 +260,46 @@ def test_watch_once_checks_watchlist_and_deployments(monkeypatch) -> None:
         {"model_id": "Xkev/Llama-3.2V-11B-cot", "changes": ["sha: a -> b"], "reopened": 1}
     ]
     assert watcher.watch_last()["checked"] == report["checked"]
+
+
+def test_discussions_become_graph_memory_with_outcomes(graphs) -> None:
+    import asyncio
+
+    from app.engine.discussions import discussions_for, ingest_discussions, record_outcome
+
+    db.query(graphs["hub"], "CREATE (:Model {id:'x/model'})")
+
+    class FakeClient:
+        async def get_json(self, _url: str) -> dict:
+            return {
+                "discussions": [
+                    {
+                        "num": 12,
+                        "title": "License compatibility",
+                        "status": "closed",
+                        "createdAt": "2025-07-09T00:00:00Z",
+                        "isPullRequest": False,
+                    },
+                    {
+                        "num": 13,
+                        "title": "Improve card",
+                        "status": "merged",
+                        "createdAt": "2025-07-15T00:00:00Z",
+                        "isPullRequest": True,
+                    },
+                ]
+            }
+
+    assert asyncio.run(ingest_discussions(FakeClient(), "x/model", graphs["hub"])) == 2
+    assert record_outcome(
+        "x/model",
+        12,
+        kind="FIXED",
+        days=130,
+        observed_at="2025-11-16",
+        evidence_url="https://example.invalid",
+        graph=graphs["hub"],
+    )
+    rows = discussions_for("x/model", graphs["hub"])
+    assert [r["num"] for r in rows] == [13, 12]
+    assert rows[1]["outcome"] == "FIXED" and rows[1]["days"] == 130

@@ -6,7 +6,17 @@ import { useEffect, useState } from "react";
 type Step = { date: string; kind: string; label: string; ref: string };
 type Child = { id: string; relation: string };
 type Affected = { graph: string; ruling_id: string; deployment_id: string; owner_id: string };
+type DiscussionRow = {
+  num: number;
+  title: string;
+  status: string;
+  opened_at: string;
+  url: string;
+  outcome: string | null;
+  days: number | null;
+};
 type Replay = {
+  discussions?: DiscussionRow[];
   model_id: string;
   base_model: string;
   card_license_now: string;
@@ -139,6 +149,29 @@ export default function XkevReplayPage() {
               come from {data.base_model}.
             </p>
           </section>
+
+          {data.discussions && data.discussions.some((d) => d.outcome) ? (
+            <section className="mt-8" data-testid="discussion-memory">
+              <h2 className="text-xl">What the graph remembers</h2>
+              <ul className="mt-2 space-y-1 text-sm">
+                {data.discussions
+                  .filter((d) => d.outcome)
+                  .map((d) => (
+                    <li key={d.num}>
+                      <a className="text-accent" href={d.url} target="_blank" rel="noreferrer">
+                        Discussion #{d.num} &quot;{d.title}&quot;
+                      </a>{" "}
+                      opened {d.opened_at.slice(0, 10)}: outcome{" "}
+                      <span className="font-mono">{d.outcome}</span> after {d.days} days.
+                    </li>
+                  ))}
+              </ul>
+              <p className="mt-1 text-xs text-muted">
+                {data.discussions.length} discussions on this model are stored as graph nodes linked
+                to it.
+              </p>
+            </section>
+          ) : null}
 
           <section className="mt-8">
             <h2 className="text-xl">Who did not get the fix</h2>

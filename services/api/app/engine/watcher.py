@@ -220,8 +220,11 @@ def replay_view(hub: str = "hub") -> dict[str, Any]:
     data = replay_data()
     model_id = data["model_id"]
     graphs = [name for name in company_graphs() if name.startswith("tenant_")]
+    from app.engine.discussions import discussions_for
+
     return {
         **data,
+        "discussions": discussions_for(model_id, hub),
         "graph_descendants": descendants(model_id, hub),
         "leverage": leverage(model_id, hub),
         "would_reopen": affected_rulings(model_id, graphs, hub),
@@ -348,6 +351,10 @@ async def watch_once(reingest: Any, hub: str = "hub") -> dict[str, Any]:
         except Exception:
             log.exception("watch check failed", extra={"model_id": model_id})
             report["errors"] += 1
+    try:
+        report["discussions"] = await refresh_discussions(hub)
+    except Exception:
+        log.exception("discussion refresh failed")
     report["ms"] = int((time.monotonic() - started) * 1000)
     report["at"] = _now_ms()
     _watch_last.clear()
@@ -357,3 +364,39 @@ async def watch_once(reingest: Any, hub: str = "hub") -> dict[str, Any]:
 
 def watch_last() -> dict[str, Any]:
     return dict(_watch_last)
+
+
+async def refresh_discussions(hub: str = "hub") -> dict[str, Any]:
+    """Ingest discussions for the watchlist and record the Xkev outcome from real history."""
+    from pathlib import Path
+
+    from app.config import get_settings
+    from app.engine.discussions import ingest_discussions, record_outcome
+    from app.hf.cache import DiskCache
+    from app.hf.client import HFClient
+
+    data = json.loads((repo_root() / "data" / "watchlist.json").read_text())
+    client = HFClient(token=get_settings().hf_token, cache=DiskCache(Path("/tmp/modelbrain-hf")))
+    report: dict[str, Any] = {"models": 0, "discussions": 0, "outcomes": 0}
+    try:
+        for model_id in data.get("models", []):
+            try:
+                report["discussions"] += await ingest_discussions(client, str(model_id), hub)
+                report["models"] += 1
+            except Exception:
+                log.exception("discussion ingest failed", extra={"model_id": model_id})
+    finally:
+        await client.aclose()
+    replay = replay_data()
+    fix = replay["fix"]
+    if record_outcome(
+        replay["model_id"],
+        12,
+        kind="FIXED",
+        days=int(fix["days_after_report"]),
+        observed_at=str(fix["date"]),
+        evidence_url=f"https://huggingface.co/{replay['model_id']}/commit/{fix['commit']}",
+        graph=hub,
+    ):
+        report["outcomes"] += 1
+    return report

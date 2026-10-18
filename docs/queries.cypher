@@ -578,3 +578,25 @@ OPTIONAL MATCH (l)-[:IMPOSES]->(cl:Clause)
 WITH node, sim, p, l, collect(DISTINCT cl.id) AS clauses
 RETURN node.id AS weights_parent, sim, [n IN nodes(p) | n.id] AS path, l.key AS license, clauses, length(p) AS hops
 ORDER BY hops
+
+// X18: (hub) upsert a Hugging Face discussion about a model
+MATCH (m:Model {id: $model_id})
+MERGE (d:Discussion {key: $key})
+SET d.num = $num, d.title = $title, d.status = $status, d.opened_at = $opened_at,
+    d.is_pr = $is_pr, d.url = $url
+MERGE (d)-[:ABOUT]->(m)
+RETURN d.key AS key
+
+// X19: (hub) record what a discussion led to (append-only Outcome)
+MATCH (d:Discussion {key: $key})
+MERGE (o:Outcome {id: $id})
+ON CREATE SET o.kind = $kind, o.days = $days, o.observed_at = $observed_at, o.evidence_url = $evidence_url
+MERGE (d)-[:RESULTED_IN]->(o)
+RETURN o.id AS id
+
+// X20: (hub) discussions about a model, with outcomes
+MATCH (d:Discussion)-[:ABOUT]->(:Model {id: $model_id})
+OPTIONAL MATCH (d)-[:RESULTED_IN]->(o:Outcome)
+RETURN d.num AS num, d.title AS title, d.status AS status, d.opened_at AS opened_at, d.is_pr AS is_pr,
+       d.url AS url, o.kind AS outcome, o.days AS days
+ORDER BY d.num DESC

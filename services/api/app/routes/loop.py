@@ -164,3 +164,16 @@ def watch_last(authorization: str | None = Header(default=None)) -> dict:
 async def watch_run(authorization: str | None = Header(default=None)) -> dict:
     require_admin(authorization)
     return await watcher.watch_once(_fresh_ingest)
+
+
+@router.post("/api/admin/discussions/run")
+async def discussions_run(authorization: str | None = Header(default=None)) -> dict:
+    require_admin(authorization)
+    return await watcher.refresh_discussions()
+
+
+@router.get("/api/models/{owner}/{name}/discussions")
+def model_discussions(owner: str, name: str) -> list[dict[str, object]]:
+    from app.engine.discussions import discussions_for
+
+    return discussions_for(_check_model(f"{owner}/{name}"))
