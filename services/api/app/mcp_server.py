@@ -67,9 +67,7 @@ async def can_i_use(
         "distributes_weights": distributes_weights,
         "end_user_only": False,
     }
-    decided = verdict_from_graph(
-        model_id, context, graph="hub", min_tier=2 if strict else 1
-    )
+    decided = verdict_from_graph(model_id, context, graph="hub", min_tier=2 if strict else 1)
     if tenant:
         try:
             record_turn(
@@ -186,9 +184,7 @@ async def watch(model_id: str, tenant: str, token: str) -> str:
         "the edge's trust tier for everyone."
     )
 )
-async def confirm_edge(
-    child: str, parent: str, tenant: str, token: str, person_id: str
-) -> str:
+async def confirm_edge(child: str, parent: str, tenant: str, token: str, person_id: str) -> str:
     return json.dumps(
         {
             "tier_before": 1,

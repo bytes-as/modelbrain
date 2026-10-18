@@ -6,7 +6,6 @@ import json
 
 from fastapi import APIRouter
 
-from app.errors import ApiError
 from app.paths import repo_root
 
 router = APIRouter()

@@ -3,13 +3,13 @@
 from __future__ import annotations
 
 import time
-import uuid
 from typing import Any
 
 from app.errors import ApiError
 from app.graph import db
 from app.graph.queries import T1, T2, T6
 from app.graph.rows import as_rows
+from app.ids import new_id
 
 
 def latest_ruling_id(graph: str, deployment_id: str) -> str | None:
@@ -48,7 +48,7 @@ def write_ruling(
             "Someone updated this deployment a moment ago.",
             hint=f"Latest ruling is {current}.",
         )
-    ruling_id = "rul_" + uuid.uuid4().hex[:12]
+    ruling_id = new_id("rul")
     now = int(time.time() * 1000)
     clause_ids = [
         hit["clause_id"]
@@ -71,7 +71,7 @@ def write_ruling(
             "hub_sha_set": list(verdict.get("hub_sha_set") or []),
             "facts": [
                 {
-                    "id": "fact_" + uuid.uuid4().hex[:12],
+                    "id": new_id("fact"),
                     "model_id": verdict["model_id"],
                     "sha": "",
                     "license_key": verdict.get("declared_license") or "",
@@ -90,7 +90,7 @@ def write_ruling(
             CREATE (e:Event {id: $event_id, kind: 'SUPERSEDED', at: $now, reason: 'new ruling'})
             CREATE (e)-[:ON]->(old)
             """,
-            {"old_id": current, "event_id": "evt_" + uuid.uuid4().hex[:12], "now": now},
+            {"old_id": current, "event_id": new_id("evt"), "now": now},
         )
     return ruling_id
 

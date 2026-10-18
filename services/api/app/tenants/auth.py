@@ -6,8 +6,6 @@ import hashlib
 import hmac
 import secrets
 
-from fastapi import Header
-
 from app.config import get_settings
 from app.errors import ApiError
 from app.tenants.bootstrap import TENANTS
@@ -71,7 +69,9 @@ def resolve_tenant(
         raise ApiError("MODEL_NOT_FOUND", f"No tenant '{tenant}'.")
     record = _sandbox_tokens.get(tenant)
     if record is None:
-        raise ApiError("SANDBOX_EXPIRED", "Sandbox not found or expired.", hint="Create a new sandbox.")
+        raise ApiError(
+            "SANDBOX_EXPIRED", "Sandbox not found or expired.", hint="Create a new sandbox."
+        )
     import time
 
     if int(record["expires_at"]) < int(time.time() * 1000):

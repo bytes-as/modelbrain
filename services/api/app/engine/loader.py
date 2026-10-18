@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import json
 import time
-import uuid
 from typing import Any
 
 from app.engine.clauses import seed_path
@@ -12,6 +11,7 @@ from app.engine.quotes import extract_quote
 from app.graph import db
 from app.graph.queries import C1, C2
 from app.hf.client import HFClient, HubUnavailable
+from app.ids import new_id
 
 stats: dict[str, int] = {"resolved": 0, "unresolved": 0}
 
@@ -71,7 +71,7 @@ async def load_clauses(client: HFClient, *, graph: str = "hub") -> dict[str, int
         graph,
         C2,
         {
-            "id": "cl_" + uuid.uuid4().hex[:12],
+            "id": new_id("cl"),
             "now": int(time.time() * 1000),
             "resolved": resolved,
             "unresolved": unresolved,

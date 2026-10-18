@@ -45,9 +45,7 @@ def hidden_lineage() -> list[dict[str, object]]:
         model_ids = [str(m) for m in (row.get("model_ids") or []) if m]
         if len(model_ids) < 2:
             continue
-        related = [
-            e for e in edges if e.get("child") in model_ids or e.get("parent") in model_ids
-        ]
+        related = [e for e in edges if e.get("child") in model_ids or e.get("parent") in model_ids]
         out.append(
             {
                 "component_id": row.get("componentId"),

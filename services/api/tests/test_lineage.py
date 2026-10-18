@@ -15,6 +15,8 @@ from app.hf.parse import load_normalise
 from app.main import app
 
 FIX = Path(__file__).resolve().parent / "fixtures" / "hf"
+
+
 def _repo() -> Path:
     for parent in Path(__file__).resolve().parents:
         if (parent / "data" / "clauses.seed.json").is_file():
@@ -60,9 +62,7 @@ def graph_name() -> str:
 
 @pytest.mark.asyncio
 async def test_lineage_distinct_edges(graph_name: str, monkeypatch: pytest.MonkeyPatch) -> None:
-    table = load_normalise(
-        json.loads((REPO_ROOT / "data" / "clauses.seed.json").read_text())
-    )
+    table = load_normalise(json.loads((REPO_ROOT / "data" / "clauses.seed.json").read_text()))
     roots = set(json.loads((REPO_ROOT / "data" / "roots.json").read_text())["orgs"])
     await ingest(
         "OPEA/Llama-3.2V-11B-cot-int4-sym-inc",
@@ -71,7 +71,9 @@ async def test_lineage_distinct_edges(graph_name: str, monkeypatch: pytest.Monke
         roots=roots,
         graph=graph_name,
     )
-    monkeypatch.setattr("app.routes.models.ro_query", lambda graph, q, params: db.ro_query(graph_name, q, params))
+    monkeypatch.setattr(
+        "app.routes.models.ro_query", lambda graph, q, params: db.ro_query(graph_name, q, params)
+    )
 
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as client:

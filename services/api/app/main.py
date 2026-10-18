@@ -7,6 +7,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.config import get_settings
 from app.errors import install_error_handlers
@@ -101,6 +102,17 @@ def health() -> dict[str, object]:
         "hf": "degraded",
         "version": VERSION,
     }
+
+
+@app.api_route(
+    "/api/{rest:path}",
+    methods=["GET", "POST", "PUT", "PATCH", "DELETE"],
+    include_in_schema=False,
+)
+def api_not_found(rest: str) -> None:
+    # Unknown /api paths get the JSON envelope instead of falling through
+    # to the MCP mount below, which answers with plain text.
+    raise StarletteHTTPException(status_code=404)
 
 
 # Mount MCP last. FastMCP's app already serves `/mcp`

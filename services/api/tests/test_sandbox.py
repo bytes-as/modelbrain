@@ -4,9 +4,9 @@ from __future__ import annotations
 
 from fastapi.testclient import TestClient
 
+from app.errors import ApiError
 from app.main import app
 from app.tenants.auth import resolve_tenant
-from app.errors import ApiError
 
 
 def test_sandbox_create_and_fixed_tenant_readonly() -> None:

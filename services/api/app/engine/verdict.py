@@ -6,13 +6,10 @@ import json
 import time
 from typing import Any
 
-import json
-
 from app.engine.clauses import applies, obligation_status, parse_json_field, seed_path
 from app.graph import db
 from app.graph.queries import C3, Q1, Q2
 from app.graph.rows import as_rows
-from app.paths import repo_root
 
 NO_ALTERNATIVES = "No compliant alternative in our candidate set."
 

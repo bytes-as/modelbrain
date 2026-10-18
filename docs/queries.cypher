@@ -411,7 +411,7 @@ RETURN c.id AS model, dp.id AS declared_parent, wp.id AS weights_parent, w.weigh
 ORDER BY sim DESC LIMIT $limit
 
 // W6: fingerprint coverage
-MATCH (m:Model) RETURN coalesce(m.dna_status, 'NOT_RUN') AS status, count(*) AS models ORDER BY models DESC
+MATCH (m:Model) RETURN coalesce(m.dna_status, 'NOT_RUN') AS status, count(m) AS models ORDER BY models DESC
 
 // W7: write merge edges ($parents = [{id, share, r2, evidence}, ...]); never alters a declared edge
 MATCH (c:Model {id:$child})

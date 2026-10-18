@@ -3,13 +3,13 @@
 from __future__ import annotations
 
 import time
-import uuid
 from pathlib import Path
 
 from app.engine.verdict import verdict_from_graph
 from app.graph import db
 from app.graph.queries import T1, T6, T9, T10
 from app.graph.rows import as_rows
+from app.ids import new_id
 from app.paths import repo_root
 
 TENANTS = ("tenant_kestrel", "tenant_harbor")
@@ -87,7 +87,7 @@ def _seed_rulings() -> None:
                 T1,
                 {
                     "deployment_id": deployment["deployment_id"],
-                    "ruling_id": "rul_" + uuid.uuid4().hex[:12],
+                    "ruling_id": new_id("rul"),
                     "verdict": decided["verdict"],
                     "strict": False,
                     "now": now,
@@ -95,7 +95,7 @@ def _seed_rulings() -> None:
                     "hub_sha_set": [],
                     "facts": [
                         {
-                            "id": "fact_" + uuid.uuid4().hex[:12],
+                            "id": new_id("fact"),
                             "model_id": model_id,
                             "sha": "",
                             "license_key": decided.get("declared_license") or "",

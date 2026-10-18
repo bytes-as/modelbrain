@@ -9,6 +9,7 @@ APP = Path(__file__).resolve().parents[1] / "app"
 QUERIES = APP / "graph" / "queries.py"
 
 _CALL = re.compile(r"\.(?:ro_)?query\(")
+_FSTRING = re.compile(r"(?<!\w)[rR]?[fF][rR]?['\"]")
 _UNBOUNDED = re.compile(r"\*(?!\d+\.\.\d+)[\]\)]")
 
 
@@ -31,13 +32,9 @@ def test_query_calls_are_not_string_built() -> None:
         text = path.read_text()
         for match in _CALL.finditer(text):
             snippet = _call_args(text, match.end() - 1)
-            built = (
-                "f'" in snippet
-                or 'f"' in snippet
-                or "f'''" in snippet
-                or 'f"""' in snippet
-                or "+" in snippet
-            )
+            # An f-string prefix is an "f" not preceded by a word character,
+            # so dict keys such as "conf" do not count.
+            built = bool(_FSTRING.search(snippet)) or "+" in snippet
             if built:
                 line = text.count("\n", 0, match.start()) + 1
                 offenders.append(f"{path.name}:{line}: {snippet.splitlines()[0]}")

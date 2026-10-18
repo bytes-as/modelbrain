@@ -4,10 +4,10 @@ from __future__ import annotations
 
 import json
 import time
-import uuid
 
 from app.graph import db
 from app.graph.rows import as_rows
+from app.ids import new_id
 
 
 def record_turn(
@@ -21,7 +21,7 @@ def record_turn(
 ) -> str:
     now = int(time.time() * 1000)
     conversation_id = "conv_" + channel
-    turn_id = "turn_" + uuid.uuid4().hex[:12]
+    turn_id = new_id("turn")
     db.query(
         graph,
         """

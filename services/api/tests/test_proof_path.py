@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from uuid import uuid4
-
 from fastapi.testclient import TestClient
 
 from app.agents.scout import write_parsed
@@ -38,13 +36,13 @@ def test_proof_path_endpoint() -> None:
     write_parsed("hub", _model(root, root=True, parents=[]), 1)
     write_parsed("hub", _model(child, root=False, parents=[(root, "finetune")]), 1)
     client = TestClient(app)
-    ok = client.get(f"/api/models/demo/proof-child/proof-path", params={"root_id": root})
+    ok = client.get("/api/models/demo/proof-child/proof-path", params={"root_id": root})
     assert ok.status_code == 200
     body = ok.json()
     assert body["no_path"] is False
     assert root in body["path"]
     missing = client.get(
-        f"/api/models/demo/proof-child/proof-path",
+        "/api/models/demo/proof-child/proof-path",
         params={"root_id": "demo/other-root"},
     )
     assert missing.status_code == 200

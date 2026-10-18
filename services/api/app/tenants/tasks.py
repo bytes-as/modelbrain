@@ -3,13 +3,13 @@
 from __future__ import annotations
 
 import time
-import uuid
 from typing import Any
 
 from app.errors import ApiError
 from app.graph import db
 from app.graph.queries import T5
 from app.graph.rows import as_rows
+from app.ids import new_id
 from app.tenants.playbooks import PLAYBOOKS
 from app.tenants.rulings import write_ruling
 
@@ -42,8 +42,8 @@ def claim_task(graph: str, task_id: str, agent: str) -> bool:
 
 
 def create_review_task(graph: str, *, ruling_id: str, owner_id: str, reason: str) -> str:
-    task_id = "task_" + uuid.uuid4().hex[:12]
-    event_id = "evt_" + uuid.uuid4().hex[:12]
+    task_id = new_id("task")
+    event_id = new_id("evt")
     now = int(time.time() * 1000)
     db.query(
         graph,
@@ -80,7 +80,7 @@ def handoff_to_owner(
     proposed_ruling: dict[str, Any],
     owner_id: str,
 ) -> str:
-    approve_id = "task_" + uuid.uuid4().hex[:12]
+    approve_id = new_id("task")
     now = int(time.time() * 1000)
     import json
 
@@ -164,7 +164,7 @@ def approve_task(graph: str, task_id: str, person_id: str) -> dict[str, object]:
         {
             "task_id": task_id,
             "person_id": person_id,
-            "event_id": "evt_" + uuid.uuid4().hex[:12],
+            "event_id": new_id("evt"),
             "now": now,
         },
     )
@@ -189,7 +189,7 @@ def reject_task(graph: str, task_id: str, person_id: str, reason: str) -> dict[s
         {
             "task_id": task_id,
             "person_id": person_id,
-            "event_id": "evt_" + uuid.uuid4().hex[:12],
+            "event_id": new_id("evt"),
             "now": now,
             "reason": reason,
         },
