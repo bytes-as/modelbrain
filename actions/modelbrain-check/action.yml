@@ -20,9 +20,25 @@ inputs:
     description: Fail on CANNOT_DETERMINE as well as BLOCKED
     required: false
     default: "false"
+  fail_on_unreachable:
+    description: Fail the build when the ModelBrain API cannot be reached
+    required: false
+    default: "false"
+  path:
+    description: Directory to scan for model ids
+    required: false
+    default: "."
 runs:
   using: composite
   steps:
     - name: ModelBrain check
       shell: bash
-      run: echo "modelbrain-check is implemented in G090"
+      env:
+        MODELBRAIN_API_URL: ${{ inputs.api_url }}
+        MODELBRAIN_HQ: ${{ inputs.hq_country }}
+        MODELBRAIN_MARKETS: ${{ inputs.markets }}
+        MODELBRAIN_COMMERCIAL: ${{ inputs.commercial }}
+        MODELBRAIN_STRICT: ${{ inputs.strict }}
+        FAIL_ON_UNREACHABLE: ${{ inputs.fail_on_unreachable }}
+        MODELBRAIN_PATH: ${{ inputs.path }}
+      run: python3 "${{ github.action_path }}/check.py"

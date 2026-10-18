@@ -107,8 +107,8 @@ Milestones: **M1** = G001-G019 (O1), **M2** = G020-G029 (O4), **M3 (core, never 
 - [ ] **G087** Discussions ingested for demo models as `(:Discussion)-[:ABOUT]->(:Model)` with outcomes. **Verify:** Browser query.
 - [ ] **G088** Notifier drafts (FLOWS F10.2) with template text and approval tasks; posting only to `HF_POST_ALLOWLIST` with `HF_WRITE_TOKEN`; otherwise "ready to copy". **Accept:** a test proves posting to a non-allowlisted repo is impossible. **Verify:** `pytest tests/test_notifier.py`.
 - [ ] **G089** Live loop on our own test repo (README + config only, "test fixture, contains no weights"): post, edit card, check now, tier 4, reopened rulings, Outcome FIXED. **Verify:** `/live-loop` run recorded. *(cuttable: keep replay)*
-- [ ] **G090** GitHub Action `actions/modelbrain-check` (FLOWS F12) with job summary and exit codes; never fails CI when our API is unreachable unless configured. **Verify:** demo repo PR red with OPEA, green with an allowed model. *(cuttable)*
-- [ ] **G091** `POST /api/ci/check`. **Verify:** API test.
+- [x] **G090** GitHub Action `actions/modelbrain-check` (FLOWS F12) with job summary and exit codes; never fails CI when our API is unreachable unless configured. **Verify:** demo repo PR red with OPEA, green with an allowed model. *(cuttable)* Done 18 Oct 2026: stdlib scanner + job summary; verified locally: OPEA fails for DE (exit 1), passes for US, unreachable API does not fail the build (`tests/test_ci.py`).
+- [x] **G091** `POST /api/ci/check`. **Verify:** API test. Done 18 Oct 2026 (`routes/ci.py`, max 20 models, 45 s ingest timeout per model).
 - [ ] **G092** Watchlist file `data/watchlist.json` (Xkev, its children, meta-llama roots in the demo). **Verify:** watcher log.
 - [ ] **G093** Resolver runs after prewarm and nightly. **Verify:** `/api/admin/resolver/last`.
 - [x] **G094** Sandbox users can run "check now" only for models in their sandbox's deployments. **Verify:** test. Done 18 Oct 2026 (sandbox token may only check its own deployments; 403 otherwise).

@@ -22,6 +22,7 @@ from app.mcp_server import mcp, mcp_http_app
 from app.observe import OriginAllowlistMiddleware, RequestIdMiddleware, configure_logging
 from app.routes.admin import router as admin_router
 from app.routes.algo import router as algo_router
+from app.routes.ci import router as ci_router
 from app.routes.dna import router as dna_router
 from app.routes.eval import router as eval_router
 from app.routes.ingest import router as ingest_router
@@ -104,6 +105,7 @@ app.include_router(eval_router)
 app.include_router(tenants_router)
 app.include_router(dna_router)
 app.include_router(loop_router)
+app.include_router(ci_router)
 
 
 @app.get("/api/health")
