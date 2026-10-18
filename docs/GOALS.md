@@ -124,7 +124,7 @@ Milestones: **M1** = G001-G019 (O1), **M2** = G020-G029 (O4), **M3 (core, never 
 - [ ] **G102** Local path: README "Run locally" works on a clean machine with Docker only (`docker compose up`, `npm run dev -- -p 3001`). **Verify:** a teammate follows it from scratch.
 - [ ] **G103** Rule 3 evidence in README: the G044 clip plus a sentence explaining that every answer is a FalkorDB query. **Verify:** README.
 - [ ] **G104** Load: 50 concurrent cached verdicts complete with no errors and p95 under 2 s; 20 concurrent ruling writes produce correct 409s. **Verify:** `scripts/load.py` output saved.
-- [ ] **G105** Rate limits per API "Conventions" return 429 with `retry_after_s`. **Verify:** test.
+- [x] **G105** Rate limits per API "Conventions" return 429 with `retry_after_s`. **Verify:** test. Done 18 Oct 2026: per-IP sliding windows (verdict 30/min, ingest 6/10 min, sandbox 3/h, else 120/min), 429 with retry_after_s, admin token and health exempt (`app/ratelimit.py`, `tests/test_ratelimit.py`); verified live: 30 x 200 then 429.
 - [x] **G106** Input validation rejects bad model ids and countries with 422. **Verify:** test. Done 18 Oct 2026: bad model ids, countries and markets return 422 INVALID_INPUT (verdict, ci, dna routes).
 - [ ] **G107** Prewarm complete on production before judging; demo models answer from cache. **Verify:** smoke.sh timing.
 - [x] **G108** Mobile layout of every page at 375 px with no horizontal scroll. **Verify:** Playwright screenshots. Done 18 Oct 2026: 8 main pages measured at 375 px, no horizontal page scroll (wide tables scroll inside their own box).

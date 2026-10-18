@@ -15,11 +15,15 @@ check() {
 
 json() { python3 -I -c "import json,sys; d=json.load(sys.stdin); print($1)"; }
 
+# With ADMIN_TOKEN set, requests are exempt from the per-IP rate limits.
+AUTH=()
+if [ -n "${ADMIN_TOKEN:-}" ]; then AUTH=(-H "Authorization: Bearer $ADMIN_TOKEN"); fi
+
 health=$(curl -fsS -m 10 "$API/api/health")
 check "health: falkordb up" "$(echo "$health" | json "int(d.get('falkordb')=='up')")"
 
 verdict() {
-  curl -fsS -m 60 -X POST "$API/api/verdict" -H 'content-type: application/json' \
+  curl -fsS -m 60 ${AUTH[@]+"${AUTH[@]}"} -X POST "$API/api/verdict" -H 'content-type: application/json' \
     -d "{\"model_id\":\"OPEA/Llama-3.2V-11B-cot-int4-sym-inc\",\"context\":{\"hq_country\":\"$1\",\"markets\":[\"$1\"],\"commercial\":true,\"mau\":1000,\"distributes_weights\":false,\"end_user_only\":false}}"
 }
 check "OPEA in DE is BLOCKED" "$(verdict DE | json "int(d.get('verdict')=='BLOCKED')")"

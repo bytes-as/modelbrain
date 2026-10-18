@@ -20,6 +20,7 @@ from app.hf.client import hub_status
 from app.jobs.runner import schedule_prewarm
 from app.mcp_server import mcp, mcp_http_app
 from app.observe import OriginAllowlistMiddleware, RequestIdMiddleware, configure_logging
+from app.ratelimit import RateLimitMiddleware
 from app.routes.admin import router as admin_router
 from app.routes.algo import router as algo_router
 from app.routes.ci import router as ci_router
@@ -105,6 +106,8 @@ async def lifespan(_app: FastAPI):
 app = FastAPI(title="ModelBrain", version=VERSION, lifespan=lifespan)
 _origins = get_settings().cors_origins
 app.add_middleware(RequestIdMiddleware)
+# Inside CORS so 429 responses still carry CORS headers.
+app.add_middleware(RateLimitMiddleware)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=_origins,

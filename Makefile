@@ -17,10 +17,10 @@ test:          ## API tests against the FalkorDB service container
 	docker compose run --rm --no-deps -v "$(CURDIR):/repo" -w /repo/services/api api sh -c 'pip install -q -e ".[dev]" >/dev/null && pytest -q'
 
 smoke:         ## health, verdicts, replay, weight DNA, MCP and pages
-	scripts/smoke.sh $(API) $(WEB)
+	ADMIN_TOKEN=$$(grep '^ADMIN_TOKEN=' .env | cut -d= -f2-) scripts/smoke.sh $(API) $(WEB)
 
 eval:          ## re-run the frozen eval and write eval/report.json
-	python3 -I eval/run_eval.py --api $(API)
+	ADMIN_TOKEN=$$(grep '^ADMIN_TOKEN=' .env | cut -d= -f2-) python3 -I eval/run_eval.py --api $(API)
 
 seed:          ## re-create missing demo tenants (restart runs the bootstrap)
 	docker compose restart api
