@@ -146,7 +146,7 @@ Milestones: **M1** = G001-G019 (O1), **M2** = G020-G029 (O4), **M3 (core, never 
 - [ ] **G121** Submission form completed before 18 Oct 2026, 23:00 IST: repo, video, live URL, tracks (Track 1 primary; Track 2; Track 3), team members registered (rule 1, 5, 7). **Verify:** confirmation screenshot.
 - [ ] **G122** `docs/EXPLAINER.md` rehearsed by every team member (rule 12). **Verify:** each member explains Q1, R1 and D1 aloud.
 - [ ] **G123** Blog post draft for the side prize, published after submission. *(cuttable)*
-- [ ] **G124** No competitor names or comparisons in the public repo, README, video or blog (rules 16-17). **Verify:** grep the repo for names listed in the private notes.
+- [x] **G124** No competitor names or comparisons in the public repo, README, video or blog (rules 16-17). **Verify:** grep the repo for names listed in the private notes. Checked 18 Oct 2026: no rival product or project names in README, docs (except OPEN_POINTS), web, API or data.
 - [ ] **G125** Final checklist: BLUEPRINT section 17 fully ticked; every goal here done or struck through with a reason. **Verify:** review this file.
 
 ## 9. Add-ons (after M6 unless noted; all cuttable in the order of BLUEPRINT section 18)
