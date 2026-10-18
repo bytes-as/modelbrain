@@ -314,6 +314,33 @@ ORDER BY fetched_at DESC
 LIMIT 1;
 """
 
+C1 = """
+MERGE (l:License {key: $license_key})
+SET l.name = $name, l.url = $url
+MERGE (c:Clause {id: $id})
+SET c.kind = $kind, c.effect = $effect, c.applies_when = $applies_when, c.check = $check,
+    c.summary = $summary, c.quote = $quote, c.locator = $locator, c.source_url = $source_url,
+    c.source_raw_url = $source_raw_url, c.section = $section
+MERGE (l)-[:IMPOSES]->(c);
+"""
+
+C2 = """
+CREATE (:ClauseLoad {id: $id, at: $now, resolved: $resolved, unresolved: $unresolved});
+"""
+
+C3 = """
+MATCH (m:Model {id: $model_id})
+RETURN m.name_starts_with AS name_starts_with, m.card_has_llama_notice AS card_has_llama_notice,
+       m.has_license_file AS has_license_file, m.declared_license AS declared_license,
+       m.pipeline_tag AS pipeline_tag;
+"""
+
+C4 = """
+MATCH (c:Clause)
+RETURN sum(CASE WHEN c.quote = '' OR c.quote IS NULL THEN 0 ELSE 1 END) AS resolved,
+       sum(CASE WHEN c.quote = '' OR c.quote IS NULL THEN 1 ELSE 0 END) AS unresolved;
+"""
+
 QUERIES = {
     "SCHEMA": SCHEMA,
     "I1": I1,
@@ -351,4 +378,8 @@ QUERIES = {
     "O5": O5,
     "L1": L1,
     "L2": L2,
+    "C1": C1,
+    "C2": C2,
+    "C3": C3,
+    "C4": C4,
 }

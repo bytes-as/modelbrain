@@ -10,7 +10,9 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import get_settings
 from app.errors import install_error_handlers
-from app.graph.db import connect, health_snapshot
+from app.graph.db import connect, health_snapshot, ro_query
+from app.graph.queries import C4
+from app.graph.rows import as_rows
 from app.graph.schema import apply_schema
 from app.observe import OriginAllowlistMiddleware, RequestIdMiddleware, configure_logging
 
@@ -49,12 +51,23 @@ install_error_handlers(app)
 def health() -> dict[str, object]:
     snap = health_snapshot()
     up = snap["falkordb"] == "up"
+    clauses = {"resolved": 0, "unresolved": 0}
+    if up:
+        try:
+            found = as_rows(ro_query("hub", C4))
+            if found:
+                clauses = {
+                    "resolved": int(found[0].get("resolved") or 0),
+                    "unresolved": int(found[0].get("unresolved") or 0),
+                }
+        except Exception:
+            log.warning("clause counts unavailable")
     return {
         "ok": up,
         "falkordb": snap["falkordb"],
         "graphs": snap["graphs"],
         "hub_models": snap["hub_models"],
-        "clauses": {"resolved": 0, "unresolved": 0},
+        "clauses": clauses,
         "hf": "degraded",
         "version": VERSION,
     }

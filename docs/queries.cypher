@@ -327,3 +327,30 @@ WITH r, f, newer, s
 WHERE newer IS NULL
 MATCH (r)-[fr:FOR]->(dep:Deployment)<-[o:OWNS]-(owner:Person)
 RETURN DISTINCT r.id AS ruling_id, dep.id AS deployment_id, owner.id AS owner_id;
+
+// ---------------------------------------------------------------------------
+// CLAUSE LOADER - hub. Quotes are extracted at runtime; this only stores the result.
+// ---------------------------------------------------------------------------
+
+// C1: upsert a licence and one clause
+MERGE (l:License {key: $license_key})
+SET l.name = $name, l.url = $url
+MERGE (c:Clause {id: $id})
+SET c.kind = $kind, c.effect = $effect, c.applies_when = $applies_when, c.check = $check,
+    c.summary = $summary, c.quote = $quote, c.locator = $locator, c.source_url = $source_url,
+    c.source_raw_url = $source_raw_url, c.section = $section
+MERGE (l)-[:IMPOSES]->(c);
+
+// C2: append a clause-loader run
+CREATE (:ClauseLoad {id: $id, at: $now, resolved: $resolved, unresolved: $unresolved});
+
+// C3: properties of the queried model used by obligation checks
+MATCH (m:Model {id: $model_id})
+RETURN m.name_starts_with AS name_starts_with, m.card_has_llama_notice AS card_has_llama_notice,
+       m.has_license_file AS has_license_file, m.declared_license AS declared_license,
+       m.pipeline_tag AS pipeline_tag;
+
+// C4: how many clause quotes resolved
+MATCH (c:Clause)
+RETURN sum(CASE WHEN c.quote = '' OR c.quote IS NULL THEN 0 ELSE 1 END) AS resolved,
+       sum(CASE WHEN c.quote = '' OR c.quote IS NULL THEN 1 ELSE 0 END) AS unresolved;
