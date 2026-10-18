@@ -25,3 +25,16 @@ def test_verdict_503_when_falkordb_is_down() -> None:
             )
     assert response.status_code == 503
     assert response.json()["error"]["code"] == "GRAPH_UNAVAILABLE"
+
+
+def test_any_route_returns_503_when_falkordb_is_down() -> None:
+    import redis.exceptions
+
+    client = TestClient(app, raise_server_exceptions=False)
+    with patch(
+        "app.routes.dna.ro_query",
+        side_effect=redis.exceptions.ConnectionError("Error 111 connecting to falkordb:6379"),
+    ):
+        response = client.get("/api/dna/hidden")
+    assert response.status_code == 503
+    assert response.json()["error"]["code"] == "GRAPH_UNAVAILABLE"

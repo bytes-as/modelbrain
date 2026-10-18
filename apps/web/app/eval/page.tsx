@@ -29,7 +29,7 @@ export default function EvalPage() {
         if (!r.ok) throw new Error("eval");
         setReport((await r.json()) as Report);
       })
-      .catch(() => setError("Eval report not available yet. Run eval/run_eval.py."));
+      .catch(() => setError("Could not reach the API. Check that it is running and try again."));
   }, []);
 
   return (

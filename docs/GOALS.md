@@ -128,7 +128,7 @@ Milestones: **M1** = G001-G019 (O1), **M2** = G020-G029 (O4), **M3 (core, never 
 - [x] **G106** Input validation rejects bad model ids and countries with 422. **Verify:** test. Done 18 Oct 2026: bad model ids, countries and markets return 422 INVALID_INPUT (verdict, ci, dna routes).
 - [ ] **G107** Prewarm complete on production before judging; demo models answer from cache. **Verify:** smoke.sh timing.
 - [x] **G108** Mobile layout of every page at 375 px with no horizontal scroll. **Verify:** Playwright screenshots. Done 18 Oct 2026: 8 main pages measured at 375 px, no horizontal page scroll (wide tables scroll inside their own box).
-- [ ] **G109** Error and empty states for every page (no data, sandbox expired, hub down, graph down). **Verify:** Playwright with mocked failures.
+- [x] **G109** Error and empty states for every page (no data, sandbox expired, hub down, graph down). **Verify:** Playwright with mocked failures. Done 18 Oct 2026: every page checked with the API stopped (clear message, no crash); with FalkorDB stopped every API route returns 503 GRAPH_UNAVAILABLE (was 500 outside /api/verdict); empty findings and empty watcher log have their own copy.
 - [ ] **G110** Security: tokens compared in constant time; no tokens in logs or the graph; admin endpoints require `ADMIN_TOKEN`. **Verify:** test.
 
 - [x] **G111** Hub snapshot export: `make export` writes the hub and tenant graphs to `exports/*.cypher` (or RDB via `BGSAVE` copy) so the demo can be restored in minutes. **Verify:** restore into a fresh container and run smoke.sh. Done 18 Oct 2026: `make export` / `make import` (DUMP/RESTORE, `scripts/graphs.py`); round trip into a fresh FalkorDB restored 3,707 hub nodes with a working vector index and WCC.

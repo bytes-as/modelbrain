@@ -104,5 +104,25 @@ def install_error_handlers(app: FastAPI) -> None:
 
     @app.exception_handler(Exception)
     async def unhandled(_request: Request, exc: Exception) -> JSONResponse:
+        if _graph_down(exc):
+            log.warning("falkordb unavailable: %s", type(exc).__name__)
+            return envelope(
+                "GRAPH_UNAVAILABLE",
+                "FalkorDB is not reachable.",
+                hint="Start FalkorDB and retry.",
+                retry_after_s=5,
+            )
         log.exception("unhandled error: %s", type(exc).__name__)
         return envelope("INTERNAL", "Something went wrong.")
+
+
+def _graph_down(exc: BaseException) -> bool:
+    """Connection-level failures talking to FalkorDB (redis client errors), anywhere in the chain."""
+    import redis.exceptions as rx
+
+    seen: BaseException | None = exc
+    while seen is not None:
+        if isinstance(seen, rx.ConnectionError | rx.TimeoutError | ConnectionRefusedError):
+            return True
+        seen = seen.__cause__ or seen.__context__
+    return False
