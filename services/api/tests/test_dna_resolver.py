@@ -179,3 +179,37 @@ def test_wrong_close_pair_loses_to_the_true_pair() -> None:
     best = dna.best_merge(child, {"a": a, "a2": a2, "b": b}, 512)
     assert best is not None
     assert {p["id"] for p in best["parents"]} == {"a", "b"}
+
+
+def test_trace_weights_is_an_mcp_tool() -> None:
+    import asyncio
+
+    from app.mcp_server import mcp
+
+    names = {tool.name for tool in asyncio.run(mcp.list_tools())}
+    assert "trace_weights" in names
+
+
+def test_verdict_paths_carry_weight_evidence(graph: str) -> None:
+    from app.engine.verdict import verdict_from_graph
+
+    rng = random.Random(21)
+    base = _vec(rng)
+    _model(graph, "meta/base", "2024-04-18", lic="llama3_2", root=True)
+    _model(graph, "x/hidden", "2025-01-01", lic="apache-2.0")
+    _fp(graph, "meta/base", base)
+    _fp(graph, "x/hidden", _near(rng, base, 0.05))
+    db.query(graph, W10, {"ids": ["meta/base"]})
+    dna.run_dna_resolver(graph)
+    context = {
+        "hq_country": "US",
+        "markets": ["US"],
+        "commercial": True,
+        "mau": 0,
+        "distributes_weights": False,
+        "end_user_only": False,
+    }
+    decided = verdict_from_graph("x/hidden", context, graph=graph, min_tier=1)
+    hop = [p for p in decided["paths"] if len(p["path"]) == 2]
+    assert hop and hop[0]["methods"] == ["weights"]
+    assert hop[0]["weights_sims"][0] > 0.9

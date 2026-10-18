@@ -198,6 +198,56 @@ async def confirm_edge(child: str, parent: str, tenant: str, token: str, person_
     )
 
 
+@mcp.tool(
+    description=(
+        "Trace a Hugging Face model's true parent from its weights, not its model card. "
+        "Samples about 2 KB of weight values with HTTP range reads and searches the "
+        "fingerprint index in FalkorDB. Returns the closest parents, any two-parent merge "
+        "found, and how much of the sampled weights trace to each root."
+    )
+)
+async def trace_weights(model_id: str) -> str:
+    import re
+
+    from app.engine import dna
+    from app.graph.queries import W2, W8, W13
+    from app.hf.dna import Sampler
+
+    if not re.match(r"^[\w.-]+/[\w.-]+$", model_id):
+        return json.dumps({"error": "model_id must look like owner/name"})
+    settings = get_settings()
+    state = as_rows(ro_query("hub", W13, {"ids": [model_id]}))
+    if not state:
+        from app.jobs.runner import _ingest_once
+
+        await _ingest_once(model_id)
+        state = as_rows(ro_query("hub", W13, {"ids": [model_id]}))
+    if not state:
+        return json.dumps({"model_id": model_id, "error": "model not found on the Hub"})
+    status = state[0].get("status")
+    if status != "OK":
+        client = dna._client()
+        try:
+            sampler = Sampler(client, settings.dna_per_tensor)
+            status = await dna.fingerprint_into_graph(
+                sampler, "hub", model_id, str(state[0].get("sha") or "main")
+            )
+        finally:
+            await client.aclose()
+    result: dict[str, Any] = {"model_id": model_id, "dna_status": status}
+    if status == "OK":
+        result["candidates"] = as_rows(
+            ro_query("hub", W2, {"id": model_id, "k": 50, "min_sim": settings.dna_related_min})
+        )
+        result["written"] = dna.resolve_model("hub", model_id)
+        result["exposure"] = as_rows(ro_query("hub", W8, {"id": model_id, "min_tier": 1}))
+    result["note"] = (
+        "Weights closely matching a parent means obligations of that parent may apply. "
+        "Automated screening, not legal advice."
+    )
+    return json.dumps(result, default=str)
+
+
 _http_app = None
 
 

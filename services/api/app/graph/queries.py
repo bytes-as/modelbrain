@@ -68,6 +68,9 @@ RETURN a.id AS ancestor, a.is_root AS is_root, a.multimodal AS multimodal, lengt
        [n IN nodes(p) | n.id] AS path,
        [r IN relationships(p) | r.tier] AS tiers,
        [r IN relationships(p) | r.relation] AS relations,
+       [r IN relationships(p) | r.method] AS methods,
+       [r IN relationships(p) | r.weights_sim] AS weights_sims,
+       [r IN relationships(p) | r.share] AS shares,
        l.key AS license,
        collect(CASE WHEN c IS NULL THEN null ELSE
                 {id: c.id, kind: c.kind, effect: c.effect, applies_when: c.applies_when,

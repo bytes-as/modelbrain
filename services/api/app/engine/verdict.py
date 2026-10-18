@@ -209,6 +209,11 @@ def _paths(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 "path": list(path),
                 "tiers": [int(item) for item in (row.get("tiers") or [])],
                 "relations": [str(item) for item in (row.get("relations") or [])],
+                "methods": [None if m is None else str(m) for m in (row.get("methods") or [])],
+                "weights_sims": [
+                    None if v is None else float(v) for v in (row.get("weights_sims") or [])
+                ],
+                "shares": [None if v is None else float(v) for v in (row.get("shares") or [])],
             }
         )
     return found

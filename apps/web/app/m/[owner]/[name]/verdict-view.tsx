@@ -30,8 +30,36 @@ type Verdict = {
   alternatives_message?: string | null;
   cypher?: { q1: string; q2: string };
   computed_ms?: number;
-  paths?: { path: string[]; tiers: number[]; relations: string[] }[];
+  paths?: PathRow[];
 };
+
+type PathRow = {
+  path: string[];
+  tiers: number[];
+  relations: string[];
+  methods?: (string | null)[];
+  weights_sims?: (number | null)[];
+  shares?: (number | null)[];
+};
+
+type Exposure = { root: string; is_root: boolean; root_license: string | null; exposure: number };
+
+function edgeChip(row: PathRow | undefined, index: number, parent: string): string | null {
+  if (!row) return null;
+  const method = row.methods?.[index] ?? null;
+  const sim = row.weights_sims?.[index] ?? null;
+  const share = row.shares?.[index] ?? null;
+  if (method === "weights_merge" && share !== null) {
+    return `Merge · ${Math.round(share * 100)}% of sampled weights from ${parent}`;
+  }
+  if (method === "weights" && sim !== null) {
+    return `Weights match ${parent} · similarity ${sim.toFixed(3)}`;
+  }
+  if (sim !== null) {
+    return `Declared · confirmed by weights ${sim.toFixed(3)}`;
+  }
+  return null;
+}
 
 const COLOUR: Record<string, string> = {
   ALLOWED: "#2fbf71",
@@ -53,6 +81,7 @@ export function VerdictView({
   const [error, setError] = useState("");
   const [progress, setProgress] = useState<string[]>([]);
   const [verdict, setVerdict] = useState<Verdict | null>(null);
+  const [exposure, setExposure] = useState<Exposure[]>([]);
 
   useEffect(() => {
     const base = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
@@ -88,6 +117,15 @@ export function VerdictView({
       }
       setVerdict(body);
       setState("done");
+      const merged = ((body.paths ?? []) as PathRow[]).some((row) =>
+        row.methods?.includes("weights_merge"),
+      );
+      if (merged) {
+        fetch(`${base}/api/dna/exposure/${modelId}`, { signal: controller.signal })
+          .then((r) => (r.ok ? r.json() : []))
+          .then((rows: Exposure[]) => setExposure(rows))
+          .catch(() => setExposure([]));
+      }
     }
 
     async function followEvents(url: string) {
@@ -160,6 +198,8 @@ export function VerdictView({
   const label = verdict.verdict.replaceAll("_", " ");
   const cards = [...verdict.blocking, ...verdict.needs_counsel, ...verdict.obligations];
   const path = cards[0]?.path ?? verdict.paths?.[0]?.path ?? [];
+  const pathRow = verdict.paths?.find((row) => row.path.join(">") === path.join(">"));
+  const hasMerge = (verdict.paths ?? []).some((row) => row.methods?.includes("weights_merge"));
 
   return (
     <div className="mt-6 space-y-6" data-testid="verdict-done">
@@ -187,13 +227,39 @@ export function VerdictView({
         </Link>
       </p>
       {path.length > 0 ? (
-        <ol className="flex flex-wrap gap-2 font-mono text-xs" data-testid="lineage-path">
-          {path.map((id) => (
-            <li key={id} className="rounded bg-surface px-2 py-1">
-              {id}
+        <ol
+          className="flex flex-wrap items-center gap-2 font-mono text-xs"
+          data-testid="lineage-path"
+        >
+          {path.map((id, index) => {
+            const chip = index > 0 ? edgeChip(pathRow, index - 1, id) : null;
+            return (
+              <li key={id} className="flex items-center gap-2">
+                {index > 0 ? <span className="text-muted">→</span> : null}
+                {chip ? (
+                  <span
+                    className="rounded border border-accent/40 px-2 py-1 font-sans text-accent"
+                    data-testid="weights-chip"
+                    title="We compared a small sample of the actual weight values (about 2 KB). The model card does not declare this parent."
+                  >
+                    {chip}
+                  </span>
+                ) : null}
+                <span className="rounded bg-surface px-2 py-1">{id}</span>
+              </li>
+            );
+          })}
+        </ol>
+      ) : null}
+      {hasMerge && exposure.length > 0 ? (
+        <ul className="text-sm text-muted" data-testid="weights-exposure">
+          {exposure.map((row) => (
+            <li key={row.root}>
+              About {Math.round(row.exposure * 100)}% of the sampled weights trace to {row.root}
+              {row.root_license ? ` (${row.root_license})` : ""}.
             </li>
           ))}
-        </ol>
+        </ul>
       ) : null}
       <div className="space-y-3" data-testid="clause-cards">
         {cards.map((hit) => (
@@ -235,8 +301,7 @@ export function VerdictView({
             </ul>
           ) : (
             <p className="mt-2 text-sm text-muted">
-              {verdict.alternatives_message ||
-                "No compliant alternative in our candidate set."}
+              {verdict.alternatives_message || "No compliant alternative in our candidate set."}
             </p>
           )}
         </section>
@@ -252,10 +317,14 @@ export function VerdictView({
         <summary className="cursor-pointer text-accent">How we decided</summary>
         <p className="mt-2 text-muted">Computed in {verdict.computed_ms ?? 0} ms.</p>
         {verdict.cypher?.q1 ? (
-          <pre className="mt-2 overflow-x-auto rounded bg-surface p-3 text-xs">{verdict.cypher.q1}</pre>
+          <pre className="mt-2 overflow-x-auto rounded bg-surface p-3 text-xs">
+            {verdict.cypher.q1}
+          </pre>
         ) : null}
         {verdict.cypher?.q2 ? (
-          <pre className="mt-2 overflow-x-auto rounded bg-surface p-3 text-xs">{verdict.cypher.q2}</pre>
+          <pre className="mt-2 overflow-x-auto rounded bg-surface p-3 text-xs">
+            {verdict.cypher.q2}
+          </pre>
         ) : null}
       </details>
       <p className="text-sm">{verdict.explanation}</p>

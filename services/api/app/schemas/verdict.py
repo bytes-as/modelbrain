@@ -40,6 +40,10 @@ class PathOut(BaseModel):
     method: str | None = None
     weights_sim: float | None = None
     share: float | None = None
+    # Per-edge weight DNA evidence, aligned with `relations` (null when absent).
+    methods: list[str | None] = []
+    weights_sims: list[float | None] = []
+    shares: list[float | None] = []
 
 
 class VerdictOut(BaseModel):
