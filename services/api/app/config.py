@@ -75,9 +75,7 @@ def load_settings(source: Mapping[str, str] | None = None) -> Settings:
     """Read settings. Blank HF_TOKEN warns. Blank admin token or salt fails."""
     env = os.environ if source is None else source
     missing = [
-        key
-        for key in ("ADMIN_TOKEN", "PUBLISHER_SALT")
-        if not str(env.get(key, "")).strip()
+        key for key in ("ADMIN_TOKEN", "PUBLISHER_SALT") if not str(env.get(key, "")).strip()
     ]
     if missing:
         raise ConfigError(f"missing required setting: {', '.join(missing)}")

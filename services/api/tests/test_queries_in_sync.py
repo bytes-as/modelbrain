@@ -7,6 +7,7 @@ from pathlib import Path
 
 from app.graph.queries import QUERIES
 
+
 def _repo_root() -> Path:
     for parent in Path(__file__).resolve().parents:
         if (parent / "docs" / "queries.cypher").is_file():
@@ -18,15 +19,41 @@ ROOT = _repo_root()
 HEADER = re.compile(r"^//\s+((?:SCHEMA|[IQRDPTOAL]\d+))\b")
 EXPECTED = (
     "SCHEMA",
-    "I1", "I2", "I3", "I4", "I5",
-    "Q1", "Q2", "Q3",
-    "R1", "R2", "R3",
-    "D1", "D2", "D3",
+    "I1",
+    "I2",
+    "I3",
+    "I4",
+    "I5",
+    "Q1",
+    "Q2",
+    "Q3",
+    "R1",
+    "R2",
+    "R3",
+    "D1",
+    "D2",
+    "D3",
     "P1",
-    "T1", "T2", "T3", "T4", "T5", "T6", "T7", "T8",
-    "A1", "A2", "A3", "A4", "A5",
-    "O1", "O2", "O3", "O4", "O5",
-    "L1", "L2",
+    "T1",
+    "T2",
+    "T3",
+    "T4",
+    "T5",
+    "T6",
+    "T7",
+    "T8",
+    "A1",
+    "A2",
+    "A3",
+    "A4",
+    "A5",
+    "O1",
+    "O2",
+    "O3",
+    "O4",
+    "O5",
+    "L1",
+    "L2",
 )
 
 

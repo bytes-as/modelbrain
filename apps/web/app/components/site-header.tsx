@@ -58,7 +58,10 @@ export function SiteHeader() {
         <Link href="/" className="text-lg text-text">
           ModelBrain
         </Link>
-        <p className="ml-auto inline-flex items-center gap-2 text-xs text-muted" data-testid="health-dot">
+        <p
+          className="ml-auto inline-flex items-center gap-2 text-xs text-muted"
+          data-testid="health-dot"
+        >
           <span
             className="inline-block h-2.5 w-2.5 rounded-full"
             style={{ background: DOT[health] }}

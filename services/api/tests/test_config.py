@@ -41,7 +41,9 @@ def test_defaults_and_types() -> None:
 
 
 def test_every_env_example_key_is_a_setting() -> None:
-    field_names = {name.upper() for name in load_settings(_required(HF_TOKEN="x")).__class__.model_fields}
+    field_names = {
+        name.upper() for name in load_settings(_required(HF_TOKEN="x")).__class__.model_fields
+    }
     assert field_names == set(ENV_KEYS)
 
 

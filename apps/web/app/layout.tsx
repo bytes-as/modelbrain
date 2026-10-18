@@ -16,7 +16,9 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} ${interTight.variable} ${jetbrains.variable} flex min-h-screen flex-col`}>
+      <body
+        className={`${inter.variable} ${interTight.variable} ${jetbrains.variable} flex min-h-screen flex-col`}
+      >
         <SiteHeader />
         <div className="mx-auto w-full max-w-6xl flex-1 px-4 py-8">{children}</div>
         <SiteFooter />
