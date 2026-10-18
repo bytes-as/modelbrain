@@ -6,10 +6,15 @@ import json
 import time
 from typing import Any
 
+import json
+
 from app.engine.clauses import applies, obligation_status, parse_json_field, seed_path
 from app.graph import db
 from app.graph.queries import C3, Q1, Q2
 from app.graph.rows import as_rows
+from app.paths import repo_root
+
+NO_ALTERNATIVES = "No compliant alternative in our candidate set."
 
 DISCLAIMER = "Automated screening, not legal advice."
 
@@ -173,6 +178,19 @@ def verdict_from_graph(
     decided["strict"] = min_tier >= 2
     decided["context"] = context
     decided["alternatives"] = []
+    decided["alternatives_message"] = None
+    if decided["verdict"] == "BLOCKED":
+        from app.engine.alternatives import find_alternatives
+
+        alts, message = find_alternatives(
+            context,
+            graph=graph,
+            min_tier=min_tier,
+            pipeline_tag=str(model.get("pipeline_tag") or "") or None,
+            exclude=model_id,
+        )
+        decided["alternatives"] = alts
+        decided["alternatives_message"] = message
     decided["ruling_id"] = None
     decided["stale"] = False
     decided["explanation_source"] = "template"

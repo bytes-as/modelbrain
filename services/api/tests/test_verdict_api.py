@@ -104,6 +104,8 @@ def _seed() -> None:
 
 
 def test_verdict_endpoint_blocks_opea_in_germany() -> None:
+    from app.schemas.verdict import VerdictOut
+
     _seed()
     client = TestClient(app)
     response = client.post(
@@ -123,6 +125,19 @@ def test_verdict_endpoint_blocks_opea_in_germany() -> None:
     assert isinstance(body["computed_ms"], int)
     assert body["explanation_source"] == "template"
     assert response.headers["x-request-id"]
+    parsed = VerdictOut.model_validate(body)
+    assert parsed.blocking
+    hit = parsed.blocking[0]
+    assert hit.clause_id
+    assert hit.path
+    assert hit.source_url
+    assert hit.section is not None
+    assert hit.quote is not None or hit.quote is None
+    assert isinstance(hit.edge_tiers, list)
+    assert body["alternatives"] is not None
+    assert body["alternatives"] or body.get("alternatives_message") == (
+        "No compliant alternative in our candidate set"
+    )
 
 
 def test_verdict_rejects_a_bad_model_id() -> None:
