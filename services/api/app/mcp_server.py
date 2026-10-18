@@ -279,6 +279,24 @@ async def trace_weights(model_id: str) -> str:
     return json.dumps(result, default=str)
 
 
+@mcp.tool(
+    description=(
+        "Where can a model be run through an API provider, and can it be served from a region? "
+        "Lists OpenRouter providers serving the model's weights, their headquarters and "
+        "datacenter countries, and proves when no provider serves it from the requested "
+        "residency (e.g. 'EU')."
+    )
+)
+async def where_can_i_run(model_id: str, residency: str | None = None) -> str:
+    import re
+
+    from app.engine import hosted
+
+    if not re.match(r"^[\w.-]+/[\w.-]+$", model_id):
+        return json.dumps({"error": "model_id must look like owner/name"})
+    return json.dumps(await hosted.where_can_i_run(model_id, residency), default=str)
+
+
 _http_app = None
 
 

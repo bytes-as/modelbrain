@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
+import { HostedPanel } from "./hosted-panel";
+
 type Hit = {
   clause_id: string;
   summary: string;
@@ -334,6 +336,7 @@ export function VerdictView({
           </article>
         ))}
       </div>
+      <HostedPanel modelId={modelId} hq={hq} />
       {verdict.verdict === "BLOCKED" ? (
         <section data-testid="alternatives">
           <h2 className="text-lg">Alternatives in our candidate set</h2>

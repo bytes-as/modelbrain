@@ -636,6 +636,14 @@ SET m.vocab_dna = $vocab
 RETURN m.id AS id
 """
 
+X23 = """
+MATCH (h:HostedModel)-[:IS]->(:Model {id: $hf_id})
+OPTIONAL MATCH (p:Provider)-[s:SERVES]->(h)
+WITH h, collect(CASE WHEN p IS NULL THEN null ELSE {slug: p.slug, name: p.name, hq: p.hq, datacenters: p.datacenters, quantization: s.quantization} END) AS providers
+RETURN h.id AS or_id, h.name AS name, providers
+ORDER BY or_id
+"""
+
 QUERIES = {
     "SCHEMA": SCHEMA,
     "I1": I1,
@@ -719,4 +727,5 @@ QUERIES = {
     "X20": X20,
     "X21": X21,
     "X22": X22,
+    "X23": X23,
 }

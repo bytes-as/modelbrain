@@ -615,3 +615,10 @@ RETURN size(bad) AS removed
 MATCH (m:Model {id: $id})
 SET m.vocab_dna = $vocab
 RETURN m.id AS id
+
+// X23: (hub) hosted models backed by a Hugging Face model, with the providers that serve them
+MATCH (h:HostedModel)-[:IS]->(:Model {id: $hf_id})
+OPTIONAL MATCH (p:Provider)-[s:SERVES]->(h)
+WITH h, collect(CASE WHEN p IS NULL THEN null ELSE {slug: p.slug, name: p.name, hq: p.hq, datacenters: p.datacenters, quantization: s.quantization} END) AS providers
+RETURN h.id AS or_id, h.name AS name, providers
+ORDER BY or_id

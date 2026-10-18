@@ -26,6 +26,7 @@ from app.routes.algo import router as algo_router
 from app.routes.ci import router as ci_router
 from app.routes.dna import router as dna_router
 from app.routes.eval import router as eval_router
+from app.routes.hosted import router as hosted_router
 from app.routes.ingest import router as ingest_router
 from app.routes.loop import router as loop_router
 from app.routes.models import router as models_router
@@ -38,6 +39,18 @@ configure_logging()
 log = logging.getLogger("modelbrain")
 
 VERSION = "0.1.0"
+
+
+async def _hosted_catalog_forever() -> None:
+    """OpenRouter catalogue sync at startup and every OPENROUTER_CATALOG_REFRESH_HOURS (F16.1)."""
+    from app.engine import hosted
+
+    while True:
+        try:
+            await hosted.sync_catalog()
+        except Exception:
+            log.warning("openrouter catalogue sync failed")
+        await asyncio.sleep(hosted.refresh_hours() * 3600)
 
 
 async def _watch_forever() -> None:
@@ -67,6 +80,7 @@ async def _clean_sandboxes_forever(every_s: int = 600) -> None:
 async def lifespan(_app: FastAPI):
     cleaner: asyncio.Task[None] | None = None
     watcher_task: asyncio.Task[None] | None = None
+    catalog_task: asyncio.Task[None] | None = None
     get_settings()
     try:
         connect()
@@ -94,11 +108,12 @@ async def lifespan(_app: FastAPI):
         schedule_prewarm()
         cleaner = asyncio.create_task(_clean_sandboxes_forever())
         watcher_task = asyncio.create_task(_watch_forever())
+        catalog_task = asyncio.create_task(_hosted_catalog_forever())
     # MCP session manager (required for streamable HTTP)
     mcp.streamable_http_app()
     async with mcp.session_manager.run():
         yield
-    for task in (cleaner, watcher_task):
+    for task in (cleaner, watcher_task, catalog_task):
         if task is not None:
             task.cancel()
 
@@ -126,6 +141,7 @@ app.include_router(tenants_router)
 app.include_router(dna_router)
 app.include_router(loop_router)
 app.include_router(ci_router)
+app.include_router(hosted_router)
 
 
 @app.get("/api/health")
