@@ -22,7 +22,7 @@ Milestones: **M1** = G001-G019 (O1), **M2** = G020-G029 (O4), **M3 (core, never 
 - [x] **G013** No string-built Cypher with user input anywhere. **Accept:** a test greps `services/api/app` for f-strings or `+` concatenation inside `.query(` calls and finds none. **Verify:** `pytest tests/test_no_cypher_injection.py`. Done 18 Oct 2026.
 - [x] **G014** All variable-length patterns are bounded (`*0..6` or `*1..6`). **Accept:** a test greps queries.py for `*]` or `*)` without bounds and finds none. **Verify:** same test file. Done 18 Oct 2026.
 - [ ] **G015** Railway services `falkordb` (private networking, volume, `requirepass`) and `api` are deployed; Vercel project for `apps/web`. **Accept:** public `/api/health` green from the Vercel page. **Verify:** open the Vercel URL.
-- [ ] **G016** `scripts/smoke.sh <api> <web>` checks health, verdict for OPEA in DE and US, lineage, and MCP `tools/list`. **Accept:** exits 0 against the deployment. **Verify:** run it.
+- [x] **G016** `scripts/smoke.sh <api> <web>` checks health, verdict for OPEA in DE and US, lineage, and MCP `tools/list`. **Accept:** exits 0 against the deployment. **Verify:** run it. Done 18 Oct 2026 locally (13 checks, exit 0); rerun against the deployment.
 
 - [x] **G017** `.env.example` is complete and matches `app/config.py` exactly (a test compares the variable lists). **Verify:** `pytest tests/test_env_example.py`. Done 18 Oct 2026.
 - [ ] **G018** `Makefile` targets: `up`, `down`, `test`, `smoke`, `eval`, `seed`, `reset` (deletes and re-seeds tenant graphs only, never the hub). **Verify:** run each target.
@@ -133,7 +133,7 @@ Milestones: **M1** = G001-G019 (O1), **M2** = G020-G029 (O4), **M3 (core, never 
 
 - [ ] **G111** Hub snapshot export: `make export` writes the hub and tenant graphs to `exports/*.cypher` (or RDB via `BGSAVE` copy) so the demo can be restored in minutes. **Verify:** restore into a fresh container and run smoke.sh.
 - [ ] **G112** Uptime check: a free external monitor (or a GitHub Actions cron) hits `/api/health` every 30 minutes during the judging window and alerts the team. **Verify:** first alert test.
-- [ ] **G113** Judge-day runbook `docs/RUNBOOK.md`: how to restart services, re-seed tenants, re-run prewarm, rotate tokens, and what to do if the Hub rate-limits. **Verify:** a teammate restarts the stack using only the runbook.
+- [x] **G113** Judge-day runbook `docs/RUNBOOK.md`: how to restart services, re-seed tenants, re-run prewarm, rotate tokens, and what to do if the Hub rate-limits. **Verify:** a teammate restarts the stack using only the runbook. Done 18 Oct 2026 (`docs/RUNBOOK.md`).
 - [ ] **G114** Cost guard: Railway spend limit set; LLM daily budget enforced; sandbox cap 50. **Verify:** settings screenshots in `docs/evidence/`.
 
 ## 8. Submission (M8)
