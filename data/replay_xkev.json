@@ -1,0 +1,88 @@
+{
+  "_readme": "Real, public Hugging Face history for the Xkev replay (FLOWS F11), checked 18 Oct 2026 via /api/models/Xkev/Llama-3.2V-11B-cot/commits/main and /discussions. Metadata only, no licence text.",
+  "model_id": "Xkev/Llama-3.2V-11B-cot",
+  "base_model": "meta-llama/Llama-3.2-11B-Vision-Instruct",
+  "card_license_now": "apache-2.0",
+  "timeline": [
+    {
+      "date": "2024-11-19",
+      "kind": "PUBLISHED",
+      "label": "Model published; card declares apache-2.0 on Llama 3.2 Vision weights",
+      "ref": "830021d2cd"
+    },
+    {
+      "date": "2025-07-09",
+      "kind": "DISCUSSION_OPENED",
+      "label": "Discussion #12 \"License compatibility\" opened",
+      "ref": "https://huggingface.co/Xkev/Llama-3.2V-11B-cot/discussions/12"
+    },
+    {
+      "date": "2025-07-15",
+      "kind": "PR",
+      "label": "PR #13 merged: model card links and tags",
+      "ref": "dfdcec1f9f"
+    },
+    {
+      "date": "2025-07-23",
+      "kind": "PR",
+      "label": "PR #14 merged: AI bill of materials",
+      "ref": "7ee73286de"
+    },
+    {
+      "date": "2025-11-16",
+      "kind": "README",
+      "label": "README updated",
+      "ref": "213eb383f1"
+    },
+    {
+      "date": "2025-11-16",
+      "kind": "LICENSE_FILE_ADDED",
+      "label": "LICENSE_llama.txt uploaded (the upstream fix)",
+      "ref": "e8c2529775"
+    }
+  ],
+  "fix": {
+    "date": "2025-11-16",
+    "commit": "e8c2529775",
+    "days_after_report": 130,
+    "change": "has_license_file: false -> true"
+  },
+  "children": [
+    {
+      "id": "OPEA/Llama-3.2V-11B-cot-int4-sym-inc",
+      "relation": "quantized"
+    },
+    {
+      "id": "mt1234/unsloth_finetune",
+      "relation": "finetune"
+    },
+    {
+      "id": "Teera/Llama-3.2v-COT-Thai",
+      "relation": "finetune"
+    },
+    {
+      "id": "cxhoang/ft-llava-cot",
+      "relation": "finetune"
+    },
+    {
+      "id": "cxhoang/ft-llava-cot-causal-qa",
+      "relation": "finetune"
+    },
+    {
+      "id": "cxhoang/ft-llava-cot-cage-semicolon",
+      "relation": "finetune"
+    },
+    {
+      "id": "cxhoang/ft-llava-cot-cage-semicolon-min",
+      "relation": "finetune"
+    },
+    {
+      "id": "cxhoang/ft-llava-cot-cage-adjacency-min",
+      "relation": "finetune"
+    },
+    {
+      "id": "cxhoang/ft-llava-cot-cage-multi-formats",
+      "relation": "finetune"
+    }
+  ]
+}

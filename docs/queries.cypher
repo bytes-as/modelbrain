@@ -459,3 +459,28 @@ RETURN m.id AS id ORDER BY m.created_at
 // W13: fingerprint state for the crawl (skip models already sampled)
 MATCH (m:Model) WHERE m.id IN $ids
 RETURN m.id AS id, m.sha AS sha, m.dna_status AS status
+
+// ---------------------------------------------------------------------------
+// --- Loop: fan-out audit and compounding (FLOWS F8, F9) ---
+// ---------------------------------------------------------------------------
+
+// X1: (hub) audit record of one reverse fan-out run
+CREATE (f:FanOut {id: $id, model_id: $model_id, reason: $reason, at: $now, descendants: $descendants,
+                  not_inherited: $not_inherited, reopened: $reopened, graphs: $graphs})
+RETURN f.id AS id
+
+// X2: (tenant graph) a person in this company confirmed a lineage edge (the hub only sees a salted hash)
+MATCH (p:Person {id: $person_id})
+CREATE (e:Event {id: $event_id, kind: 'CONFIRMED_EDGE', at: $now, child: $child, parent: $parent})
+CREATE (e)-[:BY]->(p)
+RETURN e.id AS id
+
+// X3: (hub) current trust state of one lineage edge
+MATCH (c:Model {id: $child})-[e:DERIVED_FROM]->(p:Model {id: $parent})
+RETURN e.tier AS tier, coalesce(e.confirmations, 0) AS confirmations, e.source AS source, e.relation AS relation
+
+// X4: (hub) most recent fan-out runs
+MATCH (f:FanOut)
+RETURN f.id AS id, f.model_id AS model_id, f.reason AS reason, f.at AS at, f.descendants AS descendants,
+       f.not_inherited AS not_inherited, f.reopened AS reopened, f.graphs AS graphs
+ORDER BY f.at DESC LIMIT $limit

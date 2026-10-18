@@ -23,6 +23,7 @@ from app.routes.algo import router as algo_router
 from app.routes.dna import router as dna_router
 from app.routes.eval import router as eval_router
 from app.routes.ingest import router as ingest_router
+from app.routes.loop import router as loop_router
 from app.routes.models import router as models_router
 from app.routes.sandbox import router as tenants_router
 from app.routes.verdict import router as verdict_router
@@ -85,6 +86,7 @@ app.include_router(admin_router)
 app.include_router(eval_router)
 app.include_router(tenants_router)
 app.include_router(dna_router)
+app.include_router(loop_router)
 
 
 @app.get("/api/health")

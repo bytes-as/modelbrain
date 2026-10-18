@@ -16,7 +16,7 @@ def _repo_root() -> Path:
 
 
 ROOT = _repo_root()
-HEADER = re.compile(r"^//\s+((?:SCHEMA|[IQRDPTOALC]\d+|W\d+B?))\b")
+HEADER = re.compile(r"^//\s+((?:SCHEMA|[IQRDPTOALC]\d+|W\d+B?|X\d+))\b")
 EXPECTED = (
     "SCHEMA",
     "I1",
@@ -75,6 +75,10 @@ EXPECTED = (
     "W11",
     "W12",
     "W13",
+    "X1",
+    "X2",
+    "X3",
+    "X4",
 )
 
 

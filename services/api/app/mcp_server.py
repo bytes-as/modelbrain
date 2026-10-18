@@ -185,17 +185,21 @@ async def watch(model_id: str, tenant: str, token: str) -> str:
     )
 )
 async def confirm_edge(child: str, parent: str, tenant: str, token: str, person_id: str) -> str:
-    return json.dumps(
-        {
-            "tier_before": 1,
-            "tier_after": 1,
-            "confirmations": 1,
-            "hint": "Publisher runs in G085; confirmation recorded for the tenant.",
-            "child": child,
-            "parent": parent,
-            "person_id": person_id,
+    from app.engine.watcher import confirm_edge as publish_confirmation
+    from app.errors import ApiError
+    from app.tenants.auth import resolve_tenant
+
+    try:
+        graph = resolve_tenant(tenant, token=token, write=True)
+    except ApiError as exc:
+        return json.dumps({"ok": False, "error": exc.code, "message": str(exc)})
+    result = publish_confirmation(graph, child, parent, person_id)
+    if "fan_out" in result:
+        result["fan_out"] = {
+            "descendants": result["fan_out"]["descendants"],
+            "reopened": len(result["fan_out"]["reopened"]),
         }
-    )
+    return json.dumps(result, default=str)
 
 
 @mcp.tool(
