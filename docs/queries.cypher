@@ -364,3 +364,76 @@ RETURN m.name_starts_with AS name_starts_with, m.card_has_llama_notice AS card_h
 MATCH (c:Clause)
 RETURN sum(CASE WHEN c.quote = '' OR c.quote IS NULL THEN 0 ELSE 1 END) AS resolved,
        sum(CASE WHEN c.quote = '' OR c.quote IS NULL THEN 1 ELSE 0 END) AS unresolved;
+
+// ---------------------------------------------------------------------------
+// --- Weight DNA --- (hub). See docs/ADDENDUM_WEIGHT_DNA.md section 8.
+// ---------------------------------------------------------------------------
+
+// W0: vector index over weight fingerprints (dimension = 2 * DNA_PER_TENSOR)
+CREATE VECTOR INDEX FOR (m:Model) ON (m.dna) OPTIONS {dimension:1024, similarityFunction:'cosine'}
+
+// W1: write a fingerprint (validate length 1024 in Python first)
+MATCH (m:Model {id:$id}) SET m.dna = vecf32($dna), m.dna_sig = $sig, m.dna_status = 'OK', m.dna_at = $now RETURN m.id
+
+// W1B: record a non-OK fingerprint status
+MATCH (m:Model {id:$id}) SET m.dna_status = $status, m.dna_at = $now RETURN m.id
+
+// W2: candidate parents by weight similarity (never for foundation references; same shape class; older models only)
+MATCH (c:Model {id:$id}) WHERE c.dna_status = 'OK' AND NOT coalesce(c.dna_reference, false)
+CALL db.idx.vector.queryNodes('Model', 'dna', $k, c.dna) YIELD node, score
+WITH c, node, 1 - score AS sim
+WHERE node <> c AND node.dna_sig = c.dna_sig AND node.created_at < c.created_at AND sim >= $min_sim
+RETURN node.id AS parent, sim, coalesce(node.is_root, false) AS is_root, node.created_at AS created_at
+ORDER BY sim DESC, is_root DESC, created_at ASC LIMIT 5
+
+// W3: write or corroborate a single-parent weight edge (never changes a declared edge's source or tier)
+MATCH (c:Model {id:$child}), (p:Model {id:$parent})
+MERGE (c)-[e:DERIVED_FROM]->(p)
+ON CREATE SET e.relation = 'inferred', e.source = 'inferred', e.method = 'weights', e.conf = $sim, e.tier = $tier,
+  e.evidence = $evidence, e.confirmations = 0, e.confirmers = []
+SET e.weights_sim = $sim
+RETURN e.source AS source, e.method AS method, e.tier AS tier, e.weights_sim AS weights_sim
+
+// W4: models whose weights match a parent the card does not declare (the headline finding); root = the top-most root above the parent
+MATCH (c:Model)-[e:DERIVED_FROM]->(p:Model)
+WHERE e.method IN ['weights', 'weights_merge'] AND NOT (c)-[:DERIVED_FROM {source:'declared'}]->()
+OPTIONAL MATCH path = (p)-[:DERIVED_FROM*0..6]->(r:Model {is_root:true})
+WITH c, e, p, r, path ORDER BY length(path) DESC
+WITH c, e, p, collect(r)[0] AS root
+RETURN c.id AS model, c.declared_license AS card_license, c.format AS format, p.id AS weights_parent,
+  coalesce(e.weights_sim, e.weights_r2) AS score, e.share AS share, root.id AS root, root.declared_license AS root_license
+ORDER BY score DESC LIMIT $limit
+
+// W5: declared parent and weights disagree (different families)
+MATCH (c:Model)-[:DERIVED_FROM {source:'declared'}]->(dp:Model), (c)-[w:DERIVED_FROM {method:'weights'}]->(wp:Model)
+WHERE dp <> wp AND NOT (dp)-[:DERIVED_FROM*1..6]->(wp) AND NOT (wp)-[:DERIVED_FROM*1..6]->(dp)
+RETURN c.id AS model, dp.id AS declared_parent, wp.id AS weights_parent, w.weights_sim AS sim
+ORDER BY sim DESC LIMIT $limit
+
+// W6: fingerprint coverage
+MATCH (m:Model) RETURN coalesce(m.dna_status, 'NOT_RUN') AS status, count(*) AS models ORDER BY models DESC
+
+// W7: write merge edges ($parents = [{id, share, r2, evidence}, ...]); never alters a declared edge
+MATCH (c:Model {id:$child})
+UNWIND $parents AS pr
+MATCH (p:Model {id:pr.id})
+MERGE (c)-[e:DERIVED_FROM]->(p)
+ON CREATE SET e.relation = 'merge', e.source = 'inferred', e.method = 'weights_merge', e.conf = pr.r2, e.tier = $tier,
+  e.share = pr.share, e.evidence = pr.evidence, e.confirmations = 0, e.confirmers = []
+SET e.weights_share = pr.share, e.weights_r2 = pr.r2
+RETURN p.id AS parent, e.source AS source, e.method AS method, e.share AS share, e.weights_share AS weights_share
+
+// W8: weight exposure per root or parentless ancestor (product of merge shares along each path, capped at 1)
+MATCH p = (m:Model {id:$id})-[:DERIVED_FROM*1..6]->(r:Model)
+WHERE (coalesce(r.is_root, false) OR NOT (r)-[:DERIVED_FROM]->()) AND all(e IN relationships(p) WHERE e.tier >= $min_tier)
+WITH r, sum(reduce(s = 1.0, e IN relationships(p) | s * coalesce(e.share, 1.0))) AS raw
+RETURN r.id AS root, coalesce(r.is_root, false) AS is_root, r.declared_license AS root_license, CASE WHEN raw > 1.0 THEN 1.0 ELSE raw END AS exposure
+ORDER BY exposure DESC
+
+// W9: GGUF header facts and licence ($license_key null when the header licence is unknown)
+MATCH (m:Model {id:$id})
+SET m.format = $format, m.gguf_file = $file, m.gguf_license = $gguf_license, m.gguf_basename = $basename
+WITH m WHERE $license_key IS NOT NULL
+MATCH (l:License {key:$license_key})
+MERGE (m)-[d:DECLARES]->(l) ON CREATE SET d.source = 'gguf_meta', d.as_of_sha = $sha
+RETURN m.id, d.source

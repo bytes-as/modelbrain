@@ -86,6 +86,30 @@ Trigger: after prewarm; after any ingest that wrote a model with no declared par
    2. Rule: `weights_sha256` in shared_kinds -> relation `mirror`, conf 0.97, tier 1. Else `tokenizer_sha` and `config_fp` both shared -> relation `inferred`, conf 0.8, tier 1. Else only `config_fp` -> relation `inferred`, conf 0.5, tier 0. Else skip.
    3. Pick the first candidate (R2 ordering). R3 to write the edge with `evidence = "shared " + kinds joined + " with " + root`.
 3. Emit a resolver report (counts per rule) to logs and `GET /api/admin/resolver/last`.
+4. Run F20 (weight DNA resolver) on the same trigger.
+
+## F20. Weight DNA resolver, fingerprint and crawl
+See `docs/ADDENDUM_WEIGHT_DNA.md` for sampling (section 2), graph fields (section 3), merge fit (section 6), GGUF (section 5) and wording (section 1.2).
+
+### F20.1 Sample and write fingerprint
+1. `services/api/app/hf/dna.py` (safetensors) and `app/hf/gguf.py` (GGUF-only repos) sample weight values through the HF client (30 s timeout, one retry; CDN range reads with at most 10 in flight).
+2. Validate vector length 1024 in Python before W1 (FalkorDB silently accepts wrong-length vectors). Non-OK statuses use W1B and log `{repo, sha, status, reason}` at INFO.
+3. Reference bases from `data/dna_references.json` are fingerprinted first (`fingerprint_from` mirror when gated); W1 writes the vector on the **official** node with `dna_reference = true`.
+
+### F20.2 Resolver step (after F4 hash resolver; also G093 nightly)
+For each model with `dna_status = 'OK'`, `dna_reference` not true, and no existing `DERIVED_FROM` with `method` in `weights` or `weights_merge`:
+1. W2 with `k = 50`, `min_sim = DNA_RELATED_MIN` → up to 5 candidates (same `dna_sig`, older `created_at`; never a `dna_reference` node).
+2. **Merge check first:** least-squares fit on stored vectors (addendum section 6); if accepted, W7 and stop.
+3. Else W3 on the best W2 row: `tier = 1` if `sim >= DNA_DERIVED_MIN` else `0`, `method = 'weights'`. On an existing declared edge, W3 only sets `weights_sim`.
+4. Never overwrite declared edges. Conflicts (declared parent ≠ weights parent, different families) remain both edges; W5 lists them.
+5. Extend resolver report at `GET /api/admin/resolver/last` with `dna: {ok, gated, quantized, unsupported, no_safetensors, error, edges_created, edges_corroborated, merges_found, gguf_ok}`.
+
+### F20.3 Vocab DNA and GGUF licence
+1. `vocab_dna` fingerprint from `tokenizer.json` or GGUF `tokenizer.ggml.tokens` (addendum 5.3); `HAS_FP` only — shared vocab alone never creates an edge in F4 or F20.
+2. GGUF header: W9 sets `format`, `gguf_*` fields; when `general.license` normalises and the card declares none, `DECLARES {source:'gguf_meta'}`.
+
+### F20.4 Crawl
+`services/api/app/jobs/dna_crawl.py`: Scout ingest (canonical id), fingerprint, F20.2; resumable via `DnaCrawl` and `dna_at` vs `last_modified`; `POST /api/admin/dna/crawl`, `GET /api/admin/dna/crawl/{job}`. Never commit sampled weight values.
 
 ## F5. MCP `can_i_use` (Claude Code, Cursor)
 1. Client connects to `https://<api>/mcp` (streamable HTTP). Server lists tools: `can_i_use`, `explain`, `lineage`, `watch`, `confirm_edge` with JSON schemas from `docs/API.md`.

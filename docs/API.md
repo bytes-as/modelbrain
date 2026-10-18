@@ -36,7 +36,11 @@ type Verdict = {
   blocking: ClauseHit[]; obligations: ClauseHit[]; needs_counsel: ClauseHit[]
   lineage_complete: boolean; incomplete_reasons: string[]
   alternatives: { model_id: string; verdict: VerdictKind }[]
-  paths: { path: string[]; tiers: number[]; relations: string[] }[]
+  paths: {
+    path: string[]; tiers: number[]; relations: string[]
+    method?: string | null; weights_sim?: number | null; share?: number | null
+  }[]
+  exposure?: { root: string; is_root: boolean; root_license: string | null; exposure: number }[]
   explanation: string; explanation_source: "llm" | "template"
   cypher: { q1: string; q2: string }
   ruling_id: string | null; stale: boolean
@@ -52,13 +56,19 @@ type Queued = { status: "QUEUED"; job_id: string; events_url: string }
 | Method | Path | Auth | Response |
 |---|---|---|---|
 | GET | `/api/health` | none | `{ok, falkordb:"up"|"down", graphs:string[], hub_models:number, clauses:{resolved,unresolved}, hf:"ok"|"degraded", version}` |
-| GET | `/api/admin/resolver/last` | admin | last resolver report |
+| GET | `/api/admin/resolver/last` | admin | last resolver report (includes `dna` counts after F20) |
 | POST | `/api/admin/reload-clauses` | admin | clause loader report |
+| POST | `/api/admin/dna/crawl` | admin | `{limit, include_gguf}` → `{job_id}` |
+| GET | `/api/admin/dna/crawl/{job_id}` | admin | crawl status and checkpoint |
 
 ### Models and verdicts
 | Method | Path | Body / query | Response |
 |---|---|---|---|
-| POST | `/api/verdict` | `{model_id, context, strict?, tenant?, deployment_id?, expected_ruling_id?}` | 200 `Verdict` or 202 `Queued` |
+| POST | `/api/verdict` | `{model_id, context, strict?, tenant?, deployment_id?, expected_ruling_id?}` (`model_id` may be a canonical id or an entry in `Model.aliases`) | 200 `Verdict` or 202 `Queued` |
+| GET | `/api/dna/hidden` | `limit=50` | W4 rows: metadata vs weights disagree |
+| GET | `/api/dna/conflicts` | `limit=50` | W5 rows: declared parent vs weights parent |
+| GET | `/api/dna/coverage` | | W6 status histogram |
+| GET | `/api/dna/exposure/{owner}/{name}` | `min_tier=1` | W8 exposure rows |
 | GET | `/api/models/{owner}/{name}` | | hub model properties + declared licence + snapshot count |
 | GET | `/api/models/{owner}/{name}/lineage` | `depth=6`, `min_tier=1` | `{nodes:[{id, declared_license, is_root, multimodal}], edges:[{child,parent,relation,source,tier,conf,evidence}]}` |
 | GET | `/api/models/{owner}/{name}/descendants` | `depth=2`, `limit=200` | `{descendants:[{id, declared_license, card_has_llama_notice, has_license_file}], fix_leverage:{descendants, not_inherited}}` |
@@ -117,8 +127,11 @@ Descriptions are written for the calling agent; keep them as below.
 | `families` | "Model families found by community detection over lineage." | `{}` | `[{community_id, size, sample}]` |
 | `watch` | "Subscribe a tenant to upstream changes for a model; changes reopen dependent rulings." | `{model_id, tenant, token}` | `{watching: true}` |
 | `confirm_edge` | "Confirm that a model derives from a parent. Two independent confirmations raise the edge's trust tier for everyone." | `{child, parent, tenant, token, person_id}` | publisher result |
+| `trace_weights` | "Sample or read a model's weight DNA fingerprint, find candidate parents by cosine similarity in FalkorDB, run merge detection, and return exposure along merge paths. Use when the model card may not declare the true parent." | `{model_id: string}` | `{dna_status, format, dna_sig, candidates, merge, edges_written, exposure}` |
 
 Every MCP call writes a `(:Turn {tool, args_json, verdict, at})` to the tenant's `(:Conversation)` when a tenant is given (persistent conversation history, Track 2).
+
+Config (see `.env.example`): `DNA_DERIVED_MIN` (default 0.60), `DNA_RELATED_MIN` (default 0.25), `DNA_PER_TENSOR` (512), `HF_REQ_PER_5MIN`, GGUF crawl limits.
 
 ## Add-on endpoints (BLUEPRINT section 18)
 | Method | Path | Body / query | Response |

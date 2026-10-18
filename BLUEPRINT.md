@@ -8,7 +8,8 @@ Submissions close **Sunday 18 Oct 2026, 11:59 PM IST**. Implementation: Cursor. 
 |---|---|---|
 | `AGENTS.md` | the rules every coding agent follows | binding |
 | `BLUEPRINT.md` (this file) | product, architecture, data model, logic | binding |
-| `docs/GOALS.md` | 138 numbered goals with acceptance tests: the work list Cursor executes in order | binding; the definition of done |
+| `docs/GOALS.md` | 151 numbered goals with acceptance tests: the work list Cursor executes in order | binding; the definition of done |
+| `docs/ADDENDUM_WEIGHT_DNA.md` | weight DNA, merge DNA, GGUF DNA, canonical ids (M6b) | binding (merged by G139) |
 | `docs/FLOWS.md` | every runtime flow step by step, with failure handling | binding |
 | `docs/API.md` | endpoint, type, error and MCP tool contract | binding |
 | `docs/UI.md` | every page, state and line of copy | binding |
@@ -141,13 +142,13 @@ FalkorDB cannot query across graphs, so the app joins graphs in code: the **hub*
 Nodes
 | Label | Key properties |
 |---|---|
-| `Model` | `id` (unique, e.g. `meta-llama/Llama-3.2-1B`), `sha`, `declared_license` (raw string or null), `pipeline_tag`, `created_at`, `last_modified`, `gated` (bool), `is_root` (bool, official base from an allowlisted org), `multimodal` (bool, from pipeline_tag/tags), `ingested_at`, `card_has_llama_notice` (bool), `has_license_file` (bool), `name_starts_with` (first token of the repo name) |
+| `Model` | `id` (unique, canonical Hub id from `GET /api/models/{id}`; see section 6.5), `sha`, `declared_license` (raw string or null), `pipeline_tag`, `created_at`, `last_modified`, `gated` (bool), `is_root` (bool, official base from an allowlisted org), `multimodal` (bool), `ingested_at`, `card_has_llama_notice` (bool), `has_license_file` (bool), `name_starts_with`, `declared_differs` (bool), `aliases` (list of non-canonical ids that redirect here), `dna_reference` (bool; true for ids in `data/dna_references.json`), `dna` (vecf32, 1024), `dna_sig`, `dna_status`, `dna_at`, `format` (`safetensors` or `gguf`), `gguf_file`, `gguf_license`, `gguf_basename` |
 | `License` | `key` (normalised: `llama3_2`, `apache-2.0`, `gemma`, `mit`, `cc-by-nc-4.0`, `unknown`, `other`), `name`, `url` |
 | `Clause` | `id` (e.g. `llama3_2.geo_eu_multimodal`), `kind`, `effect` (BLOCK, OBLIGATION, NEEDS_COUNSEL), `applies_when` (JSON string), `check` (JSON string or null), `summary`, `quote` (extracted at load time from the official source; null if unresolved), `locator`, `source_url`, `source_raw_url`, `section` |
 | `TenantRegistry` | `name` (graph name of each fixed tenant; no usage data) |
 | `Sandbox` | `name`, `expires_at` (no token stored) |
-| `ClauseLoad` / `FanOut` | audit records of loader runs and fan-out runs |
-| `Fingerprint` | `key` (unique: `<kind>:<value>`), `kind` (`weights_sha256`, `tokenizer_sha`, `config_fp`), `value` |
+| `ClauseLoad` / `FanOut` / `DnaCrawl` | audit records of loader runs, fan-out runs and DNA crawl jobs |
+| `Fingerprint` | `key` (unique: `<kind>:<value>`), `kind` (`weights_sha256`, `tokenizer_sha`, `config_fp`, `vocab_dna`), `value` |
 | `Discussion` | `key` (`<model_id>#<num>`), `title`, `status`, `opened_at`, `closed_at`, `url` |
 | `Outcome` | `id`, `kind` (FIXED, PARTIAL, REFUSED, SILENT), `days`, `observed_at`, `evidence_url` |
 | `Snapshot` | `id` (`<model_id>@<sha>`), `model_id`, `sha`, `declared_license`, `observed_at` (one per observed revision; append-only) |
@@ -155,8 +156,8 @@ Nodes
 Relationships
 | Type | From -> To | Properties |
 |---|---|---|
-| `DERIVED_FROM` | `Model` -> `Model` (child to parent) | `relation` (finetune, adapter, merge, quantized, mirror, inferred), `source` (declared, inferred), `conf` (0..1), `tier` (see below), `evidence` (string), `confirmations` (int), `confirmers` (list of salted tenant hashes) |
-| `DECLARES` | `Model` -> `License` | `as_of_sha` |
+| `DERIVED_FROM` | `Model` -> `Model` (child to parent) | `relation` (finetune, adapter, merge, quantized, mirror, inferred), `source` (declared, inferred), `method` (`weights`, `weights_merge`, or null for card/hash edges), `conf` (0..1), `tier` (see below), `evidence` (string), `weights_sim`, `share` (merge edges), `weights_share`, `weights_r2`, `confirmations` (int), `confirmers` (list of salted tenant hashes) |
+| `DECLARES` | `Model` -> `License` | `as_of_sha`, `source` (`declared`, `gguf_meta`, `matched_text`) |
 | `IMPOSES` | `License` -> `Clause` | |
 | `HAS_FP` | `Model` -> `Fingerprint` | |
 | `ABOUT` | `Discussion` -> `Model` | |
@@ -166,8 +167,8 @@ Relationships
 Edge tiers (trust grows over time; this is the compounding layer)
 | Tier | Meaning | Set by |
 |---|---|---|
-| 0 | weak inference (config fingerprint only) | Resolver |
-| 1 | strong inference (identical weights sha256, or tokenizer + config match) | Resolver |
+| 0 | weak inference (config fingerprint only, or weight similarity between `DNA_RELATED_MIN` and `DNA_DERIVED_MIN`) | Resolver / weight DNA (F20) |
+| 1 | strong inference (identical weights sha256, tokenizer + config match, or weight similarity >= `DNA_DERIVED_MIN`) | Resolver / weight DNA (F20) |
 | 2 | declared on the model card or tags | Scout |
 | 3 | confirmed by at least 2 independent tenants, or by public evidence | Publisher |
 | 4 | confirmed by the model author (card updated to declare it) | Watcher |
@@ -258,6 +259,7 @@ Verdict response (also the MCP `can_i_use` payload):
    - `weights_sha256`: `lfs.sha256` of every `*.safetensors` and `*.bin` file (one Fingerprint per file).
    - `tokenizer_sha`: `blobId` (or `lfs.sha256`) of `tokenizer.json`, else `tokenizer.model`.
    - `config_fp`: sha256 of canonical JSON of these `config.json` keys: `architectures, model_type, hidden_size, intermediate_size, num_hidden_layers, num_attention_heads, num_key_value_heads, vocab_size, max_position_embeddings, rope_theta, rope_scaling`. Skip if `config.json` is not fetchable.
+   - `vocab_dna`: sha256 prefix of the token vocabulary (see F20 and `docs/ADDENDUM_WEIGHT_DNA.md` section 5.3); joins the same WCC resolver (R1) but alone never creates an edge.
 2. Run `CALL algo.WCC({nodeLabels:['Model','Fingerprint'], relationshipTypes:['HAS_FP']}) YIELD node, componentId` and group models by component.
 3. For a model with **no declared parent** inside a component that contains a root model:
    - shares a `weights_sha256` with the root -> edge `relation: mirror, conf: 0.97, tier: 1`
@@ -265,6 +267,8 @@ Verdict response (also the MCP `can_i_use` payload):
    - shares only `config_fp` -> `relation: inferred, conf: 0.5, tier: 0`
    - pick the parent: the root in the component with the same `config_fp`; tie-break by earliest `created_at`.
 4. Never overwrite a declared edge with an inferred one. Write `evidence` naming the shared fingerprint keys.
+5. **Weight DNA resolver (F20):** after step 4, for each model with `dna_status = 'OK'`, `dna_reference` not true, and no `weights` / `weights_merge` edge yet, run W2–W3 (single parent) or merge fit + W7. Foundation models in `data/dna_references.json` are fingerprinted with `dna_reference = true` and are **never** candidates in W2/W7 (do not use `is_root` for this). Never overwrite a declared edge; if weights point to a different family than the declared parent, keep both edges (W5 lists conflicts). Vector index W0 lives only on `hub`.
+6. **Canonical ids:** always key `Model.id` by the `id` field that `GET /api/models/{id}` returns. When a declared `base_model` or a requested id differs (Hub redirect), write edges to the canonical node and append the requested id to `Model.aliases`. Verdict and MCP tools accept aliases (`id` or `$id IN m.aliases`).
 
 ### 6.4 Reverse fan-out and reopen
 Triggered by the Watcher when a hub model's `sha` changes (or when an edge tier changes):
@@ -437,6 +441,8 @@ H0 is the moment work starts. Person A: backend and graph. Person B: frontend, e
 
 **Cut order if behind** (cut from the top, never touch the H8 core): 1) GitHub Action fallback snapshot; 2) GitHub Action; 3) live posting loop (keep the Xkev replay); 4) sandbox copies (use the two fixed tenants, read-only for visitors); 5) LLM explanations (templates); 6) `/how-it-works` page (move content into README).
 
+**M6b cut order** (after add-ons in section 18, before core): G152 (merges/GGUF on `/findings`; keep verdict chips), G153 crawl size (fall back to prewarm + 500 models + 100 GGUF), G149 live GGUF check, G150 merge. **G140–G142, G145, G147 and G148 are not cuttable once started.**
+
 ---
 
 ## 15. The 3-minute video
@@ -495,7 +501,8 @@ Each add-on was accepted only if it strengthens the graph or the proof, not just
 | **Licence text watch** | Accept (after M6) | `LicenseText {url, sha, fetched_at}` versions, `(Clause)-[:FROM_TEXT]->(LicenseText)` (L1, L2); tenant query T8 | when Meta, Google or a provider changes a licence, use policy or terms page, every ruling resting on an affected clause reopens: knowledge kept current at the legal-text level |
 | **Web fetcher adapter (Firecrawl or Anakin)** | Accept as optional backend | none | plain HTTP already resolves 33 of 34 clause sources; the adapter handles JavaScript-heavy or custom licence pages linked from model cards (`cardData.license_link`) and can use the provider's change-tracking for the text watch. `WEB_FETCHER=httpx` (default), `firecrawl` or `anakin` |
 | **Custom licence resolution** | Accept (after M6) | `Model.license_text_sha`, `(Model)-[:DECLARES {source:"matched_text"}]->(License)` | models declaring `other` with a `license_link`: fetch the text, compare its normalised sha and distinctive phrases with known licence texts; a match becomes a declared licence, anything else stays NEEDS_COUNSEL. Lowers the CANNOT_DETERMINE rate without guessing |
-| **Ask the company brain (natural language)** | Accept (upgrades G079) | `Conversation`/`Turn` records | the LLM only chooses one of 8 templated Cypher questions and its parameters (tool selection); FalkorDB answers with sources. Model suggests, graph decides |
-| **Voice** | Accept only as a thin browser layer (cut first) | none | browser speech-to-text into the Ask box and spoken answers; about 1 hour; demo flair, no backend. A phone or realtime voice agent was rejected: it adds risk and no graph value |
+| ~~Ask the company brain (natural language)~~ | **Cut 18 Oct 2026** (was G079/G135/G136) | — | funded M6b weight DNA |
+| ~~Voice~~ | **Cut 18 Oct 2026** (was G137) | — | funded M6b weight DNA |
+| **Weight DNA (M6b)** | Accept (after M5, before other add-ons except G126) | `Model.dna` vector index (W0), weight/merge edges, GGUF header facts, exposure (W8) | provenance from sampled weight values, not only the model card; see `docs/ADDENDUM_WEIGHT_DNA.md` |
 
-Cut order for add-ons (cut these before anything in section 14): voice, custom licence resolution, web fetcher adapter (keep plain HTTP), licence text watch, hosted path, multi-LLM baseline (keep the declared-licence baseline). The OpenRouter gateway is part of the core because the explanation code uses it.
+Cut order for add-ons (cut these before anything in section 14): voice and Ask (already cut), custom licence resolution, web fetcher adapter (keep plain HTTP), licence text watch, hosted path, multi-LLM baseline (keep the declared-licence baseline). The OpenRouter gateway is part of the core because the explanation code uses it.

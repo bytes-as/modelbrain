@@ -9,7 +9,7 @@ Next.js (App Router, TypeScript, Tailwind) deployed on Vercel. Calls the API at 
 - Typeface: Inter Tight for headings, Inter for body, JetBrains Mono for ids and Cypher.
 
 ## Global layout
-- Top bar: logo "ModelBrain", nav: Check a model, Companies, Xkev replay, Live loop, MCP, Eval, How it works. A thin status dot reads `/api/health` (green up, amber degraded, red down with a banner "The graph database is restarting. Try again in a minute.").
+- Top bar: logo "ModelBrain", nav: Check a model, Findings, Companies, Xkev replay, Live loop, MCP, Eval, How it works. A thin status dot reads `/api/health` (green up, amber degraded, red down with a banner "The graph database is restarting. Try again in a minute.").
 - Footer: "Built for Graph Hacks with FalkorDB · Automated screening, not legal advice · Data: Hugging Face Hub public metadata and official licence texts · Companies shown are fictional."
 
 ## Pages
@@ -29,7 +29,7 @@ Content when done:
 1. Verdict badge (big) + one-line reason, e.g. "BLOCKED for a company based in Germany".
 2. Declared vs inherited strip: "Card declares apache-2.0 · Inherits Llama 3.2 Community License" (shown only when `declared_differs`).
 3. Context chips with "change" links; a "Flip HQ to US" quick action for EU contexts.
-4. Lineage graph (react-force-graph-2d): queried model on the left, roots on the right, edges styled by tier, nodes coloured by declared licence family; clicking a node opens its Hub page in a new tab.
+4. Lineage graph (react-force-graph-2d): queried model on the left, roots on the right, edges styled by tier, nodes coloured by declared licence family; clicking a node opens its Hub page in a new tab. Edge chips on the path (addendum section 9): `weights` → **"Weights match {parent} · similarity {sim}"** (tooltip: *"We compared a small sample of the actual weight values. The model card does not declare this parent."*); declared edge with `weights_sim` → **"Declared · confirmed by weights {sim}"**; merge edge → **"Merge · {share:.0%} of sampled weights from {parent}"**; licence from GGUF → **"Licence read from the GGUF file header"**. When W8 returns rows, show under the path: "About {exposure:.0%} of the sampled weights trace to {root} ({licence})".
 5. Clause cards: blocking first, then needs counsel, then obligations. Each: summary (our words), quote block (verbatim from source, labelled "From the licence"), section, "Source" link, the path that carried it, obligation status pill.
 6. Alternatives (only BLOCKED): "Alternatives in our candidate set" with their verdict pills; or "No compliant alternative in our candidate set."
 7. "How we decided" collapsible: the two Cypher queries (Q1, Q2) with parameters, execution time, edge tiers legend.
@@ -41,6 +41,14 @@ Content when done:
 - Per company: products -> deployments table (model id, owner, latest verdict pill, decided at, "trace" link), open tasks list with Claim/Approve/Reject buttons (sandbox only), events timeline (REOPENED, APPROVED, CONFIRMED_EDGE, SUPERSEDED).
 - Button "Try it as this company" -> `POST /api/sandbox` -> token in sessionStorage -> column switches to the sandbox.
 - Trace drawer (`/api/tenants/{t}/rulings/{id}/trace`): verdict, facts (model id, commit sha linking to the Hub commit, licence, clause ids), events with who signed.
+
+### `/findings` — "Where metadata and weights disagree"
+- Coverage line from W6: "Fingerprinted {ok} of {total} models; {gated} gated; {quantized} in formats we don't sample yet."
+- Table 1 (W4): "Weights match a parent the card does not declare" — columns: model (Hub link), format, card licence, weights parent (Hub link), score or share, root, root licence.
+- Table 2 (W5): "Declared parent and weights disagree" — model, declared parent, weights parent, similarity.
+- Table 3: top merges with exposure (W8 sample rows).
+- Copy follows addendum section 1.2: say "metadata and weights disagree", "weights closely match", "the card does not declare this parent", "obligations of the parent may apply"; never stolen, leaked, fake, violates, infringes. Disclaimer on the page.
+- Playwright must fail if forbidden words from section 1.2 appear anywhere on this page.
 
 ### `/hidden-lineage`
 - List of WCC components with unmasked re-uploads: "SicariusSicariiStuff/Llama-3.2-1B_Base_FP8 names no parent; shares tokenizer and config with meta-llama/Llama-3.2-1B (inferred, confidence 0.8)".
@@ -65,12 +73,12 @@ Content when done:
 - Diagram of the three graph layers (hub, tenants, sandboxes) on one FalkorDB instance; edge tiers; the privacy rule; the agents and their handoffs; the algorithms used and why; link to the repo and `docs/queries.cypher`.
 
 ## Copy rules
-- Never "violating", "illegal", "infringing". Use "may not be permitted", "differs from inherited obligations", "needs counsel".
+- Never "violating", "illegal", "infringing", "stolen", "leaked", "fake", "violates", "infringes". Use "may not be permitted", "metadata and weights disagree", "weights closely match", "the card does not declare this parent", "obligations of the parent may apply", "needs counsel". Prefer "machine-readable metadata" when prose on the card explains lineage the Hub fields omit.
 - Name companies and people with "(fictional)".
 - Error messages say what went wrong and how to fix it, no apologies.
 
 ## Add-on UI (BLUEPRINT section 18)
 - Verdict page: a "How do you run it?" switch: "Our own copy of the weights" (default) or "Through an API provider". The second shows a hosted-model search (from `/api/hosted`), a "Data must stay in" select (EU, US, specific countries), and a providers panel listing each provider with headquarters, datacenters, quantisation, uptime and terms link; when none qualify, a grey card: "No provider in our catalogue serves this model from an allowed datacenter."
-- `/companies`: "Ask this company" box with example questions as chips, a mic button (hidden if the browser lacks speech recognition), the answer table, the Cypher used, and sources.
+- ~~`/companies`: "Ask this company" box~~ (cut 18 Oct 2026; was G079/G135/G137).
 - `/how-it-works`: add the Provider and LicenseText layers to the diagram.
 - Copy: "Through an API provider" verdicts on Llama multimodal models show "Needs counsel: you call the model through a provider; whether the end-user exemption covers your product is a legal question."
