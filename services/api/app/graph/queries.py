@@ -192,6 +192,18 @@ SET t.state = 'CLAIMED', t.lease_until = $now + 120000, t.claimed_by = $agent
 RETURN t.id AS claimed;
 """
 
+T9 = """
+MATCH (c:Company)
+RETURN c.slug AS slug, c.name AS name, c.hq_country AS hq_country, c.eu AS eu, c.mau AS mau;
+"""
+
+T10 = """
+MATCH (prod:Product)-[:RUNS]->(dep:Deployment)
+OPTIONAL MATCH (dep)<-[:OWNS]-(owner:Person)
+RETURN prod.id AS product_id, prod.name AS product, dep.id AS deployment_id,
+       dep.model_id AS model, owner.name AS owner;
+"""
+
 T6 = """
 MATCH (prod:Product)-[:RUNS]->(dep:Deployment)<-[:FOR]-(r:Ruling)
 OPTIONAL MATCH (newer:Ruling)-[s:SUPERSEDES]->(r)
@@ -363,6 +375,8 @@ QUERIES = {
     "T3": T3,
     "T4": T4,
     "T5": T5,
+    "T9": T9,
+    "T10": T10,
     "T6": T6,
     "T7": T7,
     "T8": T8,

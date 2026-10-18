@@ -75,8 +75,8 @@ Milestones: **M1** = G001-G019 (O1), **M2** = G020-G029 (O4), **M3 (core, never 
 - [ ] **G059** Auditor batch sets `Model.declared_differs` for all hub models (needed by A1). **Accept:** OPEA and Xkev have `declared_differs = true`. **Verify:** Browser query.
 
 ## 5. Tenants, memory, MCP (M4)
-- [ ] **G060** Tenant bootstrap (FLOWS F0.6) loads `kestrel.cypher` and `harbor.cypher` into empty graphs; all names carry "(fictional)". **Accept:** `GET /api/tenants` lists both. **Verify:** API call.
-- [ ] **G061** Overview endpoint and `/companies` page show products, deployments, owners and latest verdict (T6). **Verify:** Playwright.
+- [x] **G060** Tenant bootstrap (FLOWS F0.6) loads `kestrel.cypher` and `harbor.cypher` into empty graphs; all names carry "(fictional)". **Accept:** `GET /api/tenants` lists both. **Verify:** API call. Done 18 Oct 2026.
+- [x] **G061** Overview endpoint and `/companies` page show products, deployments, owners and latest verdict (T6). **Verify:** Playwright. Done 18 Oct 2026. Overview API verified. Page is at `/companies`; open it locally. Playwright screenshot not re-run this pass.
 - [ ] **G062** Memory types are real and visible: episodic = Ruling/Event history; semantic = hub facts; procedural = `(:Playbook)` nodes per task kind seeded at bootstrap and linked by `(Task)-[:FOLLOWS]->(Playbook)`. **Accept:** README section "Memory" names each with a query. **Verify:** Browser queries.
 - [ ] **G063** One graph per company and per sandbox on a single FalkorDB instance. **Accept:** `GRAPH.LIST` shows hub, tenant_kestrel, tenant_harbor and any sbx_*. **Verify:** redis-cli.
 - [ ] **G064** Decision trace (T7) endpoint and drawer: ruling -> facts (model, commit sha linked to the Hub commit, licence, clause ids) -> events with who signed. **Verify:** Playwright.

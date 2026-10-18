@@ -205,6 +205,16 @@ WHERE t.state = 'OPEN' OR (t.state = 'CLAIMED' AND t.lease_until < $now)
 SET t.state = 'CLAIMED', t.lease_until = $now + 120000, t.claimed_by = $agent
 RETURN t.id AS claimed;
 
+// T9: company header
+MATCH (c:Company)
+RETURN c.slug AS slug, c.name AS name, c.hq_country AS hq_country, c.eu AS eu, c.mau AS mau;
+
+// T10: products and deployments, with or without a ruling
+MATCH (prod:Product)-[:RUNS]->(dep:Deployment)
+OPTIONAL MATCH (dep)<-[:OWNS]-(owner:Person)
+RETURN prod.id AS product_id, prod.name AS product, dep.id AS deployment_id,
+       dep.model_id AS model, owner.name AS owner;
+
 // T6: latest ruling per deployment (the "current knowledge" view for Track 3)
 MATCH (prod:Product)-[:RUNS]->(dep:Deployment)<-[:FOR]-(r:Ruling)
 OPTIONAL MATCH (newer:Ruling)-[s:SUPERSEDES]->(r)
