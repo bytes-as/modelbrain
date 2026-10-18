@@ -177,3 +177,36 @@ def model_discussions(owner: str, name: str) -> list[dict[str, object]]:
     from app.engine.discussions import discussions_for
 
     return discussions_for(_check_model(f"{owner}/{name}"))
+
+
+@router.post("/api/admin/licence-watch/run")
+async def licence_watch_run(authorization: str | None = Header(default=None)) -> dict:
+    require_admin(authorization)
+    from app.engine import licence_watch
+
+    return await licence_watch.run_watch()
+
+
+@router.get("/api/admin/licence-watch/last")
+def licence_watch_last(authorization: str | None = Header(default=None)) -> dict:
+    require_admin(authorization)
+    from app.engine import licence_watch
+
+    return licence_watch.last_report()
+
+
+@router.post("/api/admin/licences/resolve-custom")
+async def resolve_custom(authorization: str | None = Header(default=None)) -> dict:
+    require_admin(authorization)
+    from pathlib import Path
+
+    from app.config import get_settings
+    from app.engine import licence_watch
+    from app.hf.cache import DiskCache
+    from app.hf.client import HFClient
+
+    client = HFClient(token=get_settings().hf_token, cache=DiskCache(Path("/tmp/modelbrain-hf")))
+    try:
+        return await licence_watch.resolve_custom_licences(client)
+    finally:
+        await client.aclose()

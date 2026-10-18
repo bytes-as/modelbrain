@@ -644,6 +644,21 @@ RETURN h.id AS or_id, h.name AS name, providers
 ORDER BY or_id
 """
 
+X24 = """
+MATCH (m:Model)-[:DECLARES]->(:License {key: 'other'})
+RETURN m.id AS id, m.sha AS sha
+"""
+
+X25 = """
+MATCH (m:Model {id: $id})-[o:DECLARES]->(:License {key: 'other'})
+MATCH (l:License {key: $license_key})
+DELETE o
+MERGE (m)-[d:DECLARES]->(l)
+ON CREATE SET d.source = 'matched_text', d.as_of_sha = $sha
+SET m.license_text_sha = $text_sha
+RETURN l.key AS license
+"""
+
 QUERIES = {
     "SCHEMA": SCHEMA,
     "I1": I1,
@@ -728,4 +743,6 @@ QUERIES = {
     "X21": X21,
     "X22": X22,
     "X23": X23,
+    "X24": X24,
+    "X25": X25,
 }

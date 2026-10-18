@@ -53,6 +53,18 @@ async def _hosted_catalog_forever() -> None:
         await asyncio.sleep(hosted.refresh_hours() * 3600)
 
 
+async def _licence_watch_forever(every_s: int = 24 * 3600) -> None:
+    """Daily licence text watch (FLOWS F17); the first run records the baseline."""
+    from app.engine import licence_watch
+
+    while True:
+        try:
+            await licence_watch.run_watch()
+        except Exception:
+            log.warning("licence watch failed")
+        await asyncio.sleep(every_s)
+
+
 async def _watch_forever() -> None:
     """Scheduled watcher: re-check watched models every WATCH_INTERVAL_MINUTES."""
     from app.engine.watcher import watch_once
@@ -81,6 +93,7 @@ async def lifespan(_app: FastAPI):
     cleaner: asyncio.Task[None] | None = None
     watcher_task: asyncio.Task[None] | None = None
     catalog_task: asyncio.Task[None] | None = None
+    licence_task: asyncio.Task[None] | None = None
     get_settings()
     try:
         connect()
@@ -109,11 +122,12 @@ async def lifespan(_app: FastAPI):
         cleaner = asyncio.create_task(_clean_sandboxes_forever())
         watcher_task = asyncio.create_task(_watch_forever())
         catalog_task = asyncio.create_task(_hosted_catalog_forever())
+        licence_task = asyncio.create_task(_licence_watch_forever())
     # MCP session manager (required for streamable HTTP)
     mcp.streamable_http_app()
     async with mcp.session_manager.run():
         yield
-    for task in (cleaner, watcher_task, catalog_task):
+    for task in (cleaner, watcher_task, catalog_task, licence_task):
         if task is not None:
             task.cancel()
 

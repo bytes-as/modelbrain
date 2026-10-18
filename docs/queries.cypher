@@ -622,3 +622,16 @@ OPTIONAL MATCH (p:Provider)-[s:SERVES]->(h)
 WITH h, collect(CASE WHEN p IS NULL THEN null ELSE {slug: p.slug, name: p.name, hq: p.hq, datacenters: p.datacenters, quantization: s.quantization} END) AS providers
 RETURN h.id AS or_id, h.name AS name, providers
 ORDER BY or_id
+
+// X24: (hub) models that declare a custom ('other') licence, candidates for licence-text matching
+MATCH (m:Model)-[:DECLARES]->(:License {key: 'other'})
+RETURN m.id AS id, m.sha AS sha
+
+// X25: (hub) a linked licence text matched a known licence: replace the 'other' declaration (source matched_text)
+MATCH (m:Model {id: $id})-[o:DECLARES]->(:License {key: 'other'})
+MATCH (l:License {key: $license_key})
+DELETE o
+MERGE (m)-[d:DECLARES]->(l)
+ON CREATE SET d.source = 'matched_text', d.as_of_sha = $sha
+SET m.license_text_sha = $text_sha
+RETURN l.key AS license
