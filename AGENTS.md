@@ -27,7 +27,7 @@ Read `BLUEPRINT.md` section 0 (document map) before writing code. The binding do
 - Every endpoint validates input (model ids match `^[\w.-]+/[\w.-]+$`), returns typed errors, and logs with a request id. No secrets in logs.
 - Tests: pytest against a FalkorDB service container; golden verdict tests in `services/api/tests/golden/` must stay green. Add a test for every bug fixed.
 - Do not commit secrets. `.env` is git-ignored; `.env.example` lists every variable.
-- Git: conventional commits (`feat(api): ...`, `fix(web): ...`), one logical change per commit. Humans decide when to commit and push.
+- Git: conventional commits (`feat(api): ...`, `fix(web): ...`), one logical change per commit, stage only the files the task touched. Commit after each completed goal. Never push: humans decide when to push.
 
 ## Definition of done for any task
 - Build passes, tests pass, the deployed `/api/health` is green.
