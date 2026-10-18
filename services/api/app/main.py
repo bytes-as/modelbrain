@@ -15,6 +15,9 @@ from app.graph.queries import C4
 from app.graph.rows import as_rows
 from app.graph.schema import apply_schema
 from app.observe import OriginAllowlistMiddleware, RequestIdMiddleware, configure_logging
+from app.jobs.runner import schedule_prewarm
+from app.routes.ingest import router as ingest_router
+from app.routes.models import router as models_router
 from app.routes.tenants import router as tenants_router
 from app.routes.verdict import router as verdict_router
 from app.tenants.bootstrap import ensure_tenants
@@ -38,6 +41,7 @@ async def lifespan(_app: FastAPI):
             ensure_tenants()
         except Exception:
             log.exception("tenant bootstrap failed")
+        schedule_prewarm()
     yield
 
 
@@ -53,6 +57,8 @@ app.add_middleware(
 app.add_middleware(OriginAllowlistMiddleware, origins=_origins)
 install_error_handlers(app)
 app.include_router(verdict_router)
+app.include_router(ingest_router)
+app.include_router(models_router)
 app.include_router(tenants_router)
 
 

@@ -100,3 +100,43 @@ async def test_gated_readme_is_skipped(graph_name: str) -> None:
     )
     assert any(reason.startswith("README skipped: 403") for reason in result.incomplete_reasons)
     assert any(reason.startswith("config skipped: 401") for reason in result.incomplete_reasons)
+
+
+@pytest.mark.asyncio
+async def test_children_ingest_writes_one_level(graph_name: str) -> None:
+    root_id = "meta-llama/Llama-3.2-11B-Vision-Instruct"
+    child_ids = [f"demo/child-{index:02d}" for index in range(25)]
+    base = json.loads((FIXTURES / "meta-vision.json").read_text())
+
+    class ChildHub(FixtureHub):
+        def __init__(self) -> None:
+            super().__init__()
+            self.models[root_id] = base
+            for child_id in child_ids:
+                payload = dict(base)
+                payload["id"] = child_id
+                payload["modelId"] = child_id
+                payload["cardData"] = {}
+                payload["tags"] = []
+                self.models[child_id] = payload
+
+        async def children(self, model_id: str, relation: str, limit: int) -> list[str]:
+            if model_id == root_id and relation == "finetune":
+                return child_ids[:limit]
+            return []
+
+    result = await ingest(
+        root_id,
+        ChildHub(),
+        table=TABLE,
+        roots=ROOTS,
+        graph=graph_name,
+        children=True,
+    )
+    assert result.nodes >= 26
+    rows = db.ro_query(
+        graph_name,
+        "MATCH (:Model {id: $root})<-[:DERIVED_FROM]-(c:Model) RETURN count(c)",
+        {"root": root_id},
+    ).result_set
+    assert int(rows[0][0]) >= 25

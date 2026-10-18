@@ -2,25 +2,17 @@
 
 from __future__ import annotations
 
-import json
 import re
-from pathlib import Path
 
 from fastapi import APIRouter
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
-from app.agents.scout import ingest
-from app.config import get_settings
 from app.engine.verdict import verdict_from_graph
 from app.errors import ApiError
 from app.graph.db import ro_query
-from app.graph.queries import C3
 from app.graph.rows import as_rows
-from app.hf.cache import DiskCache
-from app.hf.client import HFClient, HubUnavailable
-from app.hf.live import LiveHub
-from app.hf.parse import load_normalise
-from app.paths import repo_root
+from app.jobs.runner import start_ingest
 
 router = APIRouter()
 
@@ -69,36 +61,14 @@ def _validate(body: VerdictIn) -> dict[str, object]:
 
 
 def _needs_ingest(model_id: str) -> bool:
-    rows = as_rows(ro_query("hub", C3, {"model_id": model_id}))
-    if not rows:
-        return True
-    return not rows[0].get("name_starts_with")
-
-
-async def _ingest(model_id: str) -> None:
-    root = repo_root()
-    seed = json.loads((root / "data" / "clauses.seed.json").read_text())
-    roots = set(json.loads((root / "data" / "roots.json").read_text())["orgs"])
-    settings = get_settings()
-    cache_dir = Path("/tmp/modelbrain-hf")
-    client = HFClient(token=settings.hf_token, cache=DiskCache(cache_dir))
-    try:
-        await ingest(
-            model_id,
-            LiveHub(client),
-            table=load_normalise(seed),
-            roots=roots,
-            graph="hub",
+    rows = as_rows(
+        ro_query(
+            "hub",
+            "MATCH (m:Model {id: $id}) RETURN m.ingested_at AS ingested_at",
+            {"id": model_id},
         )
-    except HubUnavailable as exc:
-        raise ApiError(
-            "HUB_UNAVAILABLE",
-            "The Hugging Face Hub is unavailable and this model is not cached.",
-            hint="Try again shortly.",
-            retry_after_s=exc.retry_after_s,
-        ) from exc
-    finally:
-        await client.aclose()
+    )
+    return not rows or rows[0].get("ingested_at") is None
 
 
 @router.post("/api/verdict")
@@ -106,7 +76,16 @@ async def post_verdict(body: VerdictIn) -> dict[str, object]:
     context = _validate(body)
     try:
         if _needs_ingest(body.model_id):
-            await _ingest(body.model_id)
+            queued, job_id = await start_ingest(body.model_id, wait_s=4.0)
+            if queued is not None:
+                return JSONResponse(
+                    status_code=202,
+                    content={
+                        "status": "QUEUED",
+                        "job_id": job_id,
+                        "events_url": f"/api/jobs/{job_id}/events",
+                    },
+                )
         return verdict_from_graph(
             body.model_id,
             context,
