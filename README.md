@@ -226,7 +226,7 @@ The intended deployment is the web app on Vercel and the API plus FalkorDB on Ra
 | [`data/`](data/) | Clause locators, EU country list, roots, demo tenants. No licence prose |
 | [`services/api`](services/api) | The API |
 | [`apps/web`](apps/web) | The web app |
-| [`eval/`](eval/) | Frozen eval set. A human writes `eval/labels.json` before the clause rules |
+| [`eval/`](eval/) | Frozen eval set: 40 models, 80 labels. Written by an agent on 18 Oct 2026 at the owner's request, before the clause engine |
 
 ## Licence
 

@@ -84,7 +84,7 @@ The build can continue without these. They block a public demo, gated model file
 - **OpenRouter** (`OPENROUTER_API_KEY` plus `LLM_MODEL`, an exact id from https://openrouter.ai/api/v1/models). Optional. Explanations, drafts, and the card-only eval baseline use templates when this is empty. A few dollars of credit covers the demo. `EVAL_BASELINE_MODELS` is only for the multi-model baseline, which is cuttable.
 - **Hugging Face write token** (`HF_WRITE_TOKEN`) and a test repo you own, containing only a README and a config, no weights. Put that repo id in `HF_POST_ALLOWLIST`. Only the live posting loop needs this, and that loop is cuttable.
 - **Firecrawl or Anakin keys.** Not needed. The default fetcher is plain HTTP, which is enough for the clause quotes.
-- **Eval labels.** `eval/labels.json` must be written by a person, 80 verdicts, and committed before the clause engine (G033). Do not leave this until the end.
+- **Eval labels.** Written by an agent on 18 Oct 2026 because the owner said there was no time for a human pass. 40 models, 80 labels, hash in `eval/labels.sha256`. The clause engine was not in the tree yet.
 - **Later, a person, not a vendor:** Claude Code screen recording, the 3-minute video, and the submission form before 23:00 IST.
 
 ## Questions for the owner

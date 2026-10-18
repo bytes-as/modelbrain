@@ -1,1 +1,750 @@
-[]
+{
+  "written_by": "agent",
+  "written_on": "2026-10-18",
+  "reason": "The owner asked for the labels immediately because there was no time for a separate human labeling pass. These are card-and-clause judgments, not a substitute for counsel.",
+  "mode": "default",
+  "contexts": {
+    "EU_COMMERCIAL": {
+      "hq_country": "DE",
+      "markets": [
+        "DE"
+      ],
+      "commercial": true,
+      "mau": 0,
+      "distributes_weights": false,
+      "end_user_only": false
+    },
+    "US_COMMERCIAL": {
+      "hq_country": "US",
+      "markets": [
+        "US"
+      ],
+      "commercial": true,
+      "mau": 2000000,
+      "distributes_weights": false,
+      "end_user_only": false
+    }
+  },
+  "labels": [
+    {
+      "model_id": "OPEA/Llama-3.2V-11B-cot-int4-sym-inc",
+      "group": "llama32_vision",
+      "context": "EU_COMMERCIAL",
+      "declared_license": "apache-2.0",
+      "verdict": "BLOCKED",
+      "declared_differs": true,
+      "note": "Card says apache-2.0. Ancestry reaches multimodal Llama 3.2 Vision."
+    },
+    {
+      "model_id": "OPEA/Llama-3.2V-11B-cot-int4-sym-inc",
+      "group": "llama32_vision",
+      "context": "US_COMMERCIAL",
+      "declared_license": "apache-2.0",
+      "verdict": "ALLOWED_WITH_OBLIGATIONS",
+      "declared_differs": true,
+      "note": "Card says apache-2.0. Ancestry reaches multimodal Llama 3.2 Vision."
+    },
+    {
+      "model_id": "Xkev/Llama-3.2V-11B-cot",
+      "group": "llama32_vision",
+      "context": "EU_COMMERCIAL",
+      "declared_license": "apache-2.0",
+      "verdict": "BLOCKED",
+      "declared_differs": true,
+      "note": "Card says apache-2.0. Finetune of meta-llama/Llama-3.2-11B-Vision-Instruct."
+    },
+    {
+      "model_id": "Xkev/Llama-3.2V-11B-cot",
+      "group": "llama32_vision",
+      "context": "US_COMMERCIAL",
+      "declared_license": "apache-2.0",
+      "verdict": "ALLOWED_WITH_OBLIGATIONS",
+      "declared_differs": true,
+      "note": "Card says apache-2.0. Finetune of meta-llama/Llama-3.2-11B-Vision-Instruct."
+    },
+    {
+      "model_id": "unsloth/Llama-3.2-11B-Vision-Instruct",
+      "group": "llama32_vision",
+      "context": "EU_COMMERCIAL",
+      "declared_license": "llama3.2",
+      "verdict": "BLOCKED",
+      "declared_differs": false,
+      "note": "Declares llama3.2. Finetune of the multimodal Vision instruct model."
+    },
+    {
+      "model_id": "unsloth/Llama-3.2-11B-Vision-Instruct",
+      "group": "llama32_vision",
+      "context": "US_COMMERCIAL",
+      "declared_license": "llama3.2",
+      "verdict": "ALLOWED_WITH_OBLIGATIONS",
+      "declared_differs": false,
+      "note": "Declares llama3.2. Finetune of the multimodal Vision instruct model."
+    },
+    {
+      "model_id": "unsloth/Llama-3.2-11B-Vision-Instruct-bnb-4bit",
+      "group": "llama32_vision",
+      "context": "EU_COMMERCIAL",
+      "declared_license": "llama3.2",
+      "verdict": "BLOCKED",
+      "declared_differs": false,
+      "note": "Declares llama3.2. Quant of the multimodal Vision instruct model."
+    },
+    {
+      "model_id": "unsloth/Llama-3.2-11B-Vision-Instruct-bnb-4bit",
+      "group": "llama32_vision",
+      "context": "US_COMMERCIAL",
+      "declared_license": "llama3.2",
+      "verdict": "ALLOWED_WITH_OBLIGATIONS",
+      "declared_differs": false,
+      "note": "Declares llama3.2. Quant of the multimodal Vision instruct model."
+    },
+    {
+      "model_id": "mlx-community/Llama-3.2-11B-Vision-Instruct-4bit",
+      "group": "llama32_vision",
+      "context": "EU_COMMERCIAL",
+      "declared_license": "llama3.2",
+      "verdict": "BLOCKED",
+      "declared_differs": false,
+      "note": "Declares llama3.2. Derived from the multimodal Vision instruct model."
+    },
+    {
+      "model_id": "mlx-community/Llama-3.2-11B-Vision-Instruct-4bit",
+      "group": "llama32_vision",
+      "context": "US_COMMERCIAL",
+      "declared_license": "llama3.2",
+      "verdict": "ALLOWED_WITH_OBLIGATIONS",
+      "declared_differs": false,
+      "note": "Declares llama3.2. Derived from the multimodal Vision instruct model."
+    },
+    {
+      "model_id": "mlx-community/Llama-3.2-11B-Vision-Instruct-8bit",
+      "group": "llama32_vision",
+      "context": "EU_COMMERCIAL",
+      "declared_license": "llama3.2",
+      "verdict": "BLOCKED",
+      "declared_differs": false,
+      "note": "Declares llama3.2. Derived from the multimodal Vision instruct model."
+    },
+    {
+      "model_id": "mlx-community/Llama-3.2-11B-Vision-Instruct-8bit",
+      "group": "llama32_vision",
+      "context": "US_COMMERCIAL",
+      "declared_license": "llama3.2",
+      "verdict": "ALLOWED_WITH_OBLIGATIONS",
+      "declared_differs": false,
+      "note": "Declares llama3.2. Derived from the multimodal Vision instruct model."
+    },
+    {
+      "model_id": "Cannae-AI/MedicalLlama3.2-vision-11B-IT",
+      "group": "llama32_vision",
+      "context": "EU_COMMERCIAL",
+      "declared_license": "apache-2.0",
+      "verdict": "BLOCKED",
+      "declared_differs": true,
+      "note": "Card says apache-2.0. Finetune of the multimodal Vision instruct model."
+    },
+    {
+      "model_id": "Cannae-AI/MedicalLlama3.2-vision-11B-IT",
+      "group": "llama32_vision",
+      "context": "US_COMMERCIAL",
+      "declared_license": "apache-2.0",
+      "verdict": "ALLOWED_WITH_OBLIGATIONS",
+      "declared_differs": true,
+      "note": "Card says apache-2.0. Finetune of the multimodal Vision instruct model."
+    },
+    {
+      "model_id": "AdaptLLM/biomed-Llama-3.2-11B-Vision-Instruct",
+      "group": "llama32_vision",
+      "context": "EU_COMMERCIAL",
+      "declared_license": "llama3.2",
+      "verdict": "BLOCKED",
+      "declared_differs": false,
+      "note": "Declares llama3.2. Finetune of the multimodal Vision instruct model."
+    },
+    {
+      "model_id": "AdaptLLM/biomed-Llama-3.2-11B-Vision-Instruct",
+      "group": "llama32_vision",
+      "context": "US_COMMERCIAL",
+      "declared_license": "llama3.2",
+      "verdict": "ALLOWED_WITH_OBLIGATIONS",
+      "declared_differs": false,
+      "note": "Declares llama3.2. Finetune of the multimodal Vision instruct model."
+    },
+    {
+      "model_id": "OPEA/Llama-3.2-11B-Vision-Instruct-int4-sym-inc",
+      "group": "llama32_vision",
+      "context": "EU_COMMERCIAL",
+      "declared_license": "llama3.2",
+      "verdict": "BLOCKED",
+      "declared_differs": false,
+      "note": "Declares llama3.2. Quant of the multimodal Vision instruct model."
+    },
+    {
+      "model_id": "OPEA/Llama-3.2-11B-Vision-Instruct-int4-sym-inc",
+      "group": "llama32_vision",
+      "context": "US_COMMERCIAL",
+      "declared_license": "llama3.2",
+      "verdict": "ALLOWED_WITH_OBLIGATIONS",
+      "declared_differs": false,
+      "note": "Declares llama3.2. Quant of the multimodal Vision instruct model."
+    },
+    {
+      "model_id": "fahadh4ilyas/llama3.2-11B-Vision-Instruct-INT4-GPTQ",
+      "group": "llama32_vision",
+      "context": "EU_COMMERCIAL",
+      "declared_license": "llama3.2",
+      "verdict": "BLOCKED",
+      "declared_differs": false,
+      "note": "Declares llama3.2. Quant of the multimodal Vision instruct model."
+    },
+    {
+      "model_id": "fahadh4ilyas/llama3.2-11B-Vision-Instruct-INT4-GPTQ",
+      "group": "llama32_vision",
+      "context": "US_COMMERCIAL",
+      "declared_license": "llama3.2",
+      "verdict": "ALLOWED_WITH_OBLIGATIONS",
+      "declared_differs": false,
+      "note": "Declares llama3.2. Quant of the multimodal Vision instruct model."
+    },
+    {
+      "model_id": "meta-llama/Llama-3.2-1B",
+      "group": "llama_text",
+      "context": "EU_COMMERCIAL",
+      "declared_license": "llama3.2",
+      "verdict": "ALLOWED_WITH_OBLIGATIONS",
+      "declared_differs": false,
+      "note": "Official text root. Notice and acceptable-use obligations apply in both contexts."
+    },
+    {
+      "model_id": "meta-llama/Llama-3.2-1B",
+      "group": "llama_text",
+      "context": "US_COMMERCIAL",
+      "declared_license": "llama3.2",
+      "verdict": "ALLOWED_WITH_OBLIGATIONS",
+      "declared_differs": false,
+      "note": "Official text root. Notice and acceptable-use obligations apply in both contexts."
+    },
+    {
+      "model_id": "meta-llama/Llama-3.2-1B-Instruct",
+      "group": "llama_text",
+      "context": "EU_COMMERCIAL",
+      "declared_license": "llama3.2",
+      "verdict": "ALLOWED_WITH_OBLIGATIONS",
+      "declared_differs": false,
+      "note": "Official instruct model, text, llama3.2. No parent declared; the org is a known root."
+    },
+    {
+      "model_id": "meta-llama/Llama-3.2-1B-Instruct",
+      "group": "llama_text",
+      "context": "US_COMMERCIAL",
+      "declared_license": "llama3.2",
+      "verdict": "ALLOWED_WITH_OBLIGATIONS",
+      "declared_differs": false,
+      "note": "Official instruct model, text, llama3.2. No parent declared; the org is a known root."
+    },
+    {
+      "model_id": "meta-llama/Llama-3.1-8B-Instruct",
+      "group": "llama_text",
+      "context": "EU_COMMERCIAL",
+      "declared_license": "llama3.1",
+      "verdict": "ALLOWED_WITH_OBLIGATIONS",
+      "declared_differs": false,
+      "note": "Finetune of Llama 3.1 8B. Text. Notice obligation applies. MAU is under 700 million."
+    },
+    {
+      "model_id": "meta-llama/Llama-3.1-8B-Instruct",
+      "group": "llama_text",
+      "context": "US_COMMERCIAL",
+      "declared_license": "llama3.1",
+      "verdict": "ALLOWED_WITH_OBLIGATIONS",
+      "declared_differs": false,
+      "note": "Finetune of Llama 3.1 8B. Text. Notice obligation applies. MAU is under 700 million."
+    },
+    {
+      "model_id": "unsloth/Llama-3.2-1B",
+      "group": "llama_text",
+      "context": "EU_COMMERCIAL",
+      "declared_license": "llama3.2",
+      "verdict": "ALLOWED_WITH_OBLIGATIONS",
+      "declared_differs": false,
+      "note": "Declares llama3.2 and names meta-llama/Llama-3.2-1B as base."
+    },
+    {
+      "model_id": "unsloth/Llama-3.2-1B",
+      "group": "llama_text",
+      "context": "US_COMMERCIAL",
+      "declared_license": "llama3.2",
+      "verdict": "ALLOWED_WITH_OBLIGATIONS",
+      "declared_differs": false,
+      "note": "Declares llama3.2 and names meta-llama/Llama-3.2-1B as base."
+    },
+    {
+      "model_id": "unsloth/Llama-3.1-8B-Instruct",
+      "group": "llama_text",
+      "context": "EU_COMMERCIAL",
+      "declared_license": "llama3.1",
+      "verdict": "ALLOWED_WITH_OBLIGATIONS",
+      "declared_differs": false,
+      "note": "Declares llama3.1 and names the Llama 3.1 instruct model as base."
+    },
+    {
+      "model_id": "unsloth/Llama-3.1-8B-Instruct",
+      "group": "llama_text",
+      "context": "US_COMMERCIAL",
+      "declared_license": "llama3.1",
+      "verdict": "ALLOWED_WITH_OBLIGATIONS",
+      "declared_differs": false,
+      "note": "Declares llama3.1 and names the Llama 3.1 instruct model as base."
+    },
+    {
+      "model_id": "unsloth/Meta-Llama-3.1-8B-Instruct",
+      "group": "llama_text",
+      "context": "EU_COMMERCIAL",
+      "declared_license": "llama3.1",
+      "verdict": "ALLOWED_WITH_OBLIGATIONS",
+      "declared_differs": false,
+      "note": "Declares llama3.1 and names the Llama 3.1 instruct model as base."
+    },
+    {
+      "model_id": "unsloth/Meta-Llama-3.1-8B-Instruct",
+      "group": "llama_text",
+      "context": "US_COMMERCIAL",
+      "declared_license": "llama3.1",
+      "verdict": "ALLOWED_WITH_OBLIGATIONS",
+      "declared_differs": false,
+      "note": "Declares llama3.1 and names the Llama 3.1 instruct model as base."
+    },
+    {
+      "model_id": "osllmai-community/Llama-3.2-1B",
+      "group": "llama_text",
+      "context": "EU_COMMERCIAL",
+      "declared_license": "llama3.2",
+      "verdict": "ALLOWED_WITH_OBLIGATIONS",
+      "declared_differs": false,
+      "note": "Declares llama3.2 and names meta-llama/Llama-3.2-1B as base."
+    },
+    {
+      "model_id": "osllmai-community/Llama-3.2-1B",
+      "group": "llama_text",
+      "context": "US_COMMERCIAL",
+      "declared_license": "llama3.2",
+      "verdict": "ALLOWED_WITH_OBLIGATIONS",
+      "declared_differs": false,
+      "note": "Declares llama3.2 and names meta-llama/Llama-3.2-1B as base."
+    },
+    {
+      "model_id": "NousResearch/Llama-3.2-1B",
+      "group": "llama_text",
+      "context": "EU_COMMERCIAL",
+      "declared_license": "llama3.2",
+      "verdict": "CANNOT_DETERMINE",
+      "declared_differs": false,
+      "note": "Relabel-style re-upload: declares llama3.2 but the card names no parent, and the org is not a known root. Lineage is incomplete until an edge is inferred or declared."
+    },
+    {
+      "model_id": "NousResearch/Llama-3.2-1B",
+      "group": "llama_text",
+      "context": "US_COMMERCIAL",
+      "declared_license": "llama3.2",
+      "verdict": "CANNOT_DETERMINE",
+      "declared_differs": false,
+      "note": "Relabel-style re-upload: declares llama3.2 but the card names no parent, and the org is not a known root. Lineage is incomplete until an edge is inferred or declared."
+    },
+    {
+      "model_id": "google/gemma-2-9b-it",
+      "group": "gemma",
+      "context": "EU_COMMERCIAL",
+      "declared_license": "gemma",
+      "verdict": "ALLOWED_WITH_OBLIGATIONS",
+      "declared_differs": false,
+      "note": "Gemma terms. Prohibited-use obligation applies even when weights are not redistributed."
+    },
+    {
+      "model_id": "google/gemma-2-9b-it",
+      "group": "gemma",
+      "context": "US_COMMERCIAL",
+      "declared_license": "gemma",
+      "verdict": "ALLOWED_WITH_OBLIGATIONS",
+      "declared_differs": false,
+      "note": "Gemma terms. Prohibited-use obligation applies even when weights are not redistributed."
+    },
+    {
+      "model_id": "google/gemma-2-2b-it",
+      "group": "gemma",
+      "context": "EU_COMMERCIAL",
+      "declared_license": "gemma",
+      "verdict": "ALLOWED_WITH_OBLIGATIONS",
+      "declared_differs": false,
+      "note": "Gemma terms, text instruct, declared parent in the Gemma family."
+    },
+    {
+      "model_id": "google/gemma-2-2b-it",
+      "group": "gemma",
+      "context": "US_COMMERCIAL",
+      "declared_license": "gemma",
+      "verdict": "ALLOWED_WITH_OBLIGATIONS",
+      "declared_differs": false,
+      "note": "Gemma terms, text instruct, declared parent in the Gemma family."
+    },
+    {
+      "model_id": "princeton-nlp/gemma-2-9b-it-SimPO",
+      "group": "gemma",
+      "context": "EU_COMMERCIAL",
+      "declared_license": "mit",
+      "verdict": "ALLOWED_WITH_OBLIGATIONS",
+      "declared_differs": true,
+      "note": "Relabel hub: card says MIT, base is google/gemma-2-9b-it."
+    },
+    {
+      "model_id": "princeton-nlp/gemma-2-9b-it-SimPO",
+      "group": "gemma",
+      "context": "US_COMMERCIAL",
+      "declared_license": "mit",
+      "verdict": "ALLOWED_WITH_OBLIGATIONS",
+      "declared_differs": true,
+      "note": "Relabel hub: card says MIT, base is google/gemma-2-9b-it."
+    },
+    {
+      "model_id": "unsloth/gemma-2-9b-it-bnb-4bit",
+      "group": "gemma",
+      "context": "EU_COMMERCIAL",
+      "declared_license": "gemma",
+      "verdict": "ALLOWED_WITH_OBLIGATIONS",
+      "declared_differs": false,
+      "note": "Declares gemma and names google/gemma-2-9b-it as the quant base."
+    },
+    {
+      "model_id": "unsloth/gemma-2-9b-it-bnb-4bit",
+      "group": "gemma",
+      "context": "US_COMMERCIAL",
+      "declared_license": "gemma",
+      "verdict": "ALLOWED_WITH_OBLIGATIONS",
+      "declared_differs": false,
+      "note": "Declares gemma and names google/gemma-2-9b-it as the quant base."
+    },
+    {
+      "model_id": "unsloth/gemma-2-9b-it",
+      "group": "gemma",
+      "context": "EU_COMMERCIAL",
+      "declared_license": "gemma",
+      "verdict": "CANNOT_DETERMINE",
+      "declared_differs": false,
+      "note": "Declares gemma but the card names no parent, and unsloth is not a known root."
+    },
+    {
+      "model_id": "unsloth/gemma-2-9b-it",
+      "group": "gemma",
+      "context": "US_COMMERCIAL",
+      "declared_license": "gemma",
+      "verdict": "CANNOT_DETERMINE",
+      "declared_differs": false,
+      "note": "Declares gemma but the card names no parent, and unsloth is not a known root."
+    },
+    {
+      "model_id": "mlx-community/gemma-2-9b-it-4bit",
+      "group": "gemma",
+      "context": "EU_COMMERCIAL",
+      "declared_license": "gemma",
+      "verdict": "CANNOT_DETERMINE",
+      "declared_differs": false,
+      "note": "Declares gemma but the card names no parent, and mlx-community is not a known root."
+    },
+    {
+      "model_id": "mlx-community/gemma-2-9b-it-4bit",
+      "group": "gemma",
+      "context": "US_COMMERCIAL",
+      "declared_license": "gemma",
+      "verdict": "CANNOT_DETERMINE",
+      "declared_differs": false,
+      "note": "Declares gemma but the card names no parent, and mlx-community is not a known root."
+    },
+    {
+      "model_id": "Qwen/Qwen2.5-7B",
+      "group": "apache",
+      "context": "EU_COMMERCIAL",
+      "declared_license": "apache-2.0",
+      "verdict": "ALLOWED",
+      "declared_differs": false,
+      "note": "Apache-2.0 root. Redistribution obligations do not apply when weights are not distributed."
+    },
+    {
+      "model_id": "Qwen/Qwen2.5-7B",
+      "group": "apache",
+      "context": "US_COMMERCIAL",
+      "declared_license": "apache-2.0",
+      "verdict": "ALLOWED",
+      "declared_differs": false,
+      "note": "Apache-2.0 root. Redistribution obligations do not apply when weights are not distributed."
+    },
+    {
+      "model_id": "Qwen/Qwen2.5-7B-Instruct",
+      "group": "apache",
+      "context": "EU_COMMERCIAL",
+      "declared_license": "apache-2.0",
+      "verdict": "ALLOWED",
+      "declared_differs": false,
+      "note": "Apache-2.0 finetune of Qwen/Qwen2.5-7B. Not blocked in DE."
+    },
+    {
+      "model_id": "Qwen/Qwen2.5-7B-Instruct",
+      "group": "apache",
+      "context": "US_COMMERCIAL",
+      "declared_license": "apache-2.0",
+      "verdict": "ALLOWED",
+      "declared_differs": false,
+      "note": "Apache-2.0 finetune of Qwen/Qwen2.5-7B. Not blocked in DE."
+    },
+    {
+      "model_id": "Qwen/Qwen2.5-1.5B-Instruct",
+      "group": "apache",
+      "context": "EU_COMMERCIAL",
+      "declared_license": "apache-2.0",
+      "verdict": "ALLOWED",
+      "declared_differs": false,
+      "note": "Apache-2.0 finetune of Qwen/Qwen2.5-1.5B."
+    },
+    {
+      "model_id": "Qwen/Qwen2.5-1.5B-Instruct",
+      "group": "apache",
+      "context": "US_COMMERCIAL",
+      "declared_license": "apache-2.0",
+      "verdict": "ALLOWED",
+      "declared_differs": false,
+      "note": "Apache-2.0 finetune of Qwen/Qwen2.5-1.5B."
+    },
+    {
+      "model_id": "Qwen/Qwen2.5-0.5B-Instruct",
+      "group": "apache",
+      "context": "EU_COMMERCIAL",
+      "declared_license": "apache-2.0",
+      "verdict": "ALLOWED",
+      "declared_differs": false,
+      "note": "Apache-2.0 member of the Qwen2.5 family. Same obligations as the other Qwen rows."
+    },
+    {
+      "model_id": "Qwen/Qwen2.5-0.5B-Instruct",
+      "group": "apache",
+      "context": "US_COMMERCIAL",
+      "declared_license": "apache-2.0",
+      "verdict": "ALLOWED",
+      "declared_differs": false,
+      "note": "Apache-2.0 member of the Qwen2.5 family. Same obligations as the other Qwen rows."
+    },
+    {
+      "model_id": "mistralai/Mistral-7B-v0.3",
+      "group": "apache",
+      "context": "EU_COMMERCIAL",
+      "declared_license": "apache-2.0",
+      "verdict": "ALLOWED",
+      "declared_differs": false,
+      "note": "Apache-2.0 root from Mistral."
+    },
+    {
+      "model_id": "mistralai/Mistral-7B-v0.3",
+      "group": "apache",
+      "context": "US_COMMERCIAL",
+      "declared_license": "apache-2.0",
+      "verdict": "ALLOWED",
+      "declared_differs": false,
+      "note": "Apache-2.0 root from Mistral."
+    },
+    {
+      "model_id": "mistralai/Mistral-7B-Instruct-v0.3",
+      "group": "apache",
+      "context": "EU_COMMERCIAL",
+      "declared_license": "apache-2.0",
+      "verdict": "ALLOWED",
+      "declared_differs": false,
+      "note": "Apache-2.0 finetune of mistralai/Mistral-7B-v0.3."
+    },
+    {
+      "model_id": "mistralai/Mistral-7B-Instruct-v0.3",
+      "group": "apache",
+      "context": "US_COMMERCIAL",
+      "declared_license": "apache-2.0",
+      "verdict": "ALLOWED",
+      "declared_differs": false,
+      "note": "Apache-2.0 finetune of mistralai/Mistral-7B-v0.3."
+    },
+    {
+      "model_id": "grimjim/llama-3-Nephilim-v1-8B",
+      "group": "merge",
+      "context": "EU_COMMERCIAL",
+      "declared_license": "cc-by-nc-4.0",
+      "verdict": "BLOCKED",
+      "declared_differs": true,
+      "note": "Commercial use. Card is cc-by-nc-4.0 and the model is a multi-parent Llama 3 merge."
+    },
+    {
+      "model_id": "grimjim/llama-3-Nephilim-v1-8B",
+      "group": "merge",
+      "context": "US_COMMERCIAL",
+      "declared_license": "cc-by-nc-4.0",
+      "verdict": "BLOCKED",
+      "declared_differs": true,
+      "note": "Commercial use. Card is cc-by-nc-4.0 and the model is a multi-parent Llama 3 merge."
+    },
+    {
+      "model_id": "shanchen/llama3-8B-slerp-med-chinese",
+      "group": "merge",
+      "context": "EU_COMMERCIAL",
+      "declared_license": "llama3",
+      "verdict": "ALLOWED_WITH_OBLIGATIONS",
+      "declared_differs": false,
+      "note": "Merge that declares llama3. Text Llama 3 notice and use-policy obligations."
+    },
+    {
+      "model_id": "shanchen/llama3-8B-slerp-med-chinese",
+      "group": "merge",
+      "context": "US_COMMERCIAL",
+      "declared_license": "llama3",
+      "verdict": "ALLOWED_WITH_OBLIGATIONS",
+      "declared_differs": false,
+      "note": "Merge that declares llama3. Text Llama 3 notice and use-policy obligations."
+    },
+    {
+      "model_id": "shanchen/llama3-8B-slerp-biomed-chat-chinese",
+      "group": "merge",
+      "context": "EU_COMMERCIAL",
+      "declared_license": "llama3",
+      "verdict": "ALLOWED_WITH_OBLIGATIONS",
+      "declared_differs": false,
+      "note": "Merge that declares llama3."
+    },
+    {
+      "model_id": "shanchen/llama3-8B-slerp-biomed-chat-chinese",
+      "group": "merge",
+      "context": "US_COMMERCIAL",
+      "declared_license": "llama3",
+      "verdict": "ALLOWED_WITH_OBLIGATIONS",
+      "declared_differs": false,
+      "note": "Merge that declares llama3."
+    },
+    {
+      "model_id": "grimjim/Llama-3-Instruct-8B-SimPO-SPPO-Iter3-merge",
+      "group": "merge",
+      "context": "EU_COMMERCIAL",
+      "declared_license": "llama3",
+      "verdict": "ALLOWED_WITH_OBLIGATIONS",
+      "declared_differs": false,
+      "note": "Merge that declares llama3."
+    },
+    {
+      "model_id": "grimjim/Llama-3-Instruct-8B-SimPO-SPPO-Iter3-merge",
+      "group": "merge",
+      "context": "US_COMMERCIAL",
+      "declared_license": "llama3",
+      "verdict": "ALLOWED_WITH_OBLIGATIONS",
+      "declared_differs": false,
+      "note": "Merge that declares llama3."
+    },
+    {
+      "model_id": "grimjim/Llama-3-Instruct-8B-SPPO-Iter3-SimPO-merge",
+      "group": "merge",
+      "context": "EU_COMMERCIAL",
+      "declared_license": "llama3",
+      "verdict": "ALLOWED_WITH_OBLIGATIONS",
+      "declared_differs": false,
+      "note": "Merge that declares llama3."
+    },
+    {
+      "model_id": "grimjim/Llama-3-Instruct-8B-SPPO-Iter3-SimPO-merge",
+      "group": "merge",
+      "context": "US_COMMERCIAL",
+      "declared_license": "llama3",
+      "verdict": "ALLOWED_WITH_OBLIGATIONS",
+      "declared_differs": false,
+      "note": "Merge that declares llama3."
+    },
+    {
+      "model_id": "SicariusSicariiStuff/Llama-3.2-1B_Base_FP8",
+      "group": "parentless",
+      "context": "EU_COMMERCIAL",
+      "declared_license": "apache-2.0",
+      "verdict": "ALLOWED_WITH_OBLIGATIONS",
+      "declared_differs": true,
+      "note": "No parent on the card. Verified tokenizer and config match to meta-llama/Llama-3.2-1B, so default mode inherits Llama 3.2. Strict mode would be CANNOT_DETERMINE."
+    },
+    {
+      "model_id": "SicariusSicariiStuff/Llama-3.2-1B_Base_FP8",
+      "group": "parentless",
+      "context": "US_COMMERCIAL",
+      "declared_license": "apache-2.0",
+      "verdict": "ALLOWED_WITH_OBLIGATIONS",
+      "declared_differs": true,
+      "note": "No parent on the card. Verified tokenizer and config match to meta-llama/Llama-3.2-1B, so default mode inherits Llama 3.2. Strict mode would be CANNOT_DETERMINE."
+    },
+    {
+      "model_id": "shuyuej/Llama-3.2-1B-GPTQ",
+      "group": "parentless",
+      "context": "EU_COMMERCIAL",
+      "declared_license": "apache-2.0",
+      "verdict": "ALLOWED_WITH_OBLIGATIONS",
+      "declared_differs": true,
+      "note": "No parent on the card. Verified tokenizer and config match to meta-llama/Llama-3.2-1B. Strict mode would be CANNOT_DETERMINE."
+    },
+    {
+      "model_id": "shuyuej/Llama-3.2-1B-GPTQ",
+      "group": "parentless",
+      "context": "US_COMMERCIAL",
+      "declared_license": "apache-2.0",
+      "verdict": "ALLOWED_WITH_OBLIGATIONS",
+      "declared_differs": true,
+      "note": "No parent on the card. Verified tokenizer and config match to meta-llama/Llama-3.2-1B. Strict mode would be CANNOT_DETERMINE."
+    },
+    {
+      "model_id": "alpindale/Llama-3.2-1B",
+      "group": "parentless",
+      "context": "EU_COMMERCIAL",
+      "declared_license": "llama3.2",
+      "verdict": "ALLOWED_WITH_OBLIGATIONS",
+      "declared_differs": false,
+      "note": "No parent on the card. Weights file is byte-identical to Meta's Llama 3.2 1B, and the card already says llama3.2. Strict mode would be CANNOT_DETERMINE."
+    },
+    {
+      "model_id": "alpindale/Llama-3.2-1B",
+      "group": "parentless",
+      "context": "US_COMMERCIAL",
+      "declared_license": "llama3.2",
+      "verdict": "ALLOWED_WITH_OBLIGATIONS",
+      "declared_differs": false,
+      "note": "No parent on the card. Weights file is byte-identical to Meta's Llama 3.2 1B, and the card already says llama3.2. Strict mode would be CANNOT_DETERMINE."
+    },
+    {
+      "model_id": "open-unlearning/tofu_Llama-3.2-1B-Instruct_full",
+      "group": "parentless",
+      "context": "EU_COMMERCIAL",
+      "declared_license": "bsd-3-clause",
+      "verdict": "CANNOT_DETERMINE",
+      "declared_differs": true,
+      "note": "No parent on the card. Declared licence bsd-3-clause is not in the clause table, so it stays other and needs counsel."
+    },
+    {
+      "model_id": "open-unlearning/tofu_Llama-3.2-1B-Instruct_full",
+      "group": "parentless",
+      "context": "US_COMMERCIAL",
+      "declared_license": "bsd-3-clause",
+      "verdict": "CANNOT_DETERMINE",
+      "declared_differs": true,
+      "note": "No parent on the card. Declared licence bsd-3-clause is not in the clause table, so it stays other and needs counsel."
+    },
+    {
+      "model_id": "DavidAU/Llama-3.2-1B-Instruct-NEO-SI-FI-GGUF",
+      "group": "parentless",
+      "context": "EU_COMMERCIAL",
+      "declared_license": "apache-2.0",
+      "verdict": "CANNOT_DETERMINE",
+      "declared_differs": false,
+      "note": "No parent on the card and the org is not a known root. Hash match was not verified, so the lineage is incomplete."
+    },
+    {
+      "model_id": "DavidAU/Llama-3.2-1B-Instruct-NEO-SI-FI-GGUF",
+      "group": "parentless",
+      "context": "US_COMMERCIAL",
+      "declared_license": "apache-2.0",
+      "verdict": "CANNOT_DETERMINE",
+      "declared_differs": false,
+      "note": "No parent on the card and the org is not a known root. Hash match was not verified, so the lineage is incomplete."
+    }
+  ]
+}
