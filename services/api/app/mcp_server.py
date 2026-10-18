@@ -5,8 +5,10 @@ from __future__ import annotations
 import json
 import logging
 from typing import Any
+from urllib.parse import urlsplit
 
 from mcp.server.fastmcp import FastMCP
+from mcp.server.transport_security import TransportSecuritySettings
 
 from app.config import get_settings
 from app.engine.verdict import verdict_from_graph
@@ -34,10 +36,7 @@ def _format_can_i_use(decided: dict[str, Any], hq: str) -> str:
         lines.append("Path: " + " -> ".join(deepest["path"]))
     for hit in (decided.get("blocking") or decided.get("obligations") or [])[:3]:
         lines.append(f"- {hit.get('clause_id')}: {hit.get('summary')} ({hit.get('source_url')})")
-    base = get_settings().next_public_api_url.replace(":8000", ":3001")
-    if "localhost:8000" in get_settings().next_public_api_url:
-        base = "http://localhost:3001"
-    lines.append(f"Details: {base}/m/{decided['model_id']}?hq={hq}")
+    lines.append(f"Details: {web_base()}/m/{decided['model_id']}?hq={hq}")
     lines.append(decided.get("disclaimer") or "Automated screening, not legal advice.")
     return "\n".join(lines)
 
@@ -300,8 +299,31 @@ async def where_can_i_run(model_id: str, residency: str | None = None) -> str:
 _http_app = None
 
 
+def transport_security() -> TransportSecuritySettings:
+    """DNS rebinding protection that also admits the deployed API host.
+
+    FastMCP's default only allows localhost, so a deployed /mcp answers 421.
+    """
+    settings = get_settings()
+    hosts = ["localhost", "localhost:*", "127.0.0.1", "127.0.0.1:*"]
+    public = urlsplit(settings.next_public_api_url).netloc
+    if public and public not in hosts:
+        hosts += [public, f"{public.split(':')[0]}:*"]
+    origins = [*settings.cors_origins, "http://localhost:*", "http://127.0.0.1:*"]
+    return TransportSecuritySettings(
+        enable_dns_rebinding_protection=True, allowed_hosts=hosts, allowed_origins=origins
+    )
+
+
+def web_base() -> str:
+    """Where verdict pages live: the web app (first CORS origin), not the API."""
+    origins = get_settings().cors_origins
+    return origins[0].rstrip("/") if origins else "http://localhost:3001"
+
+
 def mcp_http_app():
     global _http_app
     if _http_app is None:
+        mcp.settings.transport_security = transport_security()
         _http_app = mcp.streamable_http_app()
     return _http_app

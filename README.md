@@ -10,6 +10,8 @@ The answer is a verdict, the path that produced it, and a quote taken from the u
 
 Automated screening, not legal advice.
 
+**Live:** web app [web-production-8d8cb.up.railway.app](https://web-production-8d8cb.up.railway.app) · API [api-production-fc09a.up.railway.app/api/health](https://api-production-fc09a.up.railway.app/api/health) · MCP `https://api-production-fc09a.up.railway.app/mcp`
+
 Built for [Graph Hacks: Context for AI Agents](https://www.wemakedevs.org/hackathons/falkordb) (WeMakeDevs × FalkorDB). Primary track: **Track 1, Agents That Act on Connected Data**. Also entered: **Track 2** and **Track 3**.
 
 Repository: [github.com/bytes-as/modelbrain](https://github.com/bytes-as/modelbrain)
