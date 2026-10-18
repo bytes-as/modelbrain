@@ -8,7 +8,7 @@ from fastapi import APIRouter, Query
 
 from app.errors import ApiError
 from app.graph.db import ro_query
-from app.graph.queries import D1, D2, Q3
+from app.graph.queries import D1, D2, Q3, X32
 from app.graph.rows import as_rows
 
 router = APIRouter()
@@ -25,6 +25,25 @@ def _model_id(owner: str, name: str) -> str:
             hint="Example: meta-llama/Llama-3.2-1B.",
         )
     return model_id
+
+
+SEARCH = re.compile(r"^[\w./-]{2,80}$")
+
+
+@router.get("/api/models/search")
+def search_models(
+    q: str = Query(..., min_length=2, max_length=80),
+    limit: int = Query(8, ge=1, le=20),
+) -> list[dict[str, object]]:
+    """Autocomplete over models already in the hub (they answer from the warm graph)."""
+    term = q.strip().lower()
+    if not SEARCH.match(term):
+        raise ApiError(
+            "INVALID_INPUT",
+            "Search with letters, digits, '.', '_', '-' or '/'.",
+            hint="Example: llama-3.2",
+        )
+    return as_rows(ro_query("hub", X32, {"q": term, "limit": limit}))
 
 
 @router.get("/api/models/{owner}/{name}/lineage")

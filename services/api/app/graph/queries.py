@@ -705,6 +705,15 @@ FOREACH (x IN orphans | DELETE x)
 RETURN size(orphans) AS removed
 """
 
+X32 = """
+MATCH (m:Model)
+WHERE m.sha IS NOT NULL AND toLower(m.id) CONTAINS $q
+WITH m, CASE WHEN toLower(m.id) STARTS WITH $q OR toLower(split(m.id, '/')[1]) STARTS WITH $q THEN 0 ELSE 1 END AS rank
+RETURN m.id AS id, m.declared_license AS license, coalesce(m.declared_differs, false) AS differs, m.dna_status AS dna
+ORDER BY rank, size(m.id), m.id
+LIMIT $limit
+"""
+
 QUERIES = {
     "SCHEMA": SCHEMA,
     "I1": I1,
@@ -798,4 +807,5 @@ QUERIES = {
     "X29": X29,
     "X30": X30,
     "X31": X31,
+    "X32": X32,
 }

@@ -17,15 +17,15 @@ const CASES = [
     model: "TroyDoesAI/Llama-3.1-8B-Instruct",
     card: "wtfpl",
     inherited: "Llama 3.1",
-    note: "Sampled weights identical to meta-llama/Llama-3.1-8B-Instruct (cosine 1.000). Read from 2 KB of the real weights.",
-    verdict: "Allowed with obligations",
+    note: "Sampled weights identical to meta-llama/Llama-3.1-8B-Instruct (cosine 1.000). Read from 2 KB of the real weights. Llama 3.1 terms apply whatever the card says.",
+    verdict: "Llama terms apply · counsel",
   },
   {
     model: "CMSManhattan/JiRackUltra_1b",
     card: "mit",
     inherited: "Apache 2.0",
     note: "Sampled weights identical to DeepSeek-R1-Distill-Qwen-1.5B, which derives from Qwen2.5-Math-1.5B. The card declares no base model.",
-    verdict: "Attribution owed upstream",
+    verdict: "Parent hidden by the card",
   },
   {
     model: "microsoft/UserLM-8b",
@@ -43,6 +43,10 @@ const EXAMPLES = [
   "Qwen/Qwen2.5-7B-Instruct",
 ];
 
+type Suggestion = { id: string; license: string | null; differs: boolean };
+
+const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+
 export function RedlineHero() {
   const router = useRouter();
   const [i, setI] = useState(0);
@@ -50,7 +54,41 @@ export function RedlineHero() {
   const [paused, setPaused] = useState(false);
   const [modelId, setModelId] = useState("");
   const [hq, setHq] = useState("DE");
+  const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
+  const [open, setOpen] = useState(false);
+  const [active, setActive] = useState(-1);
   const c = CASES[i];
+
+  // Autocomplete from the models already in the graph (they answer instantly).
+  useEffect(() => {
+    const term = modelId.trim();
+    if (term.length < 2) {
+      setSuggestions([]);
+      return;
+    }
+    const controller = new AbortController();
+    const timer = window.setTimeout(() => {
+      fetch(`${API}/api/models/search?q=${encodeURIComponent(term)}&limit=8`, {
+        signal: controller.signal,
+      })
+        .then((r) => (r.ok ? r.json() : []))
+        .then((rows: Suggestion[]) => {
+          setSuggestions(rows);
+          setActive(-1);
+        })
+        .catch(() => undefined);
+    }, 150);
+    return () => {
+      controller.abort();
+      window.clearTimeout(timer);
+    };
+  }, [modelId]);
+
+  function choose(id: string) {
+    setModelId(id);
+    setOpen(false);
+    check(id);
+  }
 
   useEffect(() => {
     if (paused) return;
@@ -143,16 +181,82 @@ export function RedlineHero() {
               ))}
             </select>
             <span> may ship </span>
-            <input
-              aria-label="Hugging Face model id"
-              value={modelId}
-              onChange={(e) => setModelId(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") check(modelId || c.model);
-              }}
-              placeholder={c.model}
-              className="mx-1 w-full min-w-0 border-b-2 border-ink bg-transparent font-mono text-lg placeholder:text-ink/35 focus:outline-none md:w-[30rem] md:text-xl"
-            />
+            <span className="relative mx-1 inline-block w-full align-baseline md:w-[30rem]">
+              <input
+                aria-label="Hugging Face model id"
+                role="combobox"
+                aria-autocomplete="list"
+                aria-expanded={open && suggestions.length > 0}
+                aria-controls="model-suggestions"
+                aria-activedescendant={active >= 0 ? `model-option-${active}` : undefined}
+                autoComplete="off"
+                spellCheck={false}
+                value={modelId}
+                onChange={(e) => {
+                  setModelId(e.target.value);
+                  setOpen(true);
+                }}
+                onFocus={() => {
+                  setPaused(true);
+                  setOpen(true);
+                }}
+                onBlur={() => window.setTimeout(() => setOpen(false), 120)}
+                onKeyDown={(e) => {
+                  const shown = open ? suggestions : [];
+                  if (e.key === "ArrowDown" && shown.length) {
+                    e.preventDefault();
+                    setActive((v) => (v + 1) % shown.length);
+                  } else if (e.key === "ArrowUp" && shown.length) {
+                    e.preventDefault();
+                    setActive((v) => (v <= 0 ? shown.length - 1 : v - 1));
+                  } else if (e.key === "Escape") {
+                    setOpen(false);
+                  } else if (e.key === "Enter") {
+                    if (active >= 0 && shown[active]) choose(shown[active].id);
+                    else check(modelId || c.model);
+                  }
+                }}
+                placeholder={c.model}
+                className="w-full min-w-0 border-b-2 border-ink bg-transparent font-mono text-lg placeholder:text-ink/35 focus:outline-none md:text-xl"
+              />
+              {open && suggestions.length > 0 ? (
+                <ul
+                  id="model-suggestions"
+                  role="listbox"
+                  aria-label="Models in the graph"
+                  className="absolute left-0 right-0 top-full z-30 mt-1 max-h-80 overflow-auto border border-ink/20 bg-paper py-1 font-sans text-base shadow-xl shadow-ink/10"
+                >
+                  {suggestions.map((row, n) => (
+                    <li
+                      key={row.id}
+                      id={`model-option-${n}`}
+                      role="option"
+                      aria-selected={n === active}
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        choose(row.id);
+                      }}
+                      onMouseEnter={() => setActive(n)}
+                      className={`flex cursor-pointer items-baseline justify-between gap-3 px-3 py-2 ${
+                        n === active ? "bg-paper-2" : ""
+                      }`}
+                    >
+                      <span className="min-w-0 font-mono text-[13px] text-ink [overflow-wrap:anywhere]">
+                        {row.id}
+                      </span>
+                      <span className="flex shrink-0 items-baseline gap-2 font-mono text-[11px] text-ink-soft">
+                        {row.license ?? "no licence"}
+                        {row.differs ? (
+                          <span className="border border-redline/60 px-1 uppercase tracking-[0.08em] text-redline">
+                            card disagrees
+                          </span>
+                        ) : null}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
+            </span>
             <span> commercially, if the graph says so.</span>
           </div>
           <div className="mt-6 flex flex-wrap items-center gap-3">

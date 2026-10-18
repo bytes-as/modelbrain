@@ -674,3 +674,11 @@ WHERE m.sha IS NULL AND m.dna_status IS NULL AND NOT (m)--()
 WITH collect(m) AS orphans
 FOREACH (x IN orphans | DELETE x)
 RETURN size(orphans) AS removed
+
+// X32: (hub) search ingested models by id for the check form's autocomplete
+MATCH (m:Model)
+WHERE m.sha IS NOT NULL AND toLower(m.id) CONTAINS $q
+WITH m, CASE WHEN toLower(m.id) STARTS WITH $q OR toLower(split(m.id, '/')[1]) STARTS WITH $q THEN 0 ELSE 1 END AS rank
+RETURN m.id AS id, m.declared_license AS license, coalesce(m.declared_differs, false) AS differs, m.dna_status AS dna
+ORDER BY rank, size(m.id), m.id
+LIMIT $limit
