@@ -82,7 +82,11 @@ def confirm(
 ) -> dict:
     graph = resolve_tenant(tenant, token=x_tenant_token, authorization=authorization, write=True)
     return watcher.confirm_edge(
-        graph, _check_model(body.child), _check_model(body.parent), body.person_id
+        graph,
+        _check_model(body.child),
+        _check_model(body.parent),
+        body.person_id,
+        include_fixed=not graph.startswith("sbx_"),
     )
 
 

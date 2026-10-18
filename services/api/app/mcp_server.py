@@ -193,7 +193,9 @@ async def confirm_edge(child: str, parent: str, tenant: str, token: str, person_
         graph = resolve_tenant(tenant, token=token, write=True)
     except ApiError as exc:
         return json.dumps({"ok": False, "error": exc.code, "message": str(exc)})
-    result = publish_confirmation(graph, child, parent, person_id)
+    result = publish_confirmation(
+        graph, child, parent, person_id, include_fixed=not graph.startswith("sbx_")
+    )
     if "fan_out" in result:
         result["fan_out"] = {
             "descendants": result["fan_out"]["descendants"],

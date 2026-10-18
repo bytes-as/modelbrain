@@ -31,8 +31,11 @@ def _now_ms() -> int:
     return int(time.time() * 1000)
 
 
-def company_graphs() -> list[str]:
-    return [name for name in graph_names() if name.startswith(("tenant_", "sbx_"))]
+def company_graphs(*, include_fixed: bool = True) -> list[str]:
+    """Company graphs. Visitor-triggered fan-outs pass include_fixed=False so the
+    read-only demo companies only change through admin actions."""
+    prefixes = ("tenant_", "sbx_") if include_fixed else ("sbx_",)
+    return [name for name in graph_names() if name.startswith(prefixes)]
 
 
 def descendants(model_id: str, hub: str = "hub") -> list[str]:
@@ -60,12 +63,17 @@ def affected_rulings(model_id: str, graphs: list[str], hub: str = "hub") -> list
 
 
 def fan_out(
-    model_id: str, reason: str, *, graphs: list[str] | None = None, hub: str = "hub"
+    model_id: str,
+    reason: str,
+    *,
+    graphs: list[str] | None = None,
+    hub: str = "hub",
+    include_fixed: bool = True,
 ) -> dict[str, Any]:
     started = time.monotonic()
     down = descendants(model_id, hub)
     lev = leverage(model_id, hub)
-    targets = company_graphs() if graphs is None else graphs
+    targets = company_graphs(include_fixed=include_fixed) if graphs is None else graphs
     affected = [model_id, *down]
     reopened: list[dict[str, Any]] = []
     for graph in targets:
@@ -148,7 +156,13 @@ def edge_state(child: str, parent: str, hub: str = "hub") -> dict[str, Any] | No
 
 
 def confirm_edge(
-    tenant_graph: str, child: str, parent: str, person_id: str, *, hub: str = "hub"
+    tenant_graph: str,
+    child: str,
+    parent: str,
+    person_id: str,
+    *,
+    hub: str = "hub",
+    include_fixed: bool = True,
 ) -> dict[str, Any]:
     """Record a company's confirmation privately, publish only a salted hash, reopen on a tier change."""
     before = edge_state(child, parent, hub)
@@ -188,6 +202,7 @@ def confirm_edge(
             f"lineage edge {child} -> {parent} confirmed by two independent companies "
             f"(tier {result['tier_before']} -> {result['tier_after']})",
             hub=hub,
+            include_fixed=include_fixed,
         )
     return result
 

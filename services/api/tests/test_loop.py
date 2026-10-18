@@ -179,3 +179,44 @@ def test_check_now_fans_out_only_on_a_change(graphs) -> None:
     assert loud["changed"] is True
     assert any(c.startswith("has_license_file") for c in loud["changes"])
     assert [r["ruling_id"] for r in loud["fan_out"]["reopened"]] == ["rul_alice"]
+
+
+def test_approving_a_reopened_review_writes_a_superseding_ruling(graphs) -> None:
+    from app.tenants.tasks import approve_task
+
+    db.query(
+        graphs["hub"],
+        "CREATE (m:Model {id:'meta/root', is_root:true, multimodal:false}),"
+        " (l:License {key:'apache-2.0', name:'Apache 2.0'}), (m)-[:DECLARES]->(l)",
+    )
+    db.query(
+        graphs["a"],
+        "CREATE (c:Company {slug:'t', name:'Test Co (fictional)', hq_country:'US', mau:10}),"
+        " (p:Person {id:'alice', name:'Alice (fictional)'}),"
+        " (prod:Product {id:'prod', name:'Thing'}), (d:Deployment {id:'dep', model_id:'meta/root'}),"
+        " (r:Ruling {id:'rul_old', verdict:'BLOCKED', created_at:1}),"
+        " (f:Fact {id:'f1', model_id:'meta/root'}),"
+        " (p)-[:OWNS]->(d), (prod)-[:RUNS]->(d), (r)-[:FOR]->(d), (r)-[:RESTS_ON]->(f)",
+    )
+    report = watcher.fan_out(
+        "meta/root", "licence changed", graphs=[graphs["a"]], hub=graphs["hub"]
+    )
+    task = report["reopened"][0]["task_id"]
+    result = approve_task(graphs["a"], task, "alice", hub=graphs["hub"])
+    assert result["ruling_id"] and result["supersedes"] == "rul_old"
+    assert result["verdict"] == "ALLOWED"
+    link = as_rows(
+        db.ro_query(
+            graphs["a"],
+            "MATCH (n:Ruling)-[:SUPERSEDES]->(o:Ruling {id:'rul_old'}) RETURN n.id AS id",
+        )
+    )
+    assert link == [{"id": result["ruling_id"]}]
+
+
+def test_visitor_fan_out_never_writes_into_fixed_demo_tenants(graphs) -> None:
+    _hub(graphs["hub"])
+    _company(graphs["a"], "down/leaf", "alice")  # a tenant_* graph stands in for a fixed company
+    report = watcher.fan_out("up/mid", "visitor change", hub=graphs["hub"], include_fixed=False)
+    assert all(g.startswith("sbx_") for g in report["graphs"])
+    assert graphs["a"] not in report["graphs"]

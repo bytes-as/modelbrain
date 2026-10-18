@@ -119,7 +119,34 @@ def handoff_to_owner(
     return approve_id
 
 
-def approve_task(graph: str, task_id: str, person_id: str) -> dict[str, object]:
+def audit_deployment(graph: str, deployment_id: str, hub: str = "hub") -> dict[str, Any] | None:
+    """Auditor: recompute a deployment's verdict from FalkorDB with the company's context."""
+    from app.engine.verdict import verdict_from_graph
+    from app.graph.queries import T9, T10
+
+    company = as_rows(db.ro_query(graph, T9))
+    deployment = next(
+        (r for r in as_rows(db.ro_query(graph, T10)) if r.get("deployment_id") == deployment_id),
+        None,
+    )
+    if not company or not deployment or not deployment.get("model"):
+        return None
+    hq = str(company[0].get("hq_country") or "US")
+    return verdict_from_graph(
+        str(deployment["model"]),
+        {
+            "hq_country": hq,
+            "markets": [hq],
+            "commercial": True,
+            "mau": int(company[0].get("mau") or 0),
+            "distributes_weights": False,
+            "end_user_only": False,
+        },
+        graph=hub,
+    )
+
+
+def approve_task(graph: str, task_id: str, person_id: str, hub: str = "hub") -> dict[str, object]:
     import json
 
     rows = as_rows(
@@ -140,6 +167,7 @@ def approve_task(graph: str, task_id: str, person_id: str) -> dict[str, object]:
     row = rows[0]
     now = int(time.time() * 1000)
     ruling_id = None
+    verdict_now: str | None = None
     if row.get("kind") == "APPROVE_RULING" and row.get("proposed") and row.get("deployment_id"):
         proposed = json.loads(str(row["proposed"]))
         ruling_id = write_ruling(
@@ -148,6 +176,19 @@ def approve_task(graph: str, task_id: str, person_id: str) -> dict[str, object]:
             verdict=proposed,
             expected_ruling_id=str(row["old_ruling_id"]) if row.get("old_ruling_id") else None,
         )
+        verdict_now = str(proposed.get("verdict") or "")
+    elif row.get("kind") == "REVIEW_RULING" and row.get("deployment_id"):
+        # The owner approves the review: the Auditor recomputes and a new ruling
+        # supersedes the old one (rulings are append-only).
+        decided = audit_deployment(graph, str(row["deployment_id"]), hub)
+        if decided is not None:
+            ruling_id = write_ruling(
+                graph,
+                deployment_id=str(row["deployment_id"]),
+                verdict=decided,
+                expected_ruling_id=str(row["old_ruling_id"]) if row.get("old_ruling_id") else None,
+            )
+            verdict_now = str(decided.get("verdict") or "")
     db.query(
         graph,
         """
@@ -168,7 +209,7 @@ def approve_task(graph: str, task_id: str, person_id: str) -> dict[str, object]:
             "now": now,
         },
     )
-    return {"ruling_id": ruling_id}
+    return {"ruling_id": ruling_id, "verdict": verdict_now, "supersedes": row.get("old_ruling_id")}
 
 
 def reject_task(graph: str, task_id: str, person_id: str, reason: str) -> dict[str, object]:
