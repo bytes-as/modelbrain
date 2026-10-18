@@ -132,3 +132,19 @@ def test_replay_data_is_the_real_history() -> None:
     assert data["fix"]["commit"] == "e8c2529775"
     assert data["fix"]["days_after_report"] == 130
     assert len(data["children"]) == 9
+
+
+def test_compounding_demo_reset_then_one_visitor_flips_the_tier(graphs) -> None:
+    child, parent = watcher.DEMO_EDGE
+    db.query(
+        graphs["hub"],
+        "CREATE (c:Model {id:$c}), (p:Model {id:$p, is_root:true}),"
+        " (c)-[:DERIVED_FROM {relation:'inferred', source:'inferred', tier:1, confirmations:0,"
+        " confirmers:[]}]->(p)",
+        {"c": child, "p": parent},
+    )
+    reset = watcher.reset_compounding_demo(hub=graphs["hub"])
+    assert reset["ok"] and reset["tier"] == 1 and reset["confirmations"] == 1
+    _company(graphs["a"], child, "lena")
+    result = watcher.confirm_edge(graphs["a"], child, parent, "lena", hub=graphs["hub"])
+    assert result["tier_before"] == 1 and result["tier_after"] == 3

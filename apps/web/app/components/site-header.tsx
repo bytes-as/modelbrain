@@ -9,7 +9,7 @@ const NAV = [
   { href: "/findings", label: "Weight DNA" },
   { href: "/hidden-lineage", label: "Hidden lineage" },
   { href: "/replay/xkev", label: "Xkev replay" },
-  { href: "/live-loop", label: "Live loop" },
+  { href: "/live-loop", label: "Watcher log" },
   { href: "/mcp", label: "MCP" },
   { href: "/eval", label: "Eval" },
   { href: "/how-it-works", label: "How it works" },

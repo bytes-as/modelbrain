@@ -81,3 +81,16 @@ def confirm(
     return watcher.confirm_edge(
         graph, _check_model(body.child), _check_model(body.parent), body.person_id
     )
+
+
+@router.post("/api/admin/demo/compounding")
+def reset_compounding(authorization: str | None = Header(default=None)) -> dict:
+    require_admin(authorization)
+    return watcher.reset_compounding_demo()
+
+
+@router.get("/api/demo/compounding")
+def compounding_state() -> dict:
+    child, parent = watcher.DEMO_EDGE
+    state = watcher.edge_state(child, parent)
+    return {"child": child, "parent": parent, "edge": state}

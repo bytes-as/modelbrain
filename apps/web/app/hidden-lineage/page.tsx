@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 
+import { Compounding } from "./compounding";
+
 type Component = {
   component_id: string | number;
   model_ids: string[];
@@ -29,6 +31,7 @@ export default function HiddenLineagePage() {
         Models that share file fingerprints. Inferred parents are dashed edges in the graph; Confirm
         raises trust when two organisations agree.
       </p>
+      <Compounding />
       {error ? <p className="mt-4 text-[#f0605a]">{error}</p> : null}
       <ul className="mt-6 space-y-4">
         {rows.map((row) => (
@@ -47,14 +50,6 @@ export default function HiddenLineagePage() {
                 ))}
               </ul>
             ) : null}
-            <div className="mt-3 flex gap-2">
-              <button type="button" className="rounded border border-white/10 px-2 py-1 text-xs">
-                Confirm as Kestrel
-              </button>
-              <button type="button" className="rounded border border-white/10 px-2 py-1 text-xs">
-                Confirm as Harbor
-              </button>
-            </div>
           </li>
         ))}
       </ul>

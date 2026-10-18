@@ -19,7 +19,7 @@ from typing import Any
 
 from app.config import get_settings
 from app.graph import db
-from app.graph.queries import R3, W0, W1, W1B, W2, W3, W7, W10, W11, W12, W13
+from app.graph.queries import R3, W0, W1, W1B, W2, W3, W7, W10, W11, W12, W13, X5
 from app.graph.rows import as_rows
 from app.hf.cache import DiskCache
 from app.hf.client import HFClient, HubUnavailable
@@ -95,6 +95,19 @@ def mark_references(graph: str = "hub") -> int:
     ids = [ref["id"] for ref in references()]
     rows = as_rows(db.query(graph, W10, {"ids": ids}))
     return int(rows[0]["marked"]) if rows else 0
+
+
+def inherit_mirror_fingerprints(graph: str = "hub") -> int:
+    """Gated official repos hide config.json; borrow the config fingerprint of the public mirror."""
+    copied = 0
+    for ref in references():
+        if ref["fingerprint_from"] == ref["id"]:
+            continue
+        rows = as_rows(
+            db.query(graph, X5, {"mirror": ref["fingerprint_from"], "official": ref["id"]})
+        )
+        copied += int(rows[0]["copied"]) if rows else 0
+    return copied
 
 
 # --- merge fit ----------------------------------------------------------------
@@ -369,6 +382,11 @@ async def crawl(
                 _crawl["done"] += 1
         if include_references:
             _crawl["references_marked"] = mark_references(graph)
+            _crawl["mirror_fingerprints"] = inherit_mirror_fingerprints(graph)
+        from app.engine.resolver import run_resolver
+
+        hashes = run_resolver(graph)
+        _crawl["hash_resolver"] = {k: v for k, v in hashes.items() if k != "edges"}
         _crawl["resolver"] = {k: v for k, v in run_dna_resolver(graph).items() if k != "results"}
         _crawl["state"] = "done"
     except Exception:

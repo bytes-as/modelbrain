@@ -484,6 +484,18 @@ RETURN f.id AS id, f.model_id AS model_id, f.reason AS reason, f.at AS at, f.des
 ORDER BY f.at DESC LIMIT $limit
 """
 
+X5 = """
+MATCH (m:Model {id: $mirror})-[:HAS_FP]->(f:Fingerprint {kind: 'config_fp'}), (o:Model {id: $official})
+MERGE (o)-[:HAS_FP]->(f)
+RETURN count(f) AS copied
+"""
+
+X6 = """
+MATCH (:Model {id: $child})-[e:DERIVED_FROM]->(:Model {id: $parent})
+SET e.confirmers = $confirmers, e.confirmations = size($confirmers), e.tier = $tier
+RETURN e.tier AS tier, e.confirmations AS confirmations
+"""
+
 QUERIES = {
     "SCHEMA": SCHEMA,
     "I1": I1,
@@ -546,4 +558,6 @@ QUERIES = {
     "X2": X2,
     "X3": X3,
     "X4": X4,
+    "X5": X5,
+    "X6": X6,
 }

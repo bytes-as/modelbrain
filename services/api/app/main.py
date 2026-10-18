@@ -50,10 +50,11 @@ async def lifespan(_app: FastAPI):
         except Exception:
             log.exception("tenant bootstrap failed")
         try:
-            from app.engine.dna import ensure_index, mark_references
+            from app.engine.dna import ensure_index, inherit_mirror_fingerprints, mark_references
 
             ensure_index("hub")
             mark_references("hub")
+            inherit_mirror_fingerprints("hub")
         except Exception:
             log.exception("weight dna bootstrap failed")
         try:

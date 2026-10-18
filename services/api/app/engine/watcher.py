@@ -18,7 +18,7 @@ from typing import Any
 
 from app.config import get_settings
 from app.graph import db
-from app.graph.queries import D1, D2, P1, T3, T4, X1, X2, X3, X4
+from app.graph.queries import D1, D2, P1, T3, T4, X1, X2, X3, X4, X6
 from app.graph.rows import as_rows
 from app.graph.schema import graph_names
 from app.ids import new_id
@@ -219,3 +219,32 @@ def run_replay(graph: str, hub: str = "hub") -> dict[str, Any]:
         f"(commit {fix['commit']}), {fix['days_after_report']} days after the licence question"
     )
     return fan_out(data["model_id"], reason, graphs=[graph], hub=hub)
+
+
+# --- compounding demo -----------------------------------------------------------
+
+DEMO_EDGE = ("SicariusSicariiStuff/Llama-3.2-1B_Base_FP8", "meta-llama/Llama-3.2-1B")
+DEMO_FIRST_CONFIRMER = "tenant_harbor"
+
+
+def reset_compounding_demo(hub: str = "hub") -> dict[str, Any]:
+    """Start state for the demo: one company (Harbor, fictional) has confirmed the edge, tier 1.
+
+    A visitor's sandbox confirmation is then the second independent one and lifts it to tier 3.
+    """
+    child, parent = DEMO_EDGE
+    rows = as_rows(
+        db.query(
+            hub,
+            X6,
+            {
+                "child": child,
+                "parent": parent,
+                "confirmers": [tenant_hash(DEMO_FIRST_CONFIRMER)],
+                "tier": 1,
+            },
+        )
+    )
+    if not rows:
+        return {"ok": False, "reason": "demo edge not in the hub yet; run the resolver first"}
+    return {"ok": True, "child": child, "parent": parent, **rows[0]}

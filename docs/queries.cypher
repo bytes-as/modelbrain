@@ -484,3 +484,13 @@ MATCH (f:FanOut)
 RETURN f.id AS id, f.model_id AS model_id, f.reason AS reason, f.at AS at, f.descendants AS descendants,
        f.not_inherited AS not_inherited, f.reopened AS reopened, f.graphs AS graphs
 ORDER BY f.at DESC LIMIT $limit
+
+// X5: (hub) a gated official model inherits the config fingerprint of its public mirror (its config.json is not readable)
+MATCH (m:Model {id: $mirror})-[:HAS_FP]->(f:Fingerprint {kind: 'config_fp'}), (o:Model {id: $official})
+MERGE (o)-[:HAS_FP]->(f)
+RETURN count(f) AS copied
+
+// X6: (hub) demo reset: set an edge's confirmers (salted hashes) and tier
+MATCH (:Model {id: $child})-[e:DERIVED_FROM]->(:Model {id: $parent})
+SET e.confirmers = $confirmers, e.confirmations = size($confirmers), e.tier = $tier
+RETURN e.tier AS tier, e.confirmations AS confirmations

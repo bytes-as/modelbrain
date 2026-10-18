@@ -213,3 +213,19 @@ def test_verdict_paths_carry_weight_evidence(graph: str) -> None:
     hop = [p for p in decided["paths"] if len(p["path"]) == 2]
     assert hop and hop[0]["methods"] == ["weights"]
     assert hop[0]["weights_sims"][0] > 0.9
+
+
+def test_gated_official_inherits_mirror_config_fingerprint(graph: str) -> None:
+    db.query(
+        graph,
+        "CREATE (o:Model {id:'meta-llama/Llama-3.2-1B'}), (m:Model {id:'unsloth/Llama-3.2-1B'}),"
+        " (f:Fingerprint {key:'config_fp:abc', kind:'config_fp', value:'abc'}), (m)-[:HAS_FP]->(f)",
+    )
+    assert dna.inherit_mirror_fingerprints(graph) >= 1
+    rows = as_rows(
+        db.ro_query(
+            graph,
+            "MATCH (:Model {id:'meta-llama/Llama-3.2-1B'})-[:HAS_FP]->(f:Fingerprint) RETURN f.kind AS k",
+        )
+    )
+    assert rows == [{"k": "config_fp"}]
