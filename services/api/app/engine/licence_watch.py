@@ -71,6 +71,8 @@ NAME_PHRASES: dict[str, tuple[str, ...]] = {
     "apache-2.0": ("apache license", "version 2.0"),
     "mit": ("mit license",),
     "cc-by-nc-4.0": ("attribution-noncommercial 4.0",),
+    "cc-by-nc-nd-4.0": ("attribution-noncommercial-noderivatives 4.0",),
+    "cc-by-nc-sa-4.0": ("attribution-noncommercial-sharealike 4.0",),
     "cc-by-4.0": ("attribution 4.0 international",),
     "cc-by-sa-4.0": ("attribution-sharealike 4.0",),
 }

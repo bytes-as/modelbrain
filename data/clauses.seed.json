@@ -665,6 +665,116 @@
       ]
     },
     {
+      "key": "cc-by-nc-nd-4.0",
+      "name": "Creative Commons Attribution-NonCommercial-NoDerivatives 4.0",
+      "hub_tags": [
+        "cc-by-nc-nd-4.0"
+      ],
+      "url": "https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode",
+      "clauses": [
+        {
+          "id": "ccbyncnd.noncommercial",
+          "kind": "NONCOMMERCIAL",
+          "effect": "BLOCK",
+          "applies_when": {
+            "commercial": true
+          },
+          "summary": "Licensed rights may be exercised only for non-commercial purposes.",
+          "section": "2.a.1",
+          "source_url": "https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode",
+          "locator": "NonCommercial purposes only",
+          "source_raw_url": "https://raw.githubusercontent.com/spdx/license-list-data/main/text/CC-BY-NC-ND-4.0.txt",
+          "source_format": "text",
+          "locator_verified": "2026-10-18"
+        },
+        {
+          "id": "ccbyncnd.noderivatives",
+          "kind": "NO_DERIVATIVES",
+          "effect": "BLOCK",
+          "applies_when": {
+            "distributes_weights": true
+          },
+          "summary": "Adapted material (a finetune, merge or quantisation) may be produced but not shared.",
+          "section": "2.a.1.B",
+          "source_url": "https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode",
+          "locator": "but not Share, Adapted Material",
+          "source_raw_url": "https://raw.githubusercontent.com/spdx/license-list-data/main/text/CC-BY-NC-ND-4.0.txt",
+          "source_format": "text",
+          "locator_verified": "2026-10-18"
+        },
+        {
+          "id": "ccbyncnd.attribution",
+          "kind": "ATTRIBUTION_NOTICE",
+          "effect": "OBLIGATION",
+          "applies_when": {
+            "always": true
+          },
+          "summary": "Give appropriate credit, link the licence and indicate changes.",
+          "section": "3.a",
+          "source_url": "https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode",
+          "locator": "If You Share the Licensed Material",
+          "source_raw_url": "https://raw.githubusercontent.com/spdx/license-list-data/main/text/CC-BY-NC-ND-4.0.txt",
+          "source_format": "text",
+          "locator_verified": "2026-10-18"
+        }
+      ]
+    },
+    {
+      "key": "cc-by-nc-sa-4.0",
+      "name": "Creative Commons Attribution-NonCommercial-ShareAlike 4.0",
+      "hub_tags": [
+        "cc-by-nc-sa-4.0"
+      ],
+      "url": "https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode",
+      "clauses": [
+        {
+          "id": "ccbyncsa.noncommercial",
+          "kind": "NONCOMMERCIAL",
+          "effect": "BLOCK",
+          "applies_when": {
+            "commercial": true
+          },
+          "summary": "Licensed rights may be exercised only for non-commercial purposes.",
+          "section": "2.a.1",
+          "source_url": "https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode",
+          "locator": "NonCommercial purposes only",
+          "source_raw_url": "https://raw.githubusercontent.com/spdx/license-list-data/main/text/CC-BY-NC-SA-4.0.txt",
+          "source_format": "text",
+          "locator_verified": "2026-10-18"
+        },
+        {
+          "id": "ccbyncsa.sharealike",
+          "kind": "SHARE_ALIKE",
+          "effect": "OBLIGATION",
+          "applies_when": {
+            "distributes_weights": true
+          },
+          "summary": "Adapted material must be shared under the same or a compatible licence.",
+          "section": "3.b",
+          "source_url": "https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode",
+          "locator": "ShareAlike|same License Elements",
+          "source_raw_url": "https://raw.githubusercontent.com/spdx/license-list-data/main/text/CC-BY-NC-SA-4.0.txt",
+          "source_format": "text",
+          "locator_verified": "2026-10-18"
+        },
+        {
+          "id": "ccbyncsa.attribution",
+          "kind": "ATTRIBUTION_NOTICE",
+          "effect": "OBLIGATION",
+          "applies_when": {
+            "always": true
+          },
+          "summary": "Give appropriate credit, link the licence and indicate changes.",
+          "section": "3.a",
+          "source_url": "https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode",
+          "locator": "If You Share the Licensed Material",
+          "source_raw_url": "https://raw.githubusercontent.com/spdx/license-list-data/main/text/CC-BY-NC-SA-4.0.txt",
+          "source_format": "text",
+          "locator_verified": "2026-10-18"
+        }
+      ]
+    },
+    {
       "key": "cc-by-4.0",
       "name": "Creative Commons Attribution 4.0",
       "hub_tags": [
@@ -808,7 +918,9 @@
     "openrail": "openrail",
     "openrail++": "openrail",
     "bigscience-openrail-m": "openrail",
-    "other": "other"
+    "other": "other",
+    "cc-by-nc-nd-4.0": "cc-by-nc-nd-4.0",
+    "cc-by-nc-sa-4.0": "cc-by-nc-sa-4.0"
   },
   "split_regex": "(?<=[.;:])\\s+(?=[A-Z(\\\"“])|\\s(?=\\([a-z]\\)\\s)"
 }

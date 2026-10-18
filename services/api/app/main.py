@@ -53,6 +53,18 @@ async def _hosted_catalog_forever() -> None:
         await asyncio.sleep(hosted.refresh_hours() * 3600)
 
 
+async def _load_clauses_once() -> None:
+    """Upsert the clause seed with quotes from the official texts (idempotent MERGE)."""
+    from app.engine.dna import _client
+    from app.engine.loader import load_clauses
+
+    try:
+        result = await load_clauses(_client())
+        log.info("clauses loaded: %s", result)
+    except Exception:
+        log.exception("clause load failed; existing clauses stay in place")
+
+
 async def _licence_watch_forever(every_s: int = 24 * 3600) -> None:
     """Daily licence text watch (FLOWS F17); the first run records the baseline."""
     from app.engine import licence_watch
@@ -94,6 +106,7 @@ async def lifespan(_app: FastAPI):
     watcher_task: asyncio.Task[None] | None = None
     catalog_task: asyncio.Task[None] | None = None
     licence_task: asyncio.Task[None] | None = None
+    clause_task: asyncio.Task[None] | None = None
     get_settings()
     try:
         connect()
@@ -122,12 +135,13 @@ async def lifespan(_app: FastAPI):
         cleaner = asyncio.create_task(_clean_sandboxes_forever())
         watcher_task = asyncio.create_task(_watch_forever())
         catalog_task = asyncio.create_task(_hosted_catalog_forever())
+        clause_task = asyncio.create_task(_load_clauses_once())
         licence_task = asyncio.create_task(_licence_watch_forever())
     # MCP session manager (required for streamable HTTP)
     mcp.streamable_http_app()
     async with mcp.session_manager.run():
         yield
-    for task in (cleaner, watcher_task, catalog_task, licence_task):
+    for task in (cleaner, watcher_task, catalog_task, licence_task, clause_task):
         if task is not None:
             task.cancel()
 

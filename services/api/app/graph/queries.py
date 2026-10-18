@@ -356,6 +356,11 @@ RETURN sum(CASE WHEN c.quote = '' OR c.quote IS NULL THEN 0 ELSE 1 END) AS resol
        sum(CASE WHEN c.quote = '' OR c.quote IS NULL THEN 1 ELSE 0 END) AS unresolved;
 """
 
+C5 = """
+MATCH (c:Clause)
+RETURN c.id AS id, c.quote AS quote;
+"""
+
 W0 = """
 CREATE VECTOR INDEX FOR (m:Model) ON (m.dna) OPTIONS {dimension:1024, similarityFunction:'cosine'}
 """
@@ -743,6 +748,7 @@ QUERIES = {
     "C2": C2,
     "C3": C3,
     "C4": C4,
+    "C5": C5,
     "W0": W0,
     "W1": W1,
     "W1B": W1B,

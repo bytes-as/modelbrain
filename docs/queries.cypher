@@ -368,6 +368,10 @@ MATCH (c:Clause)
 RETURN sum(CASE WHEN c.quote = '' OR c.quote IS NULL THEN 0 ELSE 1 END) AS resolved,
        sum(CASE WHEN c.quote = '' OR c.quote IS NULL THEN 1 ELSE 0 END) AS unresolved;
 
+// C5: stored clause quotes, so a failed source fetch never blanks a resolved quote
+MATCH (c:Clause)
+RETURN c.id AS id, c.quote AS quote;
+
 // ---------------------------------------------------------------------------
 // --- Weight DNA --- (hub). See docs/ADDENDUM_WEIGHT_DNA.md section 8.
 // ---------------------------------------------------------------------------

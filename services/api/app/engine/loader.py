@@ -3,15 +3,19 @@
 from __future__ import annotations
 
 import json
+import logging
 import time
 from typing import Any
 
 from app.engine.clauses import seed_path
 from app.engine.quotes import extract_quote
 from app.graph import db
-from app.graph.queries import C1, C2
+from app.graph.queries import C1, C2, C5
+from app.graph.rows import as_rows
 from app.hf.client import HFClient, HubUnavailable
 from app.ids import new_id
+
+log = logging.getLogger("modelbrain.clauses")
 
 stats: dict[str, int] = {"resolved": 0, "unresolved": 0}
 
@@ -28,6 +32,11 @@ async def load_clauses(client: HFClient, *, graph: str = "hub") -> dict[str, int
     resolved = 0
     unresolved = 0
     cache: dict[str, str | None] = {}
+    stored = {
+        str(row["id"]): row.get("quote") or ""
+        for row in as_rows(db.ro_query(graph, C5))
+        if row.get("id")
+    }
     for licence in seed.get("licenses") or []:
         for clause in licence.get("clauses") or []:
             url = clause.get("source_raw_url")
@@ -43,10 +52,16 @@ async def load_clauses(client: HFClient, *, graph: str = "hub") -> dict[str, int
                         split_regex=split_regex,
                         locator=clause.get("locator") or "",
                     )
+            if not quote and stored.get(clause["id"]) and not (url and cache.get(url)):
+                # Source unreachable: keep the quote we already verified.
+                log.warning("clause source unreachable, keeping stored quote: %s", clause["id"])
+                resolved += 1
+                continue
             if quote:
                 resolved += 1
             else:
                 unresolved += 1
+                log.warning("clause locator found nothing: %s", clause["id"])
             db.query(
                 graph,
                 C1,
