@@ -210,3 +210,34 @@ async def resolve_custom(authorization: str | None = Header(default=None)) -> di
         return await licence_watch.resolve_custom_licences(client)
     finally:
         await client.aclose()
+
+
+class DraftIn(BaseModel):
+    model_id: str
+    target_repo: str | None = None
+
+
+@router.post("/api/admin/notices/draft")
+async def notice_draft(body: DraftIn, authorization: str | None = Header(default=None)) -> dict:
+    require_admin(authorization)
+    from app.agents import notifier
+
+    target = _check_model(body.target_repo) if body.target_repo else None
+    return await notifier.draft_for(_check_model(body.model_id), target_repo=target)
+
+
+@router.get("/api/admin/notices")
+def notices(authorization: str | None = Header(default=None)) -> list[dict[str, object]]:
+    require_admin(authorization)
+    from app.agents import notifier
+
+    return notifier.list_drafts()
+
+
+@router.post("/api/admin/notices/{draft_id}/approve")
+async def notice_approve(draft_id: str, authorization: str | None = Header(default=None)) -> dict:
+    """A human approval: posts only to HF_POST_ALLOWLIST repos, else READY_TO_COPY."""
+    require_admin(authorization)
+    from app.agents import notifier
+
+    return await notifier.approve(draft_id)

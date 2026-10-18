@@ -635,3 +635,19 @@ MERGE (m)-[d:DECLARES]->(l)
 ON CREATE SET d.source = 'matched_text', d.as_of_sha = $sha
 SET m.license_text_sha = $text_sha
 RETURN l.key AS license
+
+// X26: (hub) a drafted notice to a model's authors, waiting for a human approval (never posted on its own)
+CREATE (d:Draft {id: $id, model_id: $model_id, target_repo: $target_repo, title: $title, body: $body,
+               state: 'AWAITING_APPROVAL', created_at: $now, source: $source})
+RETURN d.id AS id
+
+// X27: (hub) record the outcome of an approval: POSTED with its URL, or READY_TO_COPY outside the allowlist
+MATCH (d:Draft {id: $id})
+SET d.state = $state, d.posted_url = $posted_url, d.approved_at = $now
+RETURN d.id AS id, d.state AS state, d.posted_url AS posted_url, d.target_repo AS target_repo, d.title AS title, d.body AS body
+
+// X28: (hub) drafted notices, newest first
+MATCH (d:Draft)
+RETURN d.id AS id, d.model_id AS model_id, d.target_repo AS target_repo, d.title AS title, d.body AS body,
+       d.state AS state, d.posted_url AS posted_url, d.created_at AS created_at
+ORDER BY d.created_at DESC LIMIT $limit

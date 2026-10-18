@@ -659,6 +659,25 @@ SET m.license_text_sha = $text_sha
 RETURN l.key AS license
 """
 
+X26 = """
+CREATE (d:Draft {id: $id, model_id: $model_id, target_repo: $target_repo, title: $title, body: $body,
+               state: 'AWAITING_APPROVAL', created_at: $now, source: $source})
+RETURN d.id AS id
+"""
+
+X27 = """
+MATCH (d:Draft {id: $id})
+SET d.state = $state, d.posted_url = $posted_url, d.approved_at = $now
+RETURN d.id AS id, d.state AS state, d.posted_url AS posted_url, d.target_repo AS target_repo, d.title AS title, d.body AS body
+"""
+
+X28 = """
+MATCH (d:Draft)
+RETURN d.id AS id, d.model_id AS model_id, d.target_repo AS target_repo, d.title AS title, d.body AS body,
+       d.state AS state, d.posted_url AS posted_url, d.created_at AS created_at
+ORDER BY d.created_at DESC LIMIT $limit
+"""
+
 QUERIES = {
     "SCHEMA": SCHEMA,
     "I1": I1,
@@ -745,4 +764,7 @@ QUERIES = {
     "X23": X23,
     "X24": X24,
     "X25": X25,
+    "X26": X26,
+    "X27": X27,
+    "X28": X28,
 }
