@@ -76,4 +76,3 @@ H0 = the moment the build starts. A = backend and graph. B = frontend, eval, vid
 
 ## Questions for the owner
 - This machine already runs Homebrew Redis on port 6379, so `docker compose up` cannot publish FalkorDB on host port 6379. A local untracked `docker-compose.override.yml` publishes host port 6380 instead. The API container still uses `falkordb:6379` on the compose network, and the Browser stays on `localhost:3000`. Should the committed compose file keep 6379 (clean machines) and leave the override local?
-- G009 is implemented (`.github/workflows/ci.yml`) but not ticked. Accept needs a green Actions run on main, and this repo has no GitHub remote yet. I have not pushed. Say when to create the remote and push. 
