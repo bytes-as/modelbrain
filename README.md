@@ -76,6 +76,20 @@ Measured separation: real fine-tunes score 0.98-0.9995 against their parent, hea
 
 Wording on every finding: "metadata and weights disagree" and "obligations of the parent may apply". Many cards explain their lineage in prose; the findings are about the machine-readable metadata. Each row links to both Hub pages.
 
+## Also shipped
+
+| Add-on | What it does | Status |
+|---|---|---|
+| **GGUF weight DNA** | Repos that ship only GGUF (what people run in Ollama or LM Studio) are fingerprinted from the GGUF header and F16/BF16/Q8_0 tensors by range reads, into the same vector index. The header licence becomes a `DECLARES {source:'gguf_meta'}` edge when the card declares none | Live. K-quant-only files and new hybrid/MoE layouts are reported as unsupported |
+| **Hosted path** | The public OpenRouter catalogue (112 providers, 180 hosted models with Hugging Face weights) as `(:Provider)-[:SERVES]->(:HostedModel)-[:IS]->(:Model)`. MCP `where_can_i_run`, `/api/hosted/*`, and a provider panel on the verdict page with an EU residency proof | Live. Only some providers publish datacenter countries; the proof says how many could not be checked |
+| **Licence text watch** | Daily hash of every licence text the clauses quote; a change reopens every ruling resting on those clauses | Live. First run is the baseline |
+| **Custom licence resolution** | A card declaring `other` with a `license_link` resolves to a known licence when the linked text carries that licence's name and clause wording | Live |
+| **Discussions as memory** | Hugging Face discussions on watched models with outcomes (Xkev #12: fixed after 130 days) | Live |
+| **Notifier** | Drafts a neutral notice to a model's authors; posts only after an approval, only to repos on `HF_POST_ALLOWLIST` | Built and tested; nothing has been posted |
+| **GitHub Action** | `actions/modelbrain-check` fails a pull request that loads a BLOCKED model | Live |
+| **LLM gateway** | Optional OpenRouter phrasing for explanations and drafts; the graph still decides | Built; no key configured, so templates are used |
+| **Multi-LLM card-only baseline** | `eval/baseline_llm.py` asks LLMs for verdicts from card metadata only | Built; not run (needs an OpenRouter key) |
+
 ## Graph data model
 
 FalkorDB cannot query across graphs, so the application joins them. The **hub** answers "what does this model inherit?" A **tenant** graph answers "who uses it, under which context, and what did we decide?" One FalkorDB instance holds all of them.
