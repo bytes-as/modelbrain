@@ -155,3 +155,23 @@ async def test_follows_the_redirect_of_a_renamed_repo(tmp_path: Path) -> None:
         await client.aclose()
     assert response.status == 200
     assert json.loads(response.body)["id"] == "meta-llama/Llama-3.1-8B"
+
+
+@pytest.mark.asyncio
+async def test_token_is_sent_to_hugging_face_only(tmp_path: Path) -> None:
+    seen: dict[str, str | None] = {}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen[request.url.host] = request.headers.get("Authorization")
+        return httpx.Response(200, content=b"ok")
+
+    client = HFClient(
+        token="hf_test",
+        cache=DiskCache(tmp_path),
+        transport=httpx.MockTransport(handler),
+    )
+    await client.get("https://huggingface.co/api/models/a/b", ttl_s=0)
+    await client.get("https://raw.githubusercontent.com/spdx/x.txt", ttl_s=0)
+    await client.aclose()
+    assert seen["huggingface.co"] == "Bearer hf_test"
+    assert seen["raw.githubusercontent.com"] is None

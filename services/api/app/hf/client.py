@@ -67,6 +67,22 @@ class HFResponse:
         return json.loads(self.body)
 
 
+HF_HOSTS = ("huggingface.co", "hf.co")
+
+
+class _HubOnlyBearer(httpx.Auth):
+    """Send the Hugging Face token to Hugging Face hosts only, never to licence-text mirrors."""
+
+    def __init__(self, token: str) -> None:
+        self._value = f"Bearer {token}"
+
+    def auth_flow(self, request: httpx.Request):
+        host = request.url.host
+        if any(host == h or host.endswith(f".{h}") for h in HF_HOSTS):
+            request.headers["Authorization"] = self._value
+        yield request
+
+
 class HFClient:
     """One process-wide client. Tests pass their own instance."""
 
@@ -83,10 +99,12 @@ class HFClient:
         self.cache = cache or DiskCache(Path("/tmp/modelbrain-hf"))
         self.sleep = sleep
         self.limiter = SlidingLimiter(400 if token else 90)
-        headers = {"User-Agent": "modelbrain"}
-        if token:
-            headers["Authorization"] = f"Bearer {token}"
-        self._http = httpx.AsyncClient(transport=transport, timeout=timeout_s, headers=headers)
+        self._http = httpx.AsyncClient(
+            transport=transport,
+            timeout=timeout_s,
+            headers={"User-Agent": "modelbrain"},
+            auth=_HubOnlyBearer(token) if token else None,
+        )
 
     async def aclose(self) -> None:
         await self._http.aclose()
