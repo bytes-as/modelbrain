@@ -525,3 +525,17 @@ RETURN k.id AS canonical
 // X10: (hub) every model that is the target of a lineage edge (alias candidates)
 MATCH (:Model)-[:DERIVED_FROM]->(p:Model)
 RETURN DISTINCT p.id AS id
+
+// X11: (hub) register a visitor sandbox: name, template, expiry and a hash of its token (never the token)
+MERGE (s:Sandbox {name: $name})
+SET s.expires_at = $expires_at, s.token_hash = $token_hash, s.template = $template
+RETURN s.name AS name
+
+// X12: (hub) every registered sandbox, so tokens survive an API restart
+MATCH (s:Sandbox)
+RETURN s.name AS name, s.expires_at AS expires_at, s.token_hash AS token_hash, s.template AS template
+
+// X13: (hub) unregister a sandbox
+MATCH (s:Sandbox {name: $name})
+DELETE s
+RETURN 1 AS removed

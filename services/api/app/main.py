@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import logging
 from contextlib import asynccontextmanager
 
@@ -29,7 +30,7 @@ from app.routes.models import router as models_router
 from app.routes.sandbox import router as tenants_router
 from app.routes.verdict import router as verdict_router
 from app.tenants.bootstrap import ensure_tenants
-from app.tenants.sandbox import cleanup_expired
+from app.tenants.sandbox import cleanup_expired, restore_registry
 
 configure_logging()
 log = logging.getLogger("modelbrain")
@@ -37,8 +38,18 @@ log = logging.getLogger("modelbrain")
 VERSION = "0.1.0"
 
 
+async def _clean_sandboxes_forever(every_s: int = 600) -> None:
+    while True:
+        await asyncio.sleep(every_s)
+        try:
+            cleanup_expired()
+        except Exception:
+            log.warning("periodic sandbox cleanup failed")
+
+
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
+    cleaner: asyncio.Task[None] | None = None
     get_settings()
     try:
         connect()
@@ -59,14 +70,18 @@ async def lifespan(_app: FastAPI):
         except Exception:
             log.exception("weight dna bootstrap failed")
         try:
+            restore_registry()
             cleanup_expired()
         except Exception:
             log.warning("sandbox cleanup failed")
         schedule_prewarm()
+        cleaner = asyncio.create_task(_clean_sandboxes_forever())
     # MCP session manager (required for streamable HTTP)
     mcp.streamable_http_app()
     async with mcp.session_manager.run():
         yield
+    if cleaner is not None:
+        cleaner.cancel()
 
 
 app = FastAPI(title="ModelBrain", version=VERSION, lifespan=lifespan)

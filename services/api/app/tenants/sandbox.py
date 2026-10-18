@@ -9,11 +9,15 @@ import uuid
 from app.config import get_settings
 from app.errors import ApiError
 from app.graph import db
+from app.graph.queries import X11, X12, X13
+from app.graph.rows import as_rows
 from app.tenants.auth import (
     drop_sandbox,
     list_sandbox_registry,
     new_token,
     register_sandbox,
+    restore_sandbox,
+    token_hash,
 )
 
 log = logging.getLogger("modelbrain.sandbox")
@@ -51,8 +55,13 @@ def create_sandbox(template: str) -> dict[str, object]:
         try:
             db.query(
                 "hub",
-                "MERGE (s:Sandbox {name: $name}) SET s.expires_at = $expires_at",
-                {"name": name, "expires_at": expires_at},
+                X11,
+                {
+                    "name": name,
+                    "expires_at": expires_at,
+                    "token_hash": token_hash(token),
+                    "template": template,
+                },
             )
         except Exception:
             log.warning("hub Sandbox registry write failed for %s", name)
@@ -67,16 +76,44 @@ def delete_sandbox(name: str) -> None:
     except Exception:
         log.warning("GRAPH.DELETE failed for %s", name)
     try:
-        db.query("hub", "MATCH (s:Sandbox {name: $name}) DELETE s", {"name": name})
+        db.query("hub", X13, {"name": name})
     except Exception:
         pass
 
 
+def restore_registry() -> int:
+    """Load persisted sandboxes into the token registry (tokens survive a restart)."""
+    restored = 0
+    for row in as_rows(db.ro_query("hub", X12)):
+        if not row.get("token_hash"):
+            continue
+        restore_sandbox(
+            str(row["name"]),
+            str(row["token_hash"]),
+            template=str(row.get("template") or "kestrel"),
+            expires_at=int(row.get("expires_at") or 0),
+        )
+        restored += 1
+    return restored
+
+
 def cleanup_expired() -> int:
+    """Delete expired sandboxes, and sandbox graphs nobody can reach any more."""
     now = int(time.time() * 1000)
     removed = 0
     for name, record in list(list_sandbox_registry().items()):
         if int(record["expires_at"]) < now:
             delete_sandbox(name)
             removed += 1
+    live = set(list_sandbox_registry())
+    # Sandboxes persisted by any process (e.g. created before a restart) count as live too.
+    for row in as_rows(db.ro_query("hub", X12)):
+        if int(row.get("expires_at") or 0) >= now:
+            live.add(str(row["name"]))
+    for name in db.list_graphs():
+        if str(name).startswith("sbx_") and str(name) not in live:
+            delete_sandbox(str(name))
+            removed += 1
+    if removed:
+        log.info("sandboxes removed", extra={"count": removed})
     return removed

@@ -533,6 +533,23 @@ MATCH (:Model)-[:DERIVED_FROM]->(p:Model)
 RETURN DISTINCT p.id AS id
 """
 
+X11 = """
+MERGE (s:Sandbox {name: $name})
+SET s.expires_at = $expires_at, s.token_hash = $token_hash, s.template = $template
+RETURN s.name AS name
+"""
+
+X12 = """
+MATCH (s:Sandbox)
+RETURN s.name AS name, s.expires_at AS expires_at, s.token_hash AS token_hash, s.template AS template
+"""
+
+X13 = """
+MATCH (s:Sandbox {name: $name})
+DELETE s
+RETURN 1 AS removed
+"""
+
 QUERIES = {
     "SCHEMA": SCHEMA,
     "I1": I1,
@@ -603,4 +620,7 @@ QUERIES = {
     "X8": X8,
     "X9": X9,
     "X10": X10,
+    "X11": X11,
+    "X12": X12,
+    "X13": X13,
 }

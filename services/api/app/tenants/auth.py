@@ -21,6 +21,19 @@ def register_sandbox(name: str, token: str, *, template: str, expires_at: int) -
     }
 
 
+def restore_sandbox(name: str, token_hash: str, *, template: str, expires_at: int) -> None:
+    """Re-register a sandbox from its persisted hash after an API restart."""
+    _sandbox_tokens[name] = {
+        "token_hash": token_hash,
+        "template": template,
+        "expires_at": expires_at,
+    }
+
+
+def token_hash(token: str) -> str:
+    return _hash(token)
+
+
 def drop_sandbox(name: str) -> None:
     _sandbox_tokens.pop(name, None)
 

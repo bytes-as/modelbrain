@@ -79,6 +79,10 @@ def copy_graph(source: str, destination: str) -> None:
     _database().connection.execute_command("GRAPH.COPY", source, destination)
 
 
+def list_graphs() -> list[str]:
+    return [str(name) for name in _database().list_graphs()]
+
+
 def delete_graph(name: str) -> None:
     _database().connection.execute_command("GRAPH.DELETE", name)
 
