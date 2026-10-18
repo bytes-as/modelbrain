@@ -74,6 +74,19 @@ H0 = the moment the build starts. A = backend and graph. B = frontend, eval, vid
 - Constraint syntax: not needed; MERGE on indexed ids is idempotent.
 - HF commits endpoint fields: `{id, title, message, date, authors}` (verified 18 Oct). Discussions: `{num, title, status, createdAt, author, ...}`.
 
+## What the owner needs to bring (18 Oct 2026)
+
+The build can continue without these. They block a public demo, gated model files, paid baselines, and the live posting loop.
+
+- **Hugging Face read token** (`HF_TOKEN`). Free, from https://huggingface.co/settings/tokens with read scope. Needed for Hub rate limits and for README/config on gated Meta repos. Anonymous access still works for public metadata, with a lower limit.
+- **Railway, on your own account.** The CLI on this machine is logged in as mani7833 (`mnkreddy7833@gmail.com`), not this repo's owner. Do not deploy ModelBrain there. Log in as yourself (`railway login`), then say so. Expect about $5–15 for an always-on API plus FalkorDB with a volume through judging. A card is required.
+- **Vercel** (Hobby is enough) for `apps/web`. The Vercel CLI is not installed here. Log in and say so. `NEXT_PUBLIC_API_URL` must be the Railway API URL.
+- **OpenRouter** (`OPENROUTER_API_KEY` plus `LLM_MODEL`, an exact id from https://openrouter.ai/api/v1/models). Optional. Explanations, drafts, and the card-only eval baseline use templates when this is empty. A few dollars of credit covers the demo. `EVAL_BASELINE_MODELS` is only for the multi-model baseline, which is cuttable.
+- **Hugging Face write token** (`HF_WRITE_TOKEN`) and a test repo you own, containing only a README and a config, no weights. Put that repo id in `HF_POST_ALLOWLIST`. Only the live posting loop needs this, and that loop is cuttable.
+- **Firecrawl or Anakin keys.** Not needed. The default fetcher is plain HTTP, which is enough for the clause quotes.
+- **Eval labels.** `eval/labels.json` must be written by a person, 80 verdicts, and committed before the clause engine (G033). Do not leave this until the end.
+- **Later, a person, not a vendor:** Claude Code screen recording, the 3-minute video, and the submission form before 23:00 IST.
+
 ## Questions for the owner
 - This machine already runs Homebrew Redis on port 6379, so `docker compose up` cannot publish FalkorDB on host port 6379. A local untracked `docker-compose.override.yml` publishes host port 6380 instead. The API container still uses `falkordb:6379` on the compose network, and the Browser stays on `localhost:3000`. Should the committed compose file keep 6379 (clean machines) and leave the override local?
 - BLUEPRINT section 16.5 and G115 suggest MIT. On 18 Oct 2026 the owner asked for free use with a royalty if someone commercialises the project. No OSI licence can require a royalty, so the repo uses PolyForm Noncommercial 1.0.0 plus `COMMERCIAL.md` for a separate royalty-bearing commercial licence. G115 is not ticked as MIT.

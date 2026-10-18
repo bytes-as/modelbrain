@@ -55,12 +55,23 @@ def graph(name: str):
     return _database().select_graph(name)
 
 
+def _statements(cypher: str) -> list[str]:
+    return [part.strip() for part in cypher.split(";") if part.strip()]
+
+
 def query(name: str, cypher: str, params: dict[str, Any] | None = None):
-    return graph(name).query(cypher, params or {})
+    """Run one copied query. A trailing semicolon is its own empty statement in FalkorDB."""
+    last = None
+    for statement in _statements(cypher):
+        last = graph(name).query(statement, params or {})
+    return last
 
 
 def ro_query(name: str, cypher: str, params: dict[str, Any] | None = None):
-    return graph(name).ro_query(cypher, params or {})
+    last = None
+    for statement in _statements(cypher):
+        last = graph(name).ro_query(statement, params or {})
+    return last
 
 
 def copy_graph(source: str, destination: str) -> None:
