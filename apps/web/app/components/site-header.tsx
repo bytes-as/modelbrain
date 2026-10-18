@@ -90,8 +90,13 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 border-b border-white/10 bg-bg/90 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-6xl items-center gap-8 px-4">
-        <Link href="/" className="font-serif text-[1.65rem] leading-none text-text">
-          ModelBrain
+        <Link
+          href="/"
+          aria-label="ModelBrain home"
+          className="flex items-center font-serif text-[1.65rem] leading-none text-text"
+        >
+          {/* Newsreader sits high in its line box; nudge the caps onto the bar's centre line. */}
+          <span className="inline-block translate-y-[2px]">ModelBrain</span>
         </Link>
 
         <nav aria-label="Main" className="hidden h-full items-center gap-7 text-[14px] lg:flex">

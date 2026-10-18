@@ -80,10 +80,10 @@ export function Part({
 }) {
   return (
     <section id={id} data-testid={testId} className="scroll-mt-24 pt-12 md:pt-16">
-      <div className="grid gap-4 border-t border-white/15 pt-5 md:grid-cols-[120px_minmax(0,1fr)] md:gap-6">
+      <div className="border-t border-white/15 pt-5">
         <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-muted">§{n}</p>
         <div className="min-w-0">
-          <h2 className="font-serif text-3xl font-light leading-tight tracking-[-0.015em] text-text md:text-[2.4rem]">
+          <h2 className="mt-5 font-serif text-3xl font-light leading-tight tracking-[-0.015em] text-text md:text-[2.4rem]">
             {title}
           </h2>
           {note ? (

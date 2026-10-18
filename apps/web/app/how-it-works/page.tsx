@@ -1,6 +1,15 @@
+import type { Metadata } from "next";
+
+import { pageMetadata } from "../lib/seo";
 import Link from "next/link";
 
 import { Disclaimer, Exhibit, ExhibitHeader, Part } from "../components/exhibit";
+
+export const metadata: Metadata = pageMetadata(
+  "How it works",
+  "One FalkorDB instance, three kinds of graph: bounded lineage traversal, a vector index of weight fingerprints, graph algorithms and trust on the edges.",
+  "/how-it-works",
+);
 
 const FALKOR: [string, string][] = [
   [

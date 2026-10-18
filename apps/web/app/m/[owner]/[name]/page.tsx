@@ -1,6 +1,24 @@
+import type { Metadata } from "next";
+
+import { pageMetadata } from "../../../lib/seo";
+
 import { Breakable, Exhibit, ExhibitHeader } from "../../../components/exhibit";
 
 import { VerdictView } from "./verdict-view";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ owner: string; name: string }>;
+}): Promise<Metadata> {
+  const { owner, name } = await params;
+  const id = `${owner}/${name}`;
+  return pageMetadata(
+    `Can you ship ${id}?`,
+    `The licence ${id} actually inherited: its lineage to the root model, the clauses that bind it, and a verdict for your company's country, read from FalkorDB.`,
+    `/m/${owner}/${name}`,
+  );
+}
 
 export default async function ModelVerdictPage({
   params,

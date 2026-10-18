@@ -1,5 +1,14 @@
+import type { Metadata } from "next";
+
+import { pageMetadata } from "../lib/seo";
 import { Exhibit, ExhibitHeader } from "../components/exhibit";
 import { CompaniesView } from "./companies-view";
+
+export const metadata: Metadata = pageMetadata(
+  "Companies",
+  "Two fictional companies on one FalkorDB instance, each in its own private graph: deployments, rulings with their evidence, and the tasks an upstream change opens.",
+  "/companies",
+);
 
 export default function CompaniesPage() {
   return (
