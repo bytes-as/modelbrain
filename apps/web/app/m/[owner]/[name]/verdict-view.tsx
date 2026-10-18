@@ -230,19 +230,33 @@ export function VerdictView({
 
   return (
     <div className="mt-6 space-y-6" data-testid="verdict-done">
-      <p
-        className="inline-block rounded px-3 py-2 text-lg font-medium"
-        data-testid="verdict-badge"
-        style={{ background: COLOUR[verdict.verdict] ?? "#9aa3ae", color: "#0f1419" }}
-      >
-        {label}
-      </p>
-      {verdict.declared_differs ? (
-        <p className="text-sm text-muted" data-testid="declared-differs">
-          Card declares {verdict.declared_license} · Inherits{" "}
-          {verdict.inherited_licenses.join(", ") || "no further licence"}
+      <div className="flex flex-wrap items-end gap-x-10 gap-y-4">
+        <p
+          className="stamp font-mono text-xl md:text-2xl"
+          data-testid="verdict-badge"
+          style={{ color: COLOUR[verdict.verdict] ?? "#9aa3ae" }}
+        >
+          {label}
         </p>
-      ) : null}
+        <p className="font-serif text-2xl leading-snug md:text-3xl" data-testid="declared-differs">
+          The card says{" "}
+          {verdict.declared_differs ? (
+            <span className="strike">{verdict.declared_license ?? "nothing"}</span>
+          ) : (
+            <span>{verdict.declared_license ?? "nothing"}</span>
+          )}
+          .{" "}
+          {verdict.inherited_licenses.length ? (
+            <>
+              The lineage carries{" "}
+              <em className={verdict.declared_differs ? "text-redline" : ""}>
+                {verdict.inherited_licenses.join(", ")}
+              </em>
+              .
+            </>
+          ) : null}
+        </p>
+      </div>
       <p className="text-sm" data-testid="context-chips">
         Context: {hq}, {commercial ? "commercial" : "non-commercial"}.{" "}
         <Link
@@ -315,24 +329,34 @@ export function VerdictView({
           </details>
         </section>
       ) : null}
-      <div className="space-y-3" data-testid="clause-cards">
-        {cards.map((hit) => (
-          <article key={hit.clause_id} className="rounded border border-white/10 bg-surface p-4">
-            <h2 className="font-mono text-sm">{hit.clause_id}</h2>
-            <p className="mt-2 text-sm">{hit.summary}</p>
-            {hit.quote ? (
-              <blockquote className="mt-3 border-l-2 border-accent pl-3 text-sm text-muted">
-                From the licence: {hit.quote}
-              </blockquote>
-            ) : null}
-            {hit.source_url ? (
-              <a className="mt-2 inline-block text-sm text-accent" href={hit.source_url}>
-                Source{hit.section ? `, ${hit.section}` : ""}
-              </a>
-            ) : null}
-            {hit.status ? (
-              <p className="mt-2 text-xs text-muted">Obligation: {hit.status}</p>
-            ) : null}
+      <div className="border-b border-white/15" data-testid="clause-cards">
+        {cards.map((hit, index) => (
+          <article
+            key={hit.clause_id}
+            className={`grid gap-4 border-t border-white/15 py-5 md:grid-cols-[190px_1fr] ${
+              verdict.blocking.some((b) => b.clause_id === hit.clause_id) ? "border-t-redline" : ""
+            }`}
+          >
+            <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-muted">
+              §{index + 1}
+              <span className="block break-all normal-case tracking-normal">{hit.clause_id}</span>
+            </p>
+            <div>
+              <p className="font-serif text-xl leading-snug">{hit.summary}</p>
+              {hit.quote ? (
+                <blockquote className="mt-3 border-l-2 border-redline/70 pl-3 font-serif text-[15px] italic text-muted">
+                  From the licence: {hit.quote}
+                </blockquote>
+              ) : null}
+              {hit.source_url ? (
+                <a className="mt-2 inline-block text-sm text-accent" href={hit.source_url}>
+                  Source{hit.section ? `, ${hit.section}` : ""}
+                </a>
+              ) : null}
+              {hit.status ? (
+                <p className="mt-2 text-xs text-muted">Obligation: {hit.status}</p>
+              ) : null}
+            </div>
           </article>
         ))}
       </div>

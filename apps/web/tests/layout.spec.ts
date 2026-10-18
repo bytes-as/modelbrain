@@ -8,7 +8,7 @@ for (const width of [375, 1280]) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto("/");
     await expect(page.getByRole("link", { name: "ModelBrain" })).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Can you ship this model?" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /The card says/ })).toBeVisible();
     await expect(page.getByText("Automated screening, not legal advice")).toBeVisible();
     await expect(page.getByTestId("health-dot")).toContainText(/Graph up|Degraded|Graph down/);
     await page.screenshot({

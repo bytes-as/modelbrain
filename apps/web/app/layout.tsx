@@ -1,24 +1,41 @@
 import type { Metadata } from "next";
-import { Inter, Inter_Tight, JetBrains_Mono } from "next/font/google";
+import { IBM_Plex_Mono, Inter_Tight, Newsreader } from "next/font/google";
 import { SiteFooter } from "./components/site-footer";
 import { SiteHeader } from "./components/site-header";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const newsreader = Newsreader({
+  subsets: ["latin"],
+  variable: "--font-newsreader",
+  style: ["normal", "italic"],
+  weight: ["300", "400", "500"],
+});
 const interTight = Inter_Tight({ subsets: ["latin"], variable: "--font-inter-tight" });
-const jetbrains = JetBrains_Mono({ subsets: ["latin"], variable: "--font-jetbrains" });
+const plexMono = IBM_Plex_Mono({
+  subsets: ["latin"],
+  variable: "--font-plex-mono",
+  weight: ["400", "500"],
+});
 
 export const metadata: Metadata = {
-  title: "ModelBrain",
-  description: "Can you ship this model?",
+  title: "ModelBrain · The licence your model actually inherited",
+  description:
+    "ModelBrain reads a Hugging Face model's real lineage, and its weights, in FalkorDB, and tells your team whether you can ship it, here, and who signs off.",
+  openGraph: {
+    title: "ModelBrain · The licence your model actually inherited",
+    description:
+      "Model cards can be wrong. Weights can't. Lineage, licence clauses and company memory in one graph.",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body
-        className={`${inter.variable} ${interTight.variable} ${jetbrains.variable} flex min-h-screen flex-col`}
-      >
+    // Font variables on <html>: the theme tokens on :root reference them.
+    <html
+      lang="en"
+      className={`${newsreader.variable} ${interTight.variable} ${plexMono.variable}`}
+    >
+      <body className="flex min-h-screen flex-col">
         <SiteHeader />
         <div className="mx-auto w-full max-w-6xl flex-1 px-4 py-8">{children}</div>
         <SiteFooter />
