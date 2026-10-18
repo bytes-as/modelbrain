@@ -1,0 +1,44 @@
+{
+  "sha": "188cc06c638e4b6d77e86930e126450f286c3ec8",
+  "pipeline_tag": null,
+  "gated": false,
+  "createdAt": "2024-09-25T20:36:48.000Z",
+  "lastModified": "2024-09-25T20:38:45.000Z",
+  "cardData": {
+    "license": "apache-2.0"
+  },
+  "tags": [
+    "safetensors",
+    "llama",
+    "license:apache-2.0",
+    "region:us"
+  ],
+  "siblings": [
+    {
+      "rfilename": "README.md",
+      "blobId": "7b95401dc46245ac339fc25059d4a56d90b4cde5",
+      "size": 31
+    },
+    {
+      "rfilename": "config.json",
+      "blobId": "b79036a00978a26f70ecfb6ac75a7758dad2c866",
+      "size": 1906
+    },
+    {
+      "rfilename": "model.safetensors",
+      "blobId": "9a0fcb8502c214c61a9ba9c0df47e6225136d26f",
+      "size": 1499334032,
+      "lfs": {
+        "sha256": "4b3f696185baa736e51a616fcaf7baf7623e1d68b5f5a4c4b93f79f16a4391d8",
+        "size": 1499334032,
+        "pointerSize": 135
+      }
+    },
+    {
+      "rfilename": "tokenizer.json",
+      "blobId": "5cc5f00a5b203e90a27a3bd60d1ec393b07971e8",
+      "size": 9085657
+    }
+  ],
+  "_source": "https://huggingface.co/api/models/SicariusSicariiStuff/Llama-3.2-1B_Base_FP8?blobs=true"
+}

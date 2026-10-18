@@ -1,0 +1,260 @@
+{
+  "sha": "e5e8c1d080a319983544c74d3d602bb5a21ac457",
+  "pipeline_tag": "text-generation",
+  "gated": false,
+  "createdAt": "2024-06-21T04:07:49.000Z",
+  "lastModified": "2024-07-25T14:41:29.000Z",
+  "cardData": {
+    "license": "cc-by-nc-4.0",
+    "library_name": "transformers",
+    "tags": [
+      "mergekit",
+      "merge"
+    ],
+    "base_model": [
+      "WhiteRabbitNeo/Llama-3-WhiteRabbitNeo-8B-v2.0",
+      "mlabonne/NeuralDaredevil-8B-abliterated"
+    ],
+    "pipeline_tag": "text-generation",
+    "model-index": [
+      {
+        "name": "llama-3-Nephilim-v1-8B",
+        "results": [
+          {
+            "task": {
+              "type": "text-generation",
+              "name": "Text Generation"
+            },
+            "dataset": {
+              "name": "IFEval (0-Shot)",
+              "type": "HuggingFaceH4/ifeval",
+              "args": {
+                "num_few_shot": 0
+              }
+            },
+            "metrics": [
+              {
+                "type": "inst_level_strict_acc and prompt_level_strict_acc",
+                "value": 42.77,
+                "name": "strict accuracy",
+                "verified": false
+              }
+            ],
+            "source": {
+              "url": "https://huggingface.co/spaces/open-llm-leaderboard/open_llm_leaderboard?query=grimjim/llama-3-Nephilim-v1-8B",
+              "name": "Open LLM Leaderboard"
+            }
+          },
+          {
+            "task": {
+              "type": "text-generation",
+              "name": "Text Generation"
+            },
+            "dataset": {
+              "name": "BBH (3-Shot)",
+              "type": "BBH",
+              "args": {
+                "num_few_shot": 3
+              }
+            },
+            "metrics": [
+              {
+                "type": "acc_norm",
+                "value": 29.91,
+                "name": "normalized accuracy",
+                "verified": false
+              }
+            ],
+            "source": {
+              "url": "https://huggingface.co/spaces/open-llm-leaderboard/open_llm_leaderboard?query=grimjim/llama-3-Nephilim-v1-8B",
+              "name": "Open LLM Leaderboard"
+            }
+          },
+          {
+            "task": {
+              "type": "text-generation",
+              "name": "Text Generation"
+            },
+            "dataset": {
+              "name": "MATH Lvl 5 (4-Shot)",
+              "type": "hendrycks/competition_math",
+              "args": {
+                "num_few_shot": 4
+              }
+            },
+            "metrics": [
+              {
+                "type": "exact_match",
+                "value": 8.16,
+                "name": "exact match",
+                "verified": false
+              }
+            ],
+            "source": {
+              "url": "https://huggingface.co/spaces/open-llm-leaderboard/open_llm_leaderboard?query=grimjim/llama-3-Nephilim-v1-8B",
+              "name": "Open LLM Leaderboard"
+            }
+          },
+          {
+            "task": {
+              "type": "text-generation",
+              "name": "Text Generation"
+            },
+            "dataset": {
+              "name": "GPQA (0-shot)",
+              "type": "Idavidrein/gpqa",
+              "args": {
+                "num_few_shot": 0
+              }
+            },
+            "metrics": [
+              {
+                "type": "acc_norm",
+                "value": 6.94,
+                "name": "acc_norm",
+                "verified": false
+              }
+            ],
+            "source": {
+              "url": "https://huggingface.co/spaces/open-llm-leaderboard/open_llm_leaderboard?query=grimjim/llama-3-Nephilim-v1-8B",
+              "name": "Open LLM Leaderboard"
+            }
+          },
+          {
+            "task": {
+              "type": "text-generation",
+              "name": "Text Generation"
+            },
+            "dataset": {
+              "name": "MuSR (0-shot)",
+              "type": "TAUR-Lab/MuSR",
+              "args": {
+                "num_few_shot": 0
+              }
+            },
+            "metrics": [
+              {
+                "type": "acc_norm",
+                "value": 10.64,
+                "name": "acc_norm",
+                "verified": false
+              }
+            ],
+            "source": {
+              "url": "https://huggingface.co/spaces/open-llm-leaderboard/open_llm_leaderboard?query=grimjim/llama-3-Nephilim-v1-8B",
+              "name": "Open LLM Leaderboard"
+            }
+          },
+          {
+            "task": {
+              "type": "text-generation",
+              "name": "Text Generation"
+            },
+            "dataset": {
+              "name": "MMLU-PRO (5-shot)",
+              "type": "TIGER-Lab/MMLU-Pro",
+              "config": "main",
+              "split": "test",
+              "args": {
+                "num_few_shot": 5
+              }
+            },
+            "metrics": [
+              {
+                "type": "acc",
+                "value": 31.06,
+                "name": "accuracy",
+                "verified": false
+              }
+            ],
+            "source": {
+              "url": "https://huggingface.co/spaces/open-llm-leaderboard/open_llm_leaderboard?query=grimjim/llama-3-Nephilim-v1-8B",
+              "name": "Open LLM Leaderboard"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "tags": [
+    "transformers",
+    "safetensors",
+    "llama",
+    "text-generation",
+    "mergekit",
+    "merge",
+    "conversational",
+    "base_model:WhiteRabbitNeo/Llama-3-WhiteRabbitNeo-8B-v2.0",
+    "base_model:merge:WhiteRabbitNeo/Llama-3-WhiteRabbitNeo-8B-v2.0",
+    "base_model:mlabonne/NeuralDaredevil-8B-abliterated",
+    "base_model:merge:mlabonne/NeuralDaredevil-8B-abliterated",
+    "license:cc-by-nc-4.0",
+    "model-index",
+    "text-generation-inference",
+    "endpoints_compatible",
+    "region:us"
+  ],
+  "siblings": [
+    {
+      "rfilename": "Llama-3-LICENSE",
+      "blobId": "4c763399690c7fec642231350756e4ee9184b5ce",
+      "size": 7801
+    },
+    {
+      "rfilename": "README.md",
+      "blobId": "3b7e711e22dc0accf2455436f06c94511e87b65e",
+      "size": 7270
+    },
+    {
+      "rfilename": "config.json",
+      "blobId": "9fd0853d2c93cfe59a91d52180e5902f86d05b18",
+      "size": 723
+    },
+    {
+      "rfilename": "model-00001-of-00004.safetensors",
+      "blobId": "2974b73c9179e121e534f8898d3f20a755433b8b",
+      "size": 4953586384,
+      "lfs": {
+        "sha256": "284804f438e2234cb04d57bb4b45ddcc19bb4d8d1b95129bf01e498a8fd55307",
+        "size": 4953586384,
+        "pointerSize": 135
+      }
+    },
+    {
+      "rfilename": "model-00002-of-00004.safetensors",
+      "blobId": "bd9b82db4d748b0588bdd6bb73e94f0eb5ec3bd1",
+      "size": 4999819336,
+      "lfs": {
+        "sha256": "35fc807b4dfa85369cc7ca00ccf9c6c221225b6a6badaea2aaa97208ab7b0c83",
+        "size": 4999819336,
+        "pointerSize": 135
+      }
+    },
+    {
+      "rfilename": "model-00003-of-00004.safetensors",
+      "blobId": "302356b0d508334dd6525d435e9c84133d97d693",
+      "size": 4915916144,
+      "lfs": {
+        "sha256": "b2764582d8fe7ad5faa2604ac33d77cc49f80e41f7ebba9b017b838d94e99577",
+        "size": 4915916144,
+        "pointerSize": 135
+      }
+    },
+    {
+      "rfilename": "model-00004-of-00004.safetensors",
+      "blobId": "e53241451da49558bb55c1780a1cbd7e94a19109",
+      "size": 1191234472,
+      "lfs": {
+        "sha256": "9368ef4cd8e325d54e4b8648f5e85fbcb724ebcb419ac36ccaf6b9e1e33f00d7",
+        "size": 1191234472,
+        "pointerSize": 135
+      }
+    },
+    {
+      "rfilename": "tokenizer.json",
+      "blobId": "b197f72effb9d5ed16ee0f5663e11e4cfac2ba62",
+      "size": 9085698
+    }
+  ],
+  "_source": "https://huggingface.co/api/models/grimjim/llama-3-Nephilim-v1-8B?blobs=true"
+}

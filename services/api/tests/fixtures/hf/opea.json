@@ -1,0 +1,67 @@
+{
+  "sha": "3a653119367eac6f9229c4497f28a748f752f338",
+  "pipeline_tag": null,
+  "gated": false,
+  "createdAt": "2024-12-09T01:36:26.000Z",
+  "lastModified": "2025-07-18T08:00:53.000Z",
+  "cardData": {
+    "license": "apache-2.0",
+    "base_model": [
+      "Xkev/Llama-3.2V-11B-cot"
+    ]
+  },
+  "tags": [
+    "safetensors",
+    "mllama",
+    "arxiv:2309.05516",
+    "base_model:Xkev/Llama-3.2V-11B-cot",
+    "base_model:quantized:Xkev/Llama-3.2V-11B-cot",
+    "license:apache-2.0",
+    "4-bit",
+    "auto-round",
+    "region:us"
+  ],
+  "siblings": [
+    {
+      "rfilename": "README.md",
+      "blobId": "323688a1b143bae57fcdba14e83c247058094499",
+      "size": 3902
+    },
+    {
+      "rfilename": "config.json",
+      "blobId": "60bfaabd19ef91184b090283d455588f4edad490",
+      "size": 5877
+    },
+    {
+      "rfilename": "model-00001-of-00002.safetensors",
+      "blobId": "17232c892c86255e6ef5b97f854bde4eeaab7950",
+      "size": 4986590798,
+      "lfs": {
+        "sha256": "8771ccf0ecc775c85b06936b3b02c93362b470ee246588c649add77e6d1266ae",
+        "size": 4986590798,
+        "pointerSize": 135
+      }
+    },
+    {
+      "rfilename": "model-00002-of-00002.safetensors",
+      "blobId": "09d17323e75bf803e8447e42da5aaf379144a5e1",
+      "size": 3444466088,
+      "lfs": {
+        "sha256": "ddcd46343b9c9bdcdeb2646a659a9f477701072581d4cd603f072187912b767f",
+        "size": 3444466088,
+        "pointerSize": 135
+      }
+    },
+    {
+      "rfilename": "tokenizer.json",
+      "blobId": "b206edc40f00914f7ccdf931255a3eb0813026eb",
+      "size": 17210088,
+      "lfs": {
+        "sha256": "9816d43bd5347d64bccc66b7710947fb18e9818cc660215b1462061d4a44e449",
+        "size": 17210088,
+        "pointerSize": 133
+      }
+    }
+  ],
+  "_source": "https://huggingface.co/api/models/OPEA/Llama-3.2V-11B-cot-int4-sym-inc?blobs=true"
+}

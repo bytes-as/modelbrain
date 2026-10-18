@@ -1,0 +1,164 @@
+{
+  "sha": "e8c2529775b02b818f88e4b400c74653888fdfb9",
+  "pipeline_tag": "image-text-to-text",
+  "gated": false,
+  "createdAt": "2024-11-19T15:21:45.000Z",
+  "lastModified": "2025-11-16T04:02:09.000Z",
+  "cardData": {
+    "base_model": [
+      "meta-llama/Llama-3.2-11B-Vision-Instruct"
+    ],
+    "datasets": [
+      "Xkev/LLaVA-CoT-100k"
+    ],
+    "language": [
+      "en"
+    ],
+    "library_name": "transformers",
+    "license": "apache-2.0",
+    "pipeline_tag": "image-text-to-text",
+    "tags": [
+      "llava",
+      "reasoning",
+      "vqa"
+    ]
+  },
+  "tags": [
+    "transformers",
+    "safetensors",
+    "mllama",
+    "image-text-to-text",
+    "llava",
+    "reasoning",
+    "vqa",
+    "conversational",
+    "en",
+    "dataset:Xkev/LLaVA-CoT-100k",
+    "arxiv:2411.10440",
+    "base_model:meta-llama/Llama-3.2-11B-Vision-Instruct",
+    "base_model:finetune:meta-llama/Llama-3.2-11B-Vision-Instruct",
+    "license:apache-2.0",
+    "text-generation-inference",
+    "endpoints_compatible",
+    "deploy:azure",
+    "region:us"
+  ],
+  "siblings": [
+    {
+      "rfilename": "LICENSE_llama.txt",
+      "blobId": "085b47c1575cb889b7024030e60b78f54f0b8c9e",
+      "size": 7712
+    },
+    {
+      "rfilename": "README.md",
+      "blobId": "e0471cfee8ad9e95539a1156b12ee083a36eb31c",
+      "size": 5241
+    },
+    {
+      "rfilename": "config.json",
+      "blobId": "0a824b94a1c1adc91ab15be3f8e0c24a106f28fe",
+      "size": 5138
+    },
+    {
+      "rfilename": "model-00001-of-00009.safetensors",
+      "blobId": "92b90c38d3fb35b290c60701136dafc8cece6bb5",
+      "size": 3454336036,
+      "lfs": {
+        "sha256": "cc2a47b07d6648dfb68bb93f63b0100933b3d0d0d49cc39428c67ab47f8ed877",
+        "size": 3454336036,
+        "pointerSize": 135
+      }
+    },
+    {
+      "rfilename": "model-00002-of-00009.safetensors",
+      "blobId": "8813151d44ac5aac4a00e9e36c40201dbee9ef5a",
+      "size": 4886615752,
+      "lfs": {
+        "sha256": "d4e4cce357f4854f1688cd93fda2fbf7728e57b030ffe42226aeed3bbf623d2e",
+        "size": 4886615752,
+        "pointerSize": 135
+      }
+    },
+    {
+      "rfilename": "model-00003-of-00009.safetensors",
+      "blobId": "abe15d70068c4e884cab9e29e3399afb363685d9",
+      "size": 4832009696,
+      "lfs": {
+        "sha256": "570db75c32cfca38662c01adb41da66cff31cab4b5bb6d1396211a1ebfee34d8",
+        "size": 4832009696,
+        "pointerSize": 135
+      }
+    },
+    {
+      "rfilename": "model-00004-of-00009.safetensors",
+      "blobId": "ec12435a4163d64aad2fcb7b81cccecdac26966c",
+      "size": 4999798928,
+      "lfs": {
+        "sha256": "e3975bb8cacaae36ae140746ed8aae1bf661a633c2d6a4d11f75e02c6f22de42",
+        "size": 4999798928,
+        "pointerSize": 135
+      }
+    },
+    {
+      "rfilename": "model-00005-of-00009.safetensors",
+      "blobId": "7aec0427caba48f930e4f57b5032369a4da3810f",
+      "size": 4999815448,
+      "lfs": {
+        "sha256": "0f7749e7c37d64bd20dc30d95fd36fed4239d3a8f911b01a355ccca9244d2190",
+        "size": 4999815448,
+        "pointerSize": 135
+      }
+    },
+    {
+      "rfilename": "model-00006-of-00009.safetensors",
+      "blobId": "30a528ff607002406b0184b29bf8c8eb7873a2a6",
+      "size": 4832009736,
+      "lfs": {
+        "sha256": "9a082f0fe363c09cd577e68b10f106e9a729299fd8e43968a25337afa04fbc88",
+        "size": 4832009736,
+        "pointerSize": 135
+      }
+    },
+    {
+      "rfilename": "model-00007-of-00009.safetensors",
+      "blobId": "a4cfd31eb7762f89ec2aeba61746756c58e0d672",
+      "size": 4999815448,
+      "lfs": {
+        "sha256": "3877e0b5cfbf8077968782b8fcf02462f0252c3b368f8d794cd18de2514b72fb",
+        "size": 4999815448,
+        "pointerSize": 135
+      }
+    },
+    {
+      "rfilename": "model-00008-of-00009.safetensors",
+      "blobId": "ff9c12dad76af0f53ff0e0b27bf046b84bdc0e70",
+      "size": 4999815448,
+      "lfs": {
+        "sha256": "706d314429d9d19738ee65d8234945050dd581360b3e86c020087eeda2735f8b",
+        "size": 4999815448,
+        "pointerSize": 135
+      }
+    },
+    {
+      "rfilename": "model-00009-of-00009.safetensors",
+      "blobId": "00c621511d97825a9cb09e1e1b0e09de317bb3df",
+      "size": 4676785016,
+      "lfs": {
+        "sha256": "18bc424045c1c905868dbe28dd4f1eeff61ee6d05afc2f4b27674d30b9c80eb6",
+        "size": 4676785016,
+        "pointerSize": 135
+      }
+    },
+    {
+      "rfilename": "tokenizer.json",
+      "blobId": "b206edc40f00914f7ccdf931255a3eb0813026eb",
+      "size": 17210088,
+      "lfs": {
+        "sha256": "9816d43bd5347d64bccc66b7710947fb18e9818cc660215b1462061d4a44e449",
+        "size": 17210088,
+        "pointerSize": 133
+      }
+    }
+  ],
+  "_source": "https://huggingface.co/api/models/Xkev/Llama-3.2V-11B-cot?blobs=true"
+}
