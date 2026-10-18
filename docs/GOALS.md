@@ -131,7 +131,7 @@ Milestones: **M1** = G001-G019 (O1), **M2** = G020-G029 (O4), **M3 (core, never 
 - [ ] **G109** Error and empty states for every page (no data, sandbox expired, hub down, graph down). **Verify:** Playwright with mocked failures.
 - [ ] **G110** Security: tokens compared in constant time; no tokens in logs or the graph; admin endpoints require `ADMIN_TOKEN`. **Verify:** test.
 
-- [ ] **G111** Hub snapshot export: `make export` writes the hub and tenant graphs to `exports/*.cypher` (or RDB via `BGSAVE` copy) so the demo can be restored in minutes. **Verify:** restore into a fresh container and run smoke.sh.
+- [x] **G111** Hub snapshot export: `make export` writes the hub and tenant graphs to `exports/*.cypher` (or RDB via `BGSAVE` copy) so the demo can be restored in minutes. **Verify:** restore into a fresh container and run smoke.sh. Done 18 Oct 2026: `make export` / `make import` (DUMP/RESTORE, `scripts/graphs.py`); round trip into a fresh FalkorDB restored 3,707 hub nodes with a working vector index and WCC.
 - [ ] **G112** Uptime check: a free external monitor (or a GitHub Actions cron) hits `/api/health` every 30 minutes during the judging window and alerts the team. **Verify:** first alert test.
 - [x] **G113** Judge-day runbook `docs/RUNBOOK.md`: how to restart services, re-seed tenants, re-run prewarm, rotate tokens, and what to do if the Hub rate-limits. **Verify:** a teammate restarts the stack using only the runbook. Done 18 Oct 2026 (`docs/RUNBOOK.md`).
 - [ ] **G114** Cost guard: Railway spend limit set; LLM daily budget enforced; sandbox cap 50. **Verify:** settings screenshots in `docs/evidence/`.

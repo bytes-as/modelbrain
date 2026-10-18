@@ -17,7 +17,13 @@ Exit code 0 means: FalkorDB up, OPEA is BLOCKED in DE and not in US, lineage rea
 
 `GET /api/health` shows `hf: "degraded"` for five minutes after any Hugging Face failure (rate limit, 5xx, network). Verdicts for models already in the graph keep working; new models wait.
 
-## First start on a fresh FalkorDB (about 30 minutes, mostly unattended)
+## Seed a deployment from the local hub (seconds)
+
+1. Locally: `make reset` (clean fictional tenants), then `make export` writes `exports/hub.dump`, `tenant_kestrel.dump`, `tenant_harbor.dump` and `manifest.json` (git-ignored).
+2. Against the deployed FalkorDB (from a machine that can reach it, for example `railway connect` or a temporary TCP proxy): `FALKORDB_PASSWORD=... make import FALKOR_HOST=<host> FALKOR_PORT=<port>`. Each graph is checked against the manifest node count. The vector index and algorithms work on the restored hub (verified).
+3. Restart the API, reset the compounding demo, run the smoke test.
+
+## First start on a fresh FalkorDB without an export (about 30 minutes, mostly unattended)
 
 1. Start the stack. Startup applies the schema and vector index, seeds the fictional tenants (Kestrel, Harbor), marks the 36 foundation references and prewarms the demo models.
 2. Fingerprint the references and the demo findings. Needs `HF_TOKEN` for a reasonable rate (400 requests per 5 minutes; anonymous is 90):

@@ -163,6 +163,7 @@ def confirm_edge(
     *,
     hub: str = "hub",
     include_fixed: bool = True,
+    graphs: list[str] | None = None,
 ) -> dict[str, Any]:
     """Record a company's confirmation privately, publish only a salted hash, reopen on a tier change."""
     before = edge_state(child, parent, hub)
@@ -203,6 +204,7 @@ def confirm_edge(
             f"(tier {result['tier_before']} -> {result['tier_after']})",
             hub=hub,
             include_fixed=include_fixed,
+            graphs=graphs,
         )
     return result
 

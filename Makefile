@@ -2,7 +2,7 @@
 API ?= http://localhost:8000
 WEB ?= http://localhost:3001
 
-.PHONY: up down web test smoke eval seed reset crawl demo-reset
+.PHONY: up down web test smoke eval seed reset crawl demo-reset export import
 
 up:            ## start FalkorDB and the API
 	docker compose up -d --build
@@ -36,3 +36,9 @@ crawl:         ## fingerprint the references and demo findings (needs ADMIN_TOKE
 
 demo-reset:    ## put the compounding demo back to tier 1 with one confirmation
 	curl -s -X POST $(API)/api/admin/demo/compounding -H "Authorization: Bearer $$(grep '^ADMIN_TOKEN=' .env | cut -d= -f2-)"
+
+export:        ## snapshot hub + tenant graphs to exports/ (DUMP), for seeding a deployment
+	docker compose run --rm --no-deps -v "$(CURDIR):/repo" -w /repo api python scripts/graphs.py export --host falkordb --port 6379 --out exports
+
+import:        ## restore exports/ into FALKOR_HOST:FALKOR_PORT (password from FALKORDB_PASSWORD)
+	python3 scripts/graphs.py import --host $(FALKOR_HOST) --port $(FALKOR_PORT) --in exports --replace

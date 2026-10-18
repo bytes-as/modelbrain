@@ -93,11 +93,17 @@ def test_two_independent_confirmations_raise_the_tier(graphs) -> None:
     _hub(graphs["hub"])
     _company(graphs["a"], "other/lone", "alice")
     _company(graphs["b"], "other/lone", "bob")
-    first = watcher.confirm_edge(graphs["a"], "other/lone", "meta/root", "alice", hub=graphs["hub"])
+    first = watcher.confirm_edge(
+        graphs["a"], "other/lone", "meta/root", "alice", hub=graphs["hub"], graphs=[graphs["a"]]
+    )
     assert first["ok"] and first["tier_after"] == 1 and first["confirmations"] == 1
-    again = watcher.confirm_edge(graphs["a"], "other/lone", "meta/root", "alice", hub=graphs["hub"])
+    again = watcher.confirm_edge(
+        graphs["a"], "other/lone", "meta/root", "alice", hub=graphs["hub"], graphs=[graphs["a"]]
+    )
     assert again["confirmations"] == 1  # the same company never counts twice
-    second = watcher.confirm_edge(graphs["b"], "other/lone", "meta/root", "bob", hub=graphs["hub"])
+    second = watcher.confirm_edge(
+        graphs["b"], "other/lone", "meta/root", "bob", hub=graphs["hub"], graphs=[graphs["b"]]
+    )
     assert second["tier_before"] == 1 and second["tier_after"] == 3
     assert second["confirmations"] == 2
     assert "fan_out" in second
@@ -106,7 +112,9 @@ def test_two_independent_confirmations_raise_the_tier(graphs) -> None:
 def test_hub_never_stores_tenant_names(graphs) -> None:
     _hub(graphs["hub"])
     _company(graphs["a"], "other/lone", "alice")
-    watcher.confirm_edge(graphs["a"], "other/lone", "meta/root", "alice", hub=graphs["hub"])
+    watcher.confirm_edge(
+        graphs["a"], "other/lone", "meta/root", "alice", hub=graphs["hub"], graphs=[graphs["a"]]
+    )
     rows = as_rows(
         db.ro_query(
             graphs["hub"],
@@ -146,7 +154,9 @@ def test_compounding_demo_reset_then_one_visitor_flips_the_tier(graphs) -> None:
     reset = watcher.reset_compounding_demo(hub=graphs["hub"])
     assert reset["ok"] and reset["tier"] == 1 and reset["confirmations"] == 1
     _company(graphs["a"], child, "lena")
-    result = watcher.confirm_edge(graphs["a"], child, parent, "lena", hub=graphs["hub"])
+    result = watcher.confirm_edge(
+        graphs["a"], child, parent, "lena", hub=graphs["hub"], graphs=[graphs["a"]]
+    )
     assert result["tier_before"] == 1 and result["tier_after"] == 3
 
 
