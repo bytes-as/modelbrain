@@ -127,7 +127,7 @@ Milestones: **M1** = G001-G019 (O1), **M2** = G020-G029 (O4), **M3 (core, never 
 - [ ] **G105** Rate limits per API "Conventions" return 429 with `retry_after_s`. **Verify:** test.
 - [ ] **G106** Input validation rejects bad model ids and countries with 422. **Verify:** test.
 - [ ] **G107** Prewarm complete on production before judging; demo models answer from cache. **Verify:** smoke.sh timing.
-- [ ] **G108** Mobile layout of every page at 375 px with no horizontal scroll. **Verify:** Playwright screenshots.
+- [x] **G108** Mobile layout of every page at 375 px with no horizontal scroll. **Verify:** Playwright screenshots. Done 18 Oct 2026: 8 main pages measured at 375 px, no horizontal page scroll (wide tables scroll inside their own box).
 - [ ] **G109** Error and empty states for every page (no data, sandbox expired, hub down, graph down). **Verify:** Playwright with mocked failures.
 - [ ] **G110** Security: tokens compared in constant time; no tokens in logs or the graph; admin endpoints require `ADMIN_TOKEN`. **Verify:** test.
 

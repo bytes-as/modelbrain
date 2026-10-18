@@ -100,7 +100,7 @@ export default function XkevReplayPage() {
   }
 
   return (
-    <main>
+    <main className="[overflow-wrap:anywhere]">
       <h1 className="text-3xl">Xkev replay</h1>
       <p className="mt-2 max-w-3xl text-muted">
         A real upstream licence fix, replayed through the graph. One model fixed its licence files

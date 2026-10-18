@@ -40,9 +40,11 @@ export default function HiddenLineagePage() {
             className="rounded border border-white/10 bg-surface p-4"
           >
             <p className="font-mono text-xs text-muted">component {row.component_id}</p>
-            <p className="mt-2 text-sm">{row.model_ids.join(" · ")}</p>
+            <p className="mt-2 break-words text-sm [overflow-wrap:anywhere]">
+              {row.model_ids.join(" · ")}
+            </p>
             {row.inferred_edges?.length ? (
-              <ul className="mt-2 text-xs text-muted">
+              <ul className="mt-2 text-xs text-muted [overflow-wrap:anywhere]">
                 {row.inferred_edges.map((e) => (
                   <li key={`${e.child}-${e.parent}`}>
                     {e.child} → {e.parent} ({e.relation}, tier {e.tier})

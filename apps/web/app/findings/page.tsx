@@ -90,7 +90,7 @@ export default function FindingsPage() {
     (coverage?.by_status.QUANTIZED ?? 0) + (coverage?.by_status.UNSUPPORTED_ARCH ?? 0);
 
   return (
-    <main>
+    <main className="[overflow-wrap:anywhere]">
       <h1 className="text-3xl">Where metadata and weights disagree</h1>
       <p className="mt-2 max-w-3xl text-muted">
         We read about 2 KB of each model&apos;s actual weight values with HTTP range requests and

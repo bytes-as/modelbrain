@@ -33,7 +33,7 @@ export default function EvalPage() {
   }, []);
 
   return (
-    <main>
+    <main className="[overflow-wrap:anywhere]">
       <h1 className="text-3xl">Eval</h1>
       <p className="mt-2 text-muted">
         Frozen labels vs graph verdicts. Automated screening, not legal advice.
@@ -52,31 +52,33 @@ export default function EvalPage() {
               {((report.baselines.declared_licence_only.match_rate || 0) * 100).toFixed(1)}%
             </p>
           ) : null}
-          <table className="w-full text-left text-xs">
-            <thead>
-              <tr className="text-muted">
-                <th className="py-1">model</th>
-                <th>ctx</th>
-                <th>mode</th>
-                <th>expected</th>
-                <th>actual</th>
-              </tr>
-            </thead>
-            <tbody>
-              {(report.rows || []).slice(0, 40).map((row, i) => (
-                <tr
-                  key={`${row.model_id}-${row.mode}-${i}`}
-                  className={row.match ? "" : "text-[#f0605a]"}
-                >
-                  <td className="font-mono py-1">{row.model_id}</td>
-                  <td>{row.context}</td>
-                  <td>{row.mode}</td>
-                  <td>{row.expected}</td>
-                  <td>{row.actual}</td>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs">
+              <thead>
+                <tr className="text-muted">
+                  <th className="py-1">model</th>
+                  <th>ctx</th>
+                  <th>mode</th>
+                  <th>expected</th>
+                  <th>actual</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {(report.rows || []).slice(0, 40).map((row, i) => (
+                  <tr
+                    key={`${row.model_id}-${row.mode}-${i}`}
+                    className={row.match ? "" : "text-[#f0605a]"}
+                  >
+                    <td className="font-mono py-1">{row.model_id}</td>
+                    <td>{row.context}</td>
+                    <td>{row.mode}</td>
+                    <td>{row.expected}</td>
+                    <td>{row.actual}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       ) : null}
     </main>

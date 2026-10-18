@@ -30,7 +30,7 @@ export default function LiveLoopPage() {
   }, []);
 
   return (
-    <main>
+    <main className="[overflow-wrap:anywhere]">
       <h1 className="text-3xl">Watcher log</h1>
       <p className="mt-2 max-w-3xl text-muted">
         Every time an upstream model changes, or two companies confirm a lineage edge, ModelBrain
