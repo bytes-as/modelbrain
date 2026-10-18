@@ -283,7 +283,6 @@ One Railway project with three services: FalkorDB (private networking only, a vo
 | [`docs/UI.md`](docs/UI.md) | Pages and copy |
 | [`docs/GOALS.md`](docs/GOALS.md) | The build list and acceptance tests |
 | [`docs/EXPLAINER.md`](docs/EXPLAINER.md) | Two-minute explanation of the graph |
-| [`docs/DEMO.md`](docs/DEMO.md) | The 3-minute demo script |
 | [`docs/DEPLOY.md`](docs/DEPLOY.md) / [`docs/RUNBOOK.md`](docs/RUNBOOK.md) | Deploying on Railway; judge-day operations |
 | [`docs/ADDENDUM_WEIGHT_DNA.md`](docs/ADDENDUM_WEIGHT_DNA.md) | The weight DNA specification and its evidence |
 | [`actions/modelbrain-check`](actions/modelbrain-check) | GitHub Action that gates pull requests |

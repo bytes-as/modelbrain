@@ -52,7 +52,7 @@ Without an export, run the crawl from `docs/RUNBOOK.md` instead (about 25 minute
 ADMIN_TOKEN=<prod admin token> scripts/smoke.sh https://<api> https://<web>
 ```
 
-All checks must say `ok`. Then open `https://<web>` in a private window and walk through `docs/DEMO.md`.
+All checks must say `ok`. Then open `https://<web>` in a private window and click through `/`, `/findings`, `/hidden-lineage`, `/replay/xkev` and `/companies`.
 
 Point MCP clients at `https://<api>/mcp`, and the GitHub Action's `api_url` at `https://<api>`.
 
