@@ -26,7 +26,7 @@ Milestones: **M1** = G001-G019 (O1), **M2** = G020-G029 (O4), **M3 (core, never 
 
 - [x] **G017** `.env.example` is complete and matches `app/config.py` exactly (a test compares the variable lists). **Verify:** `pytest tests/test_env_example.py`. Done 18 Oct 2026.
 - [ ] **G018** `Makefile` targets: `up`, `down`, `test`, `smoke`, `eval`, `seed`, `reset` (deletes and re-seeds tenant graphs only, never the hub). **Verify:** run each target.
-- [ ] **G019** Lint and format: ruff + black for Python, eslint + prettier for web, run in CI. **Verify:** CI green.
+- [x] **G019** Lint and format: ruff + black for Python, eslint + prettier for web, run in CI. **Verify:** CI green. Done 18 Oct 2026.
 
 ## 2. Hugging Face ingest (M2)
 - [ ] **G020** `app/hf/client.py`: async httpx, shared limiter (400/5 min with token, 90 without), 10 s timeout, retries per FLOWS F2.6, disk cache (6 h JSON; README/config keyed by `id@sha`). **Accept:** unit tests with a mock server for 429 and 5xx. **Verify:** `pytest tests/test_hf_client.py`.
