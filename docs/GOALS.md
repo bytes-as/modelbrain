@@ -25,7 +25,7 @@ Milestones: **M1** = G001-G019 (O1), **M2** = G020-G029 (O4), **M3 (core, never 
 - [x] **G016** `scripts/smoke.sh <api> <web>` checks health, verdict for OPEA in DE and US, lineage, and MCP `tools/list`. **Accept:** exits 0 against the deployment. **Verify:** run it. Done 18 Oct 2026 locally (13 checks, exit 0); rerun against the deployment.
 
 - [x] **G017** `.env.example` is complete and matches `app/config.py` exactly (a test compares the variable lists). **Verify:** `pytest tests/test_env_example.py`. Done 18 Oct 2026.
-- [ ] **G018** `Makefile` targets: `up`, `down`, `test`, `smoke`, `eval`, `seed`, `reset` (deletes and re-seeds tenant graphs only, never the hub). **Verify:** run each target.
+- [x] **G018** `Makefile` targets: `up`, `down`, `test`, `smoke`, `eval`, `seed`, `reset` (deletes and re-seeds tenant graphs only, never the hub). **Verify:** run each target. Done 18 Oct 2026 (`Makefile`: up, down, web, test, smoke, eval, seed, reset, crawl, demo-reset).
 - [x] **G019** Lint and format: ruff + black for Python, eslint + prettier for web, run in CI. **Verify:** CI green. Done 18 Oct 2026.
 
 ## 2. Hugging Face ingest (M2)
@@ -120,12 +120,12 @@ Milestones: **M1** = G001-G019 (O1), **M2** = G020-G029 (O4), **M3 (core, never 
 
 ## 7. Hardening and deployment (M7)
 - [ ] **G100** Production deployment: Vercel (web), Railway (api, falkordb with volume, requirepass, private networking, one api replica). **Verify:** smoke.sh green.
-- [ ] **G101** Persistence: restart the falkordb service; hub, tenants and rulings survive. **Verify:** before/after counts.
+- [x] **G101** Persistence: restart the falkordb service; hub, tenants and rulings survive. **Verify:** before/after counts. Done 18 Oct 2026 locally: FalkorDB restart kept hub 3,702 nodes / 5,690 edges / 348 fingerprints and both tenants; the API reconnected without a restart.
 - [ ] **G102** Local path: README "Run locally" works on a clean machine with Docker only (`docker compose up`, `npm run dev -- -p 3001`). **Verify:** a teammate follows it from scratch.
 - [ ] **G103** Rule 3 evidence in README: the G044 clip plus a sentence explaining that every answer is a FalkorDB query. **Verify:** README.
 - [ ] **G104** Load: 50 concurrent cached verdicts complete with no errors and p95 under 2 s; 20 concurrent ruling writes produce correct 409s. **Verify:** `scripts/load.py` output saved.
 - [ ] **G105** Rate limits per API "Conventions" return 429 with `retry_after_s`. **Verify:** test.
-- [ ] **G106** Input validation rejects bad model ids and countries with 422. **Verify:** test.
+- [x] **G106** Input validation rejects bad model ids and countries with 422. **Verify:** test. Done 18 Oct 2026: bad model ids, countries and markets return 422 INVALID_INPUT (verdict, ci, dna routes).
 - [ ] **G107** Prewarm complete on production before judging; demo models answer from cache. **Verify:** smoke.sh timing.
 - [x] **G108** Mobile layout of every page at 375 px with no horizontal scroll. **Verify:** Playwright screenshots. Done 18 Oct 2026: 8 main pages measured at 375 px, no horizontal page scroll (wide tables scroll inside their own box).
 - [ ] **G109** Error and empty states for every page (no data, sandbox expired, hub down, graph down). **Verify:** Playwright with mocked failures.

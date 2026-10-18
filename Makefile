@@ -1,0 +1,38 @@
+# ModelBrain local targets (G018). Requires Docker; the web app also needs Node.js 22.
+API ?= http://localhost:8000
+WEB ?= http://localhost:3001
+
+.PHONY: up down web test smoke eval seed reset crawl demo-reset
+
+up:            ## start FalkorDB and the API
+	docker compose up -d --build
+
+down:          ## stop everything (data stays in the falkordb-data volume)
+	docker compose down
+
+web:           ## run the web app on port 3001
+	cd apps/web && npm install && npm run dev -- -p 3001
+
+test:          ## API tests against the FalkorDB service container
+	docker compose run --rm --no-deps -v "$(CURDIR):/repo" -w /repo/services/api api sh -c 'pip install -q -e ".[dev]" >/dev/null && pytest -q'
+
+smoke:         ## health, verdicts, replay, weight DNA, MCP and pages
+	scripts/smoke.sh $(API) $(WEB)
+
+eval:          ## re-run the frozen eval and write eval/report.json
+	python3 -I eval/run_eval.py --api $(API)
+
+seed:          ## re-create missing demo tenants (restart runs the bootstrap)
+	docker compose restart api
+
+reset:         ## delete and re-seed the fictional tenant graphs only, never the hub
+	docker compose exec falkordb redis-cli GRAPH.DELETE tenant_kestrel || true
+	docker compose exec falkordb redis-cli GRAPH.DELETE tenant_harbor || true
+	docker compose restart api
+
+crawl:         ## fingerprint the references and demo findings (needs ADMIN_TOKEN in .env)
+	curl -s -X POST $(API)/api/admin/dna/crawl -H "Authorization: Bearer $$(grep '^ADMIN_TOKEN=' .env | cut -d= -f2-)" \
+	  -H 'content-type: application/json' -d '{"include_scout_findings":true}'
+
+demo-reset:    ## put the compounding demo back to tier 1 with one confirmation
+	curl -s -X POST $(API)/api/admin/demo/compounding -H "Authorization: Bearer $$(grep '^ADMIN_TOKEN=' .env | cut -d= -f2-)"
