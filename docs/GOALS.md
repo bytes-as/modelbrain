@@ -97,7 +97,7 @@ Milestones: **M1** = G001-G019 (O1), **M2** = G020-G029 (O4), **M3 (core, never 
 - ~~**G079** Stretch: "Ask the company brain" box on `/companies`…~~ **Cut 18 Oct 2026** to fund weight DNA (M6b).
 
 ## 6. Watcher, fan-out, compounding, loop, CI (M6)
-- [ ] **G080** Watcher job (FLOWS F9.1-6): sha check, re-ingest, Snapshot, diff, descendants (D1), reopen (T3, T4), FanOut record. **Accept:** changing a fixture model's sha reopens Kestrel's ruling and creates a task for its owner. **Verify:** integration test.
+- [x] **G080** Watcher job (FLOWS F9.1-6): sha check, re-ingest, Snapshot, diff, descendants (D1), reopen (T3, T4), FanOut record. **Accept:** changing a fixture model's sha reopens Kestrel's ruling and creates a task for its owner. **Verify:** integration test. Done 18 Oct 2026: scheduled watcher every WATCH_INTERVAL_MINUTES re-reads watched models without cache, diffs sha/licence/licence file/notice, fans out on change (D1, T3, T4, FanOut). Live pass: 7 models in 10.5 s, no change.
 - [x] **G081** `POST /api/watch/check` "check now". **Verify:** API call. Done 18 Oct 2026 (`POST /api/watch/check`, uncached re-ingest, diff, fan-out on change).
 - [x] **G082** Approve/reject flow writes a new ruling with SUPERSEDES and a signed Event (FLOWS F9.8). **Verify:** integration test. Done 18 Oct 2026: approving a reopened review runs the Auditor (FalkorDB verdict with company context) and writes a ruling that SUPERSEDES the old one, with a signed APPROVED event (`tests/test_loop.py`).
 - [x] **G083** Fix leverage (D2) shown on descendants and replay views. **Verify:** API call. Done 18 Oct 2026 (`GET /api/models/{id}/fix-leverage`, replay view).
@@ -109,8 +109,8 @@ Milestones: **M1** = G001-G019 (O1), **M2** = G020-G029 (O4), **M3 (core, never 
 - [ ] **G089** Live loop on our own test repo (README + config only, "test fixture, contains no weights"): post, edit card, check now, tier 4, reopened rulings, Outcome FIXED. **Verify:** `/live-loop` run recorded. *(cuttable: keep replay)*
 - [x] **G090** GitHub Action `actions/modelbrain-check` (FLOWS F12) with job summary and exit codes; never fails CI when our API is unreachable unless configured. **Verify:** demo repo PR red with OPEA, green with an allowed model. *(cuttable)* Done 18 Oct 2026: stdlib scanner + job summary; verified locally: OPEA fails for DE (exit 1), passes for US, unreachable API does not fail the build (`tests/test_ci.py`).
 - [x] **G091** `POST /api/ci/check`. **Verify:** API test. Done 18 Oct 2026 (`routes/ci.py`, max 20 models, 45 s ingest timeout per model).
-- [ ] **G092** Watchlist file `data/watchlist.json` (Xkev, its children, meta-llama roots in the demo). **Verify:** watcher log.
-- [ ] **G093** Resolver runs after prewarm and nightly. **Verify:** `/api/admin/resolver/last`.
+- [x] **G092** Watchlist file `data/watchlist.json` (Xkev, its children, meta-llama roots in the demo). **Verify:** watcher log. Done 18 Oct 2026: watchlist plus every model a fixed company deploys.
+- [x] **G093** Resolver runs after prewarm and nightly. **Verify:** `/api/admin/resolver/last`. Done 18 Oct 2026: hash resolver, relabel flags and the weight resolver run after prewarm; admin endpoints run them on demand.
 - [x] **G094** Sandbox users can run "check now" only for models in their sandbox's deployments. **Verify:** test. Done 18 Oct 2026 (sandbox token may only check its own deployments; 403 otherwise).
 - [x] **G095** Eval re-run after M6 still has false ALLOW = 0. **Verify:** report. Done 18 Oct 2026: 160 cases, false ALLOW 0, default accuracy 0.85 (was 0.75). 12 misses are label-vs-rule disagreements listed in docs/TASKS.md for the owner's label review.
 - [ ] **G096** All web pages in UI exist and link from the nav. **Verify:** Playwright crawl.

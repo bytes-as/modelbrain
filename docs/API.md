@@ -170,6 +170,7 @@ Additional MCP tools:
 | `GET /api/demo/compounding` | none | the demo edge and its trust state |
 | `POST /api/admin/demo/compounding` | admin | resets the demo edge to tier 1 with Harbor's confirmation |
 | `POST /api/admin/fan-out` `{model_id, reason}` | admin | fan-out report across every company graph |
+| `POST /api/admin/watch/run` / `GET /api/admin/watch/last` | admin | one scheduled-watcher pass now / the last pass report |
 | `POST /api/watch/check` `{model_id, tenant?}` | admin, or a sandbox token for a model that sandbox deploys | `{changed, changes[], sha, fan_out?}`; re-reads the Hub without cache |
 
 Verdict `paths[]` items gain `methods[]`, `weights_sims[]`, `shares[]`, aligned with `relations[]`.

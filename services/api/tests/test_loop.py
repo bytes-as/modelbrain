@@ -230,3 +230,28 @@ def test_visitor_fan_out_never_writes_into_fixed_demo_tenants(graphs) -> None:
     report = watcher.fan_out("up/mid", "visitor change", hub=graphs["hub"], include_fixed=False)
     assert all(g.startswith("sbx_") for g in report["graphs"])
     assert graphs["a"] not in report["graphs"]
+
+
+def test_watch_once_checks_watchlist_and_deployments(monkeypatch) -> None:
+    import asyncio
+
+    checked: list[str] = []
+
+    async def fake_check(model_id, _reingest, **_kw):
+        checked.append(model_id)
+        return {
+            "model_id": model_id,
+            "changed": model_id == "Xkev/Llama-3.2V-11B-cot",
+            "changes": ["sha: a -> b"],
+            "fan_out": {"reopened": [1]},
+        }
+
+    monkeypatch.setattr(watcher, "check_now", fake_check)
+    db.connect(tries=5, delay_s=0.5)
+    report = asyncio.run(watcher.watch_once(None))
+    assert "Xkev/Llama-3.2V-11B-cot" in checked
+    assert report["checked"] == len(checked)
+    assert report["changed"] == [
+        {"model_id": "Xkev/Llama-3.2V-11B-cot", "changes": ["sha: a -> b"], "reopened": 1}
+    ]
+    assert watcher.watch_last()["checked"] == report["checked"]

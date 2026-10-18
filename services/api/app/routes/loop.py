@@ -152,3 +152,15 @@ async def watch_check(
     else:
         require_admin(authorization)
     return await watcher.check_now(model_id, _fresh_ingest, graphs=graphs)
+
+
+@router.get("/api/admin/watch/last")
+def watch_last(authorization: str | None = Header(default=None)) -> dict:
+    require_admin(authorization)
+    return watcher.watch_last()
+
+
+@router.post("/api/admin/watch/run")
+async def watch_run(authorization: str | None = Header(default=None)) -> dict:
+    require_admin(authorization)
+    return await watcher.watch_once(_fresh_ingest)

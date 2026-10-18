@@ -167,6 +167,9 @@ async def run_prewarm() -> None:
 
         run_resolver("hub")
         set_declared_differs("hub")
+        from app.engine.dna import run_dna_resolver
+
+        run_dna_resolver("hub")
     except Exception:
         log.exception("resolver after prewarm failed")
     log.info("prewarm finished")

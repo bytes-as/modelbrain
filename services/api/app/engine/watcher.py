@@ -306,3 +306,54 @@ async def check_now(
             model_id, "upstream change: " + "; ".join(changes), graphs=graphs, hub=hub
         )
     return result
+
+
+# --- scheduled watcher (FLOWS F9, G080/G092) -------------------------------------
+
+_watch_last: dict[str, Any] = {}
+
+
+def watched_models(hub: str = "hub") -> list[str]:
+    """The watchlist plus every model a fixed company deploys."""
+    from app.graph.queries import T10
+    from app.tenants.bootstrap import TENANTS
+
+    data = json.loads((repo_root() / "data" / "watchlist.json").read_text())
+    models = [str(m) for m in data.get("models", [])]
+    for graph in TENANTS:
+        try:
+            for row in as_rows(db.ro_query(graph, T10)):
+                if row.get("model") and str(row["model"]) not in models:
+                    models.append(str(row["model"]))
+        except Exception:
+            log.warning("could not read deployments", extra={"graph": graph})
+    return models
+
+
+async def watch_once(reingest: Any, hub: str = "hub") -> dict[str, Any]:
+    started = time.monotonic()
+    report: dict[str, Any] = {"checked": 0, "changed": [], "errors": 0}
+    for model_id in watched_models(hub):
+        try:
+            result = await check_now(model_id, reingest, hub=hub)
+            report["checked"] += 1
+            if result["changed"]:
+                report["changed"].append(
+                    {
+                        "model_id": model_id,
+                        "changes": result["changes"],
+                        "reopened": len(result.get("fan_out", {}).get("reopened", [])),
+                    }
+                )
+        except Exception:
+            log.exception("watch check failed", extra={"model_id": model_id})
+            report["errors"] += 1
+    report["ms"] = int((time.monotonic() - started) * 1000)
+    report["at"] = _now_ms()
+    _watch_last.clear()
+    _watch_last.update(report)
+    return report
+
+
+def watch_last() -> dict[str, Any]:
+    return dict(_watch_last)

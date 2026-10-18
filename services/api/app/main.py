@@ -39,6 +39,20 @@ log = logging.getLogger("modelbrain")
 VERSION = "0.1.0"
 
 
+async def _watch_forever() -> None:
+    """Scheduled watcher: re-check watched models every WATCH_INTERVAL_MINUTES."""
+    from app.engine.watcher import watch_once
+    from app.routes.loop import _fresh_ingest
+
+    every_s = max(get_settings().watch_interval_minutes, 1) * 60
+    while True:
+        await asyncio.sleep(every_s)
+        try:
+            await watch_once(_fresh_ingest)
+        except Exception:
+            log.exception("scheduled watch failed")
+
+
 async def _clean_sandboxes_forever(every_s: int = 600) -> None:
     while True:
         await asyncio.sleep(every_s)
@@ -51,6 +65,7 @@ async def _clean_sandboxes_forever(every_s: int = 600) -> None:
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
     cleaner: asyncio.Task[None] | None = None
+    watcher_task: asyncio.Task[None] | None = None
     get_settings()
     try:
         connect()
@@ -77,12 +92,14 @@ async def lifespan(_app: FastAPI):
             log.warning("sandbox cleanup failed")
         schedule_prewarm()
         cleaner = asyncio.create_task(_clean_sandboxes_forever())
+        watcher_task = asyncio.create_task(_watch_forever())
     # MCP session manager (required for streamable HTTP)
     mcp.streamable_http_app()
     async with mcp.session_manager.run():
         yield
-    if cleaner is not None:
-        cleaner.cancel()
+    for task in (cleaner, watcher_task):
+        if task is not None:
+            task.cancel()
 
 
 app = FastAPI(title="ModelBrain", version=VERSION, lifespan=lifespan)
