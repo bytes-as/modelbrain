@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import { Disclaimer, Exhibit, ExhibitHeader, Part } from "../components/exhibit";
+
 const FALKOR: [string, string][] = [
   [
     "Many graphs in one instance, GRAPH.COPY",
@@ -46,118 +48,171 @@ const AGENTS: [string, string][] = [
   ["Publisher", "Turns a company's confirmation into a salted hash on the shared edge."],
 ];
 
-function Layer({ title, body }: { title: string; body: string }) {
-  return (
-    <div className="rounded border border-white/10 bg-surface p-4">
-      <p className="font-medium">{title}</p>
-      <p className="mt-1 text-sm text-muted">{body}</p>
-    </div>
-  );
-}
+const GRAPHS: [string, string][] = [
+  [
+    "hub",
+    "Public facts. Models, DERIVED_FROM edges with trust tiers, licences, clauses, file fingerprints and weight DNA vectors. Never stores which company uses which model.",
+  ],
+  [
+    "tenant_*",
+    "One per company. People, products, deployments, append-only rulings and the facts they rest on, events, tasks and playbooks. Kestrel and Harbor are fictional.",
+  ],
+  [
+    "sbx_*",
+    "One per visitor. A GRAPH.COPY of a fictional company. Everything you click writes here, expires after two hours, and never reaches the demo companies.",
+  ],
+];
+
+const LINK = "text-accent underline decoration-white/25 underline-offset-4 hover:decoration-accent";
 
 export default function HowItWorksPage() {
   return (
-    <main className="[overflow-wrap:anywhere]">
-      <h1 className="text-3xl">How it works</h1>
-      <p className="mt-2 max-w-3xl text-muted">
-        Licence obligations travel with the weights, through every fine-tune, merge and re-upload.
-        ModelBrain keeps that real lineage in FalkorDB and lets the graph decide. A language model
-        may phrase an explanation; it never decides.
-      </p>
+    <Exhibit>
+      <ExhibitHeader
+        mark="Exhibit H · Governing engine"
+        source="FalkorDB"
+        title={<>Obligations travel with the weights. The graph decides.</>}
+        lede={
+          <>
+            Licence obligations travel with the weights, through every fine-tune, merge and
+            re-upload. ModelBrain keeps that real lineage in FalkorDB and lets the graph decide. A
+            language model may phrase an explanation; it never decides.
+          </>
+        }
+        facts={[
+          { value: GRAPHS.length, label: "Kinds of graph, one instance" },
+          { value: 6, label: "Hops of ancestry, max" },
+          { value: TIERS.length, label: "Trust tiers per edge" },
+          { value: AGENTS.length, label: "Agents" },
+        ]}
+      />
 
-      <section className="mt-8">
-        <h2 className="text-xl">One FalkorDB instance, three kinds of graph</h2>
-        <div className="mt-3 grid gap-3 md:grid-cols-3">
-          <Layer
-            title="hub (public facts)"
-            body="Models, DERIVED_FROM edges with trust tiers, licences, clauses, file fingerprints and weight DNA vectors. Never stores which company uses which model."
-          />
-          <Layer
-            title="tenant_* (one per company)"
-            body="People, products, deployments, append-only rulings and the facts they rest on, events, tasks and playbooks. Kestrel and Harbor are fictional."
-          />
-          <Layer
-            title="sbx_* (one per visitor)"
-            body="A GRAPH.COPY of a fictional company. Everything you click writes here, expires after two hours, and never reaches the demo companies."
-          />
-        </div>
-        <p className="mt-3 text-sm text-muted">
-          A company&apos;s confirmation reaches the hub only as a salted hash. Two different hashes
-          raise an edge to tier 3 for everyone; nobody learns who confirmed.
-        </p>
-      </section>
-
-      <section className="mt-8">
-        <h2 className="text-xl">What only the graph engine gives us</h2>
-        <ul className="mt-3 space-y-3">
-          {FALKOR.map(([title, body]) => (
-            <li key={title} className="rounded border border-white/10 p-3">
-              <p className="font-medium">{title}</p>
-              <p className="mt-1 text-sm text-muted">{body}</p>
-            </li>
-          ))}
-        </ul>
-        <p className="mt-3 text-sm text-muted">
-          Stop FalkorDB and nothing answers: verdicts return 503, never a cached answer.
-        </p>
-      </section>
-
-      <section className="mt-8">
-        <h2 className="text-xl">Trust tiers on every edge</h2>
-        <table className="mt-3 text-left text-sm">
-          <tbody>
-            {TIERS.map(([tier, text]) => (
-              <tr key={tier} className="border-t border-white/10">
-                <td className="py-2 pr-4 font-mono">{tier}</td>
-                <td className="py-2">{text}</td>
+      <Part
+        n="1"
+        title="One FalkorDB instance, three kinds of graph."
+        note={
+          <>
+            A company&apos;s confirmation reaches the hub only as a salted hash. Two different
+            hashes raise an edge to tier 3 for everyone; nobody learns who confirmed.
+          </>
+        }
+      >
+        <div className="ledger-wrap">
+          <table className="ledger">
+            <thead>
+              <tr>
+                <th>Graph</th>
+                <th>Holds</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-        <p className="mt-2 text-sm text-muted">
-          Default verdicts use tier 1 and above. Strict mode uses tier 2 and above and answers
-          CANNOT DETERMINE when a parent is only inferred.
-        </p>
-      </section>
+            </thead>
+            <tbody>
+              {GRAPHS.map(([graph, text]) => (
+                <tr key={graph}>
+                  <td className="whitespace-nowrap font-mono text-[13px]">{graph}</td>
+                  <td className="min-w-[14rem] text-muted">{text}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </Part>
 
-      <section className="mt-8">
-        <h2 className="text-xl">Agents and handoffs</h2>
-        <ul className="mt-3 space-y-2 text-sm">
-          {AGENTS.map(([name, text]) => (
-            <li key={name}>
-              <span className="font-medium">{name}:</span> {text}
+      <Part
+        n="2"
+        title="What only the graph engine gives us."
+        note="Stop FalkorDB and nothing answers: verdicts return 503, never a cached answer."
+      >
+        <ol className="grid gap-x-10 gap-y-8 md:grid-cols-2">
+          {FALKOR.map(([title, body], index) => (
+            <li key={title} className="grid grid-cols-[32px_minmax(0,1fr)] gap-2">
+              <span className="font-mono text-sm text-muted">
+                ({String.fromCharCode(97 + index)})
+              </span>
+              <div>
+                <p className="font-serif text-2xl leading-snug">{title}</p>
+                <p className="mt-1 text-sm leading-relaxed text-muted">{body}</p>
+              </div>
             </li>
           ))}
-        </ul>
-        <p className="mt-2 text-sm text-muted">
-          Agents hand work to people through Task nodes. Approving a reopened review writes a new
-          ruling that supersedes the old one.
-        </p>
-      </section>
+        </ol>
+      </Part>
 
-      <p className="mt-8 text-sm">
-        Every query is in{" "}
-        <a
-          className="text-accent"
-          href="https://github.com/bytes-as/modelbrain/blob/main/docs/queries.cypher"
-        >
-          docs/queries.cypher
-        </a>
-        . Try it:{" "}
-        <Link className="text-accent" href="/findings">
-          weight DNA findings
-        </Link>
-        ,{" "}
-        <Link className="text-accent" href="/replay/xkev">
-          the Xkev replay
-        </Link>
-        ,{" "}
-        <Link className="text-accent" href="/hidden-lineage">
-          compounding
-        </Link>
-        .
-      </p>
-      <p className="mt-6 text-sm text-muted">Automated screening, not legal advice.</p>
-    </main>
+      <Part
+        n="3"
+        title="Trust tiers on every edge."
+        note="Default verdicts use tier 1 and above. Strict mode uses tier 2 and above and answers CANNOT DETERMINE when a parent is only inferred."
+      >
+        <div className="ledger-wrap">
+          <table className="ledger">
+            <thead>
+              <tr>
+                <th>Tier</th>
+                <th>Evidence for the edge</th>
+              </tr>
+            </thead>
+            <tbody>
+              {TIERS.map(([tier, text]) => (
+                <tr key={tier}>
+                  <td className="w-16 font-mono text-[13px]">{tier}</td>
+                  <td className="min-w-[14rem]">{text}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </Part>
+
+      <Part
+        n="4"
+        title="Agents and handoffs."
+        note="Agents hand work to people through Task nodes. Approving a reopened review writes a new ruling that supersedes the old one."
+      >
+        <div className="ledger-wrap">
+          <table className="ledger">
+            <thead>
+              <tr>
+                <th>Agent</th>
+                <th>Duty</th>
+              </tr>
+            </thead>
+            <tbody>
+              {AGENTS.map(([name, text]) => (
+                <tr key={name}>
+                  <td className="whitespace-nowrap font-mono text-[13px]">{name}</td>
+                  <td className="min-w-[14rem] text-muted">{text}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </Part>
+
+      <Part n="5" title="Read the queries.">
+        <p className="max-w-3xl font-serif text-xl leading-relaxed">
+          Every query is in{" "}
+          <a
+            className={`font-mono text-base ${LINK}`}
+            href="https://github.com/bytes-as/modelbrain/blob/main/docs/queries.cypher"
+          >
+            docs/queries.cypher
+          </a>
+          . Try it:{" "}
+          <Link className={LINK} href="/findings">
+            weight DNA findings
+          </Link>
+          ,{" "}
+          <Link className={LINK} href="/replay/xkev">
+            the Xkev replay
+          </Link>
+          ,{" "}
+          <Link className={LINK} href="/hidden-lineage">
+            compounding
+          </Link>
+          .
+        </p>
+      </Part>
+
+      <Disclaimer />
+    </Exhibit>
   );
 }

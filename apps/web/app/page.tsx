@@ -25,9 +25,9 @@ function Clause({
   return (
     <section className={`bleed ${ground}`}>
       <div className="mx-auto max-w-6xl px-4 py-14 md:py-20">
-        <div className={`grid gap-6 border-t pt-6 md:grid-cols-[120px_1fr] ${meta}`}>
+        <div className={`grid gap-6 border-t pt-6 md:grid-cols-[120px_minmax(0,1fr)] ${meta}`}>
           <p className="font-mono text-[11px] uppercase tracking-[0.16em]">§{n}</p>
-          <div>
+          <div className="min-w-0">
             <h2
               className={`font-serif font-light leading-[1.02] tracking-[-0.02em] ${heading}`}
               style={{ fontSize: "clamp(2.1rem, min(5vw, 8vh), 4.4rem)" }}

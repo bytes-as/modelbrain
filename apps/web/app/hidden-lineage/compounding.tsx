@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useState } from "react";
 
+import { ModelRef, Status } from "../components/exhibit";
+
 type Edge = { tier: number; confirmations: number; source: string; relation: string } | null;
 type State = { child: string; parent: string; edge: Edge };
 type Confirm = {
@@ -100,45 +102,68 @@ export function Compounding() {
     setBusy(false);
   }
 
-  if (error) return <p className="mt-4 text-[#f0605a]">{error}</p>;
-  if (!state) return <p className="mt-4 text-muted">Loading the shared edge…</p>;
+  if (error) return <Status state="error" error={error} />;
+  if (!state) return <Status state="loading" />;
 
   return (
-    <section
-      className="mt-6 rounded border border-white/10 bg-surface p-4"
-      data-testid="compounding"
-    >
-      <h2 className="text-lg">Knowledge that compounds across companies</h2>
-      <p className="mt-1 text-sm text-muted">
-        {state.child} declares no parent. ModelBrain inferred {state.parent} from shared tokenizer
-        and config fingerprints. Strict mode refuses inferred lineage, so a strict company gets
-        CANNOT DETERMINE until two independent companies confirm the edge. Each company&apos;s
-        confirmation stays in its own graph; the shared graph only sees a salted hash.
+    <div data-testid="compounding">
+      <p className="max-w-3xl text-[15px] leading-relaxed text-text">
+        <ModelRef id={state.child} hub={false} /> declares no parent. ModelBrain inferred{" "}
+        <ModelRef id={state.parent} hub={false} /> from shared tokenizer and config fingerprints.
+        Strict mode refuses inferred lineage, so a strict company gets CANNOT DETERMINE until two
+        independent companies confirm the edge.
       </p>
-      <p className="mt-3 text-sm" data-testid="edge-state">
-        Edge trust tier: <span className="font-mono">{state.edge?.tier ?? "?"}</span> ·
-        confirmations: <span className="font-mono">{state.edge?.confirmations ?? 0}</span> · strict
-        verdict for a German company: <span className="font-mono">{verdict}</span>
-      </p>
-      <button
-        type="button"
-        className="mt-3 rounded bg-accent px-4 py-2 text-sm font-medium text-[#0f1419] disabled:opacity-50"
-        onClick={confirm}
-        disabled={busy}
-        data-testid="confirm-edge"
-      >
-        {busy ? "Confirming…" : "Confirm this edge as my sandbox company"}
-      </button>
-      {result?.ok ? (
-        <p className="mt-3 text-sm" data-testid="confirm-result">
-          Tier {result.tier_before} → {result.tier_after} with {result.confirmations} independent
-          confirmations.
-          {result.fan_out
-            ? ` The change fanned out and reopened ${result.fan_out.reopened.length} decision(s) that rested on it.`
-            : " Your company had already confirmed, or the edge is already trusted."}
-        </p>
-      ) : null}
-      {result && !result.ok ? <p className="mt-3 text-sm text-muted">{result.reason}</p> : null}
-    </section>
+
+      <dl className="mt-8 grid border-t border-white/15 sm:grid-cols-3" data-testid="edge-state">
+        <div className="border-b border-white/10 py-4 sm:border-b-0 sm:border-r sm:pr-4">
+          <dt className="font-mono text-[11px] uppercase tracking-[0.14em] text-muted">
+            Edge trust tier
+          </dt>
+          <dd className="mt-1 font-serif text-4xl font-light tabular-nums">
+            {state.edge?.tier ?? "?"}
+          </dd>
+        </div>
+        <div className="border-b border-white/10 py-4 sm:border-b-0 sm:border-r sm:px-4">
+          <dt className="font-mono text-[11px] uppercase tracking-[0.14em] text-muted">
+            Confirmations
+          </dt>
+          <dd className="mt-1 font-serif text-4xl font-light tabular-nums">
+            {state.edge?.confirmations ?? 0}
+          </dd>
+        </div>
+        <div className="py-4 sm:pl-4">
+          <dt className="font-mono text-[11px] uppercase tracking-[0.14em] text-muted">
+            Strict verdict · German company
+          </dt>
+          <dd className="mt-2 font-mono text-sm uppercase tracking-[0.08em]">{verdict}</dd>
+        </div>
+      </dl>
+
+      <div className="mt-6 border-t border-white/10 pt-6">
+        <button
+          type="button"
+          className="rounded-sm bg-paper px-4 py-2 font-medium text-ink hover:bg-white disabled:opacity-50"
+          onClick={confirm}
+          disabled={busy}
+          data-testid="confirm-edge"
+        >
+          {busy ? "Confirming…" : "Confirm this edge as my sandbox company"}
+        </button>
+        {result?.ok ? (
+          <p className="mt-4 max-w-3xl text-[15px] leading-relaxed" data-testid="confirm-result">
+            <span className="font-mono">
+              Tier {result.tier_before} → {result.tier_after}
+            </span>{" "}
+            with {result.confirmations} independent confirmations.
+            {result.fan_out
+              ? ` The change fanned out and reopened ${result.fan_out.reopened.length} decision(s) that rested on it.`
+              : " Your company had already confirmed, or the edge is already trusted."}
+          </p>
+        ) : null}
+        {result && !result.ok ? (
+          <p className="mt-4 text-[15px] text-muted">{result.reason}</p>
+        ) : null}
+      </div>
+    </div>
   );
 }

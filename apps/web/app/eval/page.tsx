@@ -2,6 +2,16 @@
 
 import { useEffect, useState } from "react";
 
+import {
+  Disclaimer,
+  Exhibit,
+  ExhibitHeader,
+  ModelRef,
+  Part,
+  Status,
+  Tag,
+} from "../components/exhibit";
+
 type Report = {
   labels_sha256?: string;
   false_allow?: number;
@@ -32,55 +42,115 @@ export default function EvalPage() {
       .catch(() => setError("Could not reach the API. Check that it is running and try again."));
   }, []);
 
+  const pct = (value: number | undefined) => `${((value || 0) * 100).toFixed(1)}%`;
+  const rows = report?.rows || [];
+  const shown = rows.slice(0, 40);
+  const baseline = report?.baselines?.declared_licence_only;
+
   return (
-    <main className="[overflow-wrap:anywhere]">
-      <h1 className="text-3xl">Eval</h1>
-      <p className="mt-2 text-muted">
-        Frozen labels vs graph verdicts. Automated screening, not legal advice.
-      </p>
-      {error ? <p className="mt-4 text-muted">{error}</p> : null}
-      {report ? (
-        <div className="mt-6 space-y-4">
-          <p className="font-mono text-xs">labels sha256: {report.labels_sha256}</p>
-          <p className="text-sm">
-            cases {report.cases} · false ALLOW {report.false_allow} · default accuracy{" "}
-            {((report.accuracy_default || 0) * 100).toFixed(1)}%
-          </p>
-          {report.baselines?.declared_licence_only ? (
-            <p className="text-sm text-muted">
-              Card-only baseline match rate{" "}
-              {((report.baselines.declared_licence_only.match_rate || 0) * 100).toFixed(1)}%
-            </p>
-          ) : null}
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead>
-                <tr className="text-muted">
-                  <th className="py-1">model</th>
-                  <th>ctx</th>
-                  <th>mode</th>
-                  <th>expected</th>
-                  <th>actual</th>
-                </tr>
-              </thead>
-              <tbody>
-                {(report.rows || []).slice(0, 40).map((row, i) => (
-                  <tr
-                    key={`${row.model_id}-${row.mode}-${i}`}
-                    className={row.match ? "" : "text-[#f0605a]"}
-                  >
-                    <td className="font-mono py-1">{row.model_id}</td>
-                    <td>{row.context}</td>
-                    <td>{row.mode}</td>
-                    <td>{row.expected}</td>
-                    <td>{row.actual}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+    <Exhibit>
+      <ExhibitHeader
+        mark="Exhibit G · Evaluation"
+        source="Live from the ModelBrain API"
+        title={
+          <>
+            Graph verdicts, <em>checked against frozen labels.</em>
+          </>
+        }
+        lede="Frozen labels vs graph verdicts, with the card-only baseline beside them."
+        facts={
+          report
+            ? [
+                { value: report.cases ?? "?", label: "Cases" },
+                { value: report.false_allow ?? "?", label: "False ALLOW" },
+                { value: pct(report.accuracy_default), label: "Default accuracy" },
+                ...(baseline
+                  ? [{ value: pct(baseline.match_rate), label: "Card-only baseline" }]
+                  : []),
+              ]
+            : undefined
+        }
+      />
+
+      <div className="[overflow-wrap:anywhere]">
+        {error ? (
+          <div className="pt-8">
+            <Status state="error" error={error} />
           </div>
-        </div>
-      ) : null}
-    </main>
+        ) : null}
+        {!report && !error ? (
+          <div className="pt-8">
+            <Status state="loading" />
+          </div>
+        ) : null}
+
+        {report ? (
+          <>
+            <Part
+              n="1"
+              title="The labels"
+              note="The label set is frozen; its hash identifies exactly which labels these numbers were scored against."
+            >
+              <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-muted">
+                labels sha256
+              </p>
+              <p className="mt-1 break-all font-mono text-[13px] text-text">
+                {report.labels_sha256}
+              </p>
+              <p className="mt-6 text-[15px] leading-relaxed text-muted">
+                cases {report.cases} · false ALLOW {report.false_allow} · default accuracy{" "}
+                {pct(report.accuracy_default)}
+                {baseline ? <> · card-only baseline match rate {pct(baseline.match_rate)}</> : null}
+              </p>
+            </Part>
+
+            <Part
+              n="2"
+              title="Case by case"
+              note={`Showing ${shown.length} of ${rows.length} rows. Red rows are where the graph verdict differs from the label.`}
+            >
+              <div className="ledger-wrap">
+                <table className="ledger">
+                  <thead>
+                    <tr>
+                      <th>Model</th>
+                      <th>Ctx</th>
+                      <th>Mode</th>
+                      <th>Expected</th>
+                      <th>Actual</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {shown.map((row, i) => (
+                      <tr
+                        key={`${row.model_id}-${row.mode}-${i}`}
+                        className={row.match ? "" : "text-redline"}
+                      >
+                        <td className="min-w-[12rem]">
+                          <ModelRef id={row.model_id} hub={false} />
+                        </td>
+                        <td className="font-mono text-[13px]">{row.context}</td>
+                        <td className="font-mono text-[13px]">{row.mode}</td>
+                        <td className="font-mono text-[13px]">{row.expected}</td>
+                        <td className="whitespace-nowrap font-mono text-[13px]">
+                          {row.actual}
+                          {row.match ? null : (
+                            <span className="ml-2">
+                              <Tag tone="red">mismatch</Tag>
+                            </span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </Part>
+          </>
+        ) : null}
+
+        <Disclaimer />
+      </div>
+    </Exhibit>
   );
 }

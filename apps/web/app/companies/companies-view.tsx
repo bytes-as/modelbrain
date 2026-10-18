@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 
+import { Licence, ModelRef, Part, Status, Tag } from "../components/exhibit";
+
 type Ruling = { id: string; verdict: string; decided_at: number | null };
 type Deployment = {
   id: string;
@@ -27,18 +29,20 @@ type Task = {
   playbook_steps?: string[];
 };
 
-const COLOUR: Record<string, string> = {
-  ALLOWED: "#2fbf71",
-  ALLOWED_WITH_OBLIGATIONS: "#e9b450",
-  BLOCKED: "#f0605a",
-  CANNOT_DETERMINE: "#9aa3ae",
-};
+const TEXT_BUTTON =
+  "font-mono text-xs uppercase tracking-[0.12em] text-accent underline decoration-white/25 underline-offset-4 hover:decoration-accent";
+
+function Verdict({ verdict }: { verdict: string }) {
+  return <Tag tone={verdict === "BLOCKED" ? "red" : "muted"}>{verdict.replaceAll("_", " ")}</Tag>;
+}
 
 function Column({
+  n,
   tenant,
   overview,
   onTrace,
 }: {
+  n: number;
   tenant: string;
   overview: Overview;
   onTrace: (tenant: string, rulingId: string) => void;
@@ -57,71 +61,94 @@ function Column({
   }, [tenant]);
 
   return (
-    <section className="rounded border border-white/10 bg-surface p-4">
-      <h2 className="text-xl">{company.name}</h2>
-      <p className="mt-1 text-sm text-muted">
-        HQ {company.hq_country}
-        {company.mau ? ` · ${company.mau.toLocaleString()} monthly active users` : ""}
-      </p>
-      <div className="mt-4 space-y-4">
+    <Part
+      n={String(n)}
+      title={company.name ?? tenant}
+      note={
+        <span className="font-mono text-[11px] uppercase tracking-[0.14em]">
+          HQ {company.hq_country}
+          {company.mau ? ` · ${company.mau.toLocaleString()} monthly active users` : ""}
+        </span>
+      }
+    >
+      <div className="space-y-10">
         {overview.products.map((product) => (
-          <div key={product.id}>
-            <h3 className="text-sm text-muted">{product.name}</h3>
-            <ul className="mt-2 space-y-2">
-              {product.deployments.map((deployment) => {
-                const verdict = deployment.latest_ruling?.verdict;
-                return (
-                  <li key={deployment.id} className="rounded border border-white/10 p-3">
-                    <p className="font-mono text-xs">{deployment.model_id}</p>
-                    <p className="mt-1 text-sm text-muted">{deployment.owner}</p>
-                    {verdict ? (
-                      <p
-                        className="mt-2 inline-block rounded px-2 py-1 text-xs font-medium"
-                        style={{ background: COLOUR[verdict] ?? "#9aa3ae", color: "#0f1419" }}
-                      >
-                        {verdict.replaceAll("_", " ")}
-                      </p>
-                    ) : (
-                      <p className="mt-2 text-sm text-muted">No ruling yet</p>
-                    )}
-                    {deployment.latest_ruling?.id ? (
-                      <button
-                        type="button"
-                        className="mt-2 text-xs text-accent"
-                        onClick={() => onTrace(tenant, deployment.latest_ruling!.id)}
-                      >
-                        Trace
-                      </button>
-                    ) : null}
-                  </li>
-                );
-              })}
-            </ul>
+          <div key={product.id} className="min-w-0">
+            <h3 className="font-mono text-[11px] uppercase tracking-[0.16em] text-muted">
+              {product.name}
+            </h3>
+            <div className="ledger-wrap mt-3">
+              <table className="ledger">
+                <thead>
+                  <tr>
+                    <th>Deployed model</th>
+                    <th>Owner</th>
+                    <th>Latest ruling</th>
+                    <th>
+                      <span className="sr-only">Trace</span>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {product.deployments.map((deployment) => {
+                    const verdict = deployment.latest_ruling?.verdict;
+                    return (
+                      <tr key={deployment.id}>
+                        <td className="min-w-[14rem]">
+                          <ModelRef id={deployment.model_id} />
+                        </td>
+                        <td className="min-w-[7rem] text-muted">{deployment.owner}</td>
+                        <td className="whitespace-nowrap">
+                          {verdict ? (
+                            <Verdict verdict={verdict} />
+                          ) : (
+                            <span className="text-muted">No ruling yet</span>
+                          )}
+                        </td>
+                        <td className="whitespace-nowrap text-right">
+                          {deployment.latest_ruling?.id ? (
+                            <button
+                              type="button"
+                              className={TEXT_BUTTON}
+                              onClick={() => onTrace(tenant, deployment.latest_ruling!.id)}
+                            >
+                              Trace
+                            </button>
+                          ) : null}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           </div>
         ))}
+        {tasks.length > 0 ? (
+          <div data-testid="task-list">
+            <h3 className="font-mono text-[11px] uppercase tracking-[0.16em] text-muted">
+              Open tasks
+            </h3>
+            <ul className="mt-3 border-b border-white/10">
+              {tasks.map((task) => (
+                <li key={task.id} className="border-t border-white/10 py-4">
+                  <p className="font-mono text-xs uppercase tracking-[0.1em] [overflow-wrap:anywhere]">
+                    {task.kind} <span className="text-muted">· {task.state}</span>
+                  </p>
+                  {task.playbook_steps && task.playbook_steps.length > 0 ? (
+                    <ol className="mt-2 max-w-3xl list-decimal space-y-1 pl-5 text-sm text-muted">
+                      {task.playbook_steps.map((step) => (
+                        <li key={step}>{step}</li>
+                      ))}
+                    </ol>
+                  ) : null}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
       </div>
-      {tasks.length > 0 ? (
-        <div className="mt-4" data-testid="task-list">
-          <h3 className="text-sm text-muted">Open tasks</h3>
-          <ul className="mt-2 space-y-2">
-            {tasks.map((task) => (
-              <li key={task.id} className="rounded border border-white/10 p-3 text-sm">
-                <p className="font-mono text-xs">
-                  {task.kind} · {task.state}
-                </p>
-                {task.playbook_steps && task.playbook_steps.length > 0 ? (
-                  <ol className="mt-2 list-decimal pl-4 text-xs text-muted">
-                    {task.playbook_steps.map((step) => (
-                      <li key={step}>{step}</li>
-                    ))}
-                  </ol>
-                ) : null}
-              </li>
-            ))}
-          </ul>
-        </div>
-      ) : null}
-    </section>
+    </Part>
   );
 }
 
@@ -179,76 +206,131 @@ export function CompaniesView() {
     setTrace((await response.json()) as Trace);
   }
 
-  if (error) return <p className="mt-6 text-[#f0605a]">{error}</p>;
-  if (tenants.length === 0) return <p className="mt-6 text-muted">Loading companies…</p>;
+  if (error)
+    return (
+      <div className="pt-12">
+        <Status state="error" error={error} />
+      </div>
+    );
+  if (tenants.length === 0)
+    return (
+      <div className="pt-12">
+        <Status state="loading" />
+      </div>
+    );
+
+  const shown = tenants.filter((tenant) => columns[tenant.name]);
 
   return (
-    <div className="mt-6 space-y-4">
-      <div className="flex flex-wrap gap-2">
+    <div>
+      <div className="flex flex-wrap items-center gap-x-6 gap-y-3 border-b border-white/10 py-6">
+        <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-muted">
+          Your own sandbox
+        </p>
         <button
           type="button"
-          className="rounded border border-white/10 px-3 py-2 text-sm text-accent"
+          className="rounded-sm bg-paper px-4 py-2 font-medium text-ink hover:bg-white"
           onClick={() => trySandbox("kestrel")}
         >
           Try it as Kestrel
         </button>
-        <button
-          type="button"
-          className="rounded border border-white/10 px-3 py-2 text-sm text-accent"
-          onClick={() => trySandbox("harbor")}
-        >
+        <button type="button" className={TEXT_BUTTON} onClick={() => trySandbox("harbor")}>
           Try it as Harbor
         </button>
-        {sandboxMsg ? <p className="text-sm text-muted">{sandboxMsg}</p> : null}
+        {sandboxMsg ? (
+          <p className="basis-full font-mono text-xs text-muted [overflow-wrap:anywhere]">
+            {sandboxMsg}
+          </p>
+        ) : null}
       </div>
-      <div className="grid gap-4 md:grid-cols-2">
-        {tenants.map((tenant) =>
-          columns[tenant.name] ? (
-            <Column
-              key={tenant.name}
-              tenant={tenant.name}
-              overview={columns[tenant.name]}
-              onTrace={onTrace}
-            />
-          ) : null,
-        )}
-      </div>
+      {shown.map((tenant, index) => (
+        <Column
+          key={tenant.name}
+          n={index + 1}
+          tenant={tenant.name}
+          overview={columns[tenant.name]}
+          onTrace={onTrace}
+        />
+      ))}
       {trace ? (
-        <aside className="rounded border border-white/10 bg-surface p-4" data-testid="trace-drawer">
-          <h3 className="text-lg">Decision trace</h3>
-          <p className="mt-1 text-sm">{trace.verdict}</p>
-          <ul className="mt-3 space-y-2 text-sm">
-            {(trace.facts || []).map((fact) => (
-              <li key={`${fact.model_id}-${fact.sha}`}>
-                {fact.model_id} · {fact.license_key}
-                {fact.sha ? (
-                  <>
-                    {" "}
-                    ·{" "}
-                    <a
-                      className="text-accent"
-                      href={`https://huggingface.co/${fact.model_id}/commit/${fact.sha}`}
-                    >
-                      commit
-                    </a>
-                  </>
-                ) : null}
-                {fact.clause_ids?.length ? (
-                  <span className="text-muted"> · {fact.clause_ids.join(", ")}</span>
-                ) : null}
-              </li>
-            ))}
-          </ul>
-          <ul className="mt-3 text-xs text-muted">
-            {(trace.events || []).map((event, index) => (
-              <li key={`${event.kind}-${index}`}>
-                {event.kind} {event.by ? `by ${event.by}` : ""}
-              </li>
-            ))}
-          </ul>
-          <button type="button" className="mt-3 text-sm text-accent" onClick={() => setTrace(null)}>
-            Close
-          </button>
+        <aside
+          className="fixed inset-x-0 bottom-0 z-40 max-h-[70vh] overflow-y-auto border-t border-white/20 bg-surface shadow-[0_-12px_32px_rgba(0,0,0,0.45)]"
+          data-testid="trace-drawer"
+          aria-label="Decision trace"
+        >
+          <div className="mx-auto max-w-6xl px-4 py-6">
+            <div className="flex items-baseline justify-between gap-4 border-b border-white/15 pb-3">
+              <h3 className="font-mono text-[11px] uppercase tracking-[0.16em] text-muted">
+                Decision trace
+              </h3>
+              <button type="button" className={TEXT_BUTTON} onClick={() => setTrace(null)}>
+                Close
+              </button>
+            </div>
+            {trace.verdict ? (
+              <p
+                className={`mt-4 font-serif text-3xl font-light ${
+                  trace.verdict === "BLOCKED" ? "text-redline" : "text-text"
+                }`}
+              >
+                {trace.verdict.replaceAll("_", " ")}
+              </p>
+            ) : null}
+            {(trace.facts || []).length > 0 ? (
+              <div className="ledger-wrap mt-5">
+                <table className="ledger">
+                  <thead>
+                    <tr>
+                      <th>Model</th>
+                      <th>Licence</th>
+                      <th>Commit</th>
+                      <th>Clauses</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {(trace.facts || []).map((fact) => (
+                      <tr key={`${fact.model_id}-${fact.sha}`}>
+                        <td className="min-w-[14rem]">
+                          <ModelRef id={fact.model_id} hub={false} />
+                        </td>
+                        <td>
+                          <Licence name={fact.license_key} />
+                        </td>
+                        <td className="whitespace-nowrap">
+                          {fact.sha ? (
+                            <a
+                              className="font-mono text-[13px] text-accent underline decoration-white/25 underline-offset-4 hover:decoration-accent"
+                              href={`https://huggingface.co/${fact.model_id}/commit/${fact.sha}`}
+                            >
+                              {fact.sha.slice(0, 7)} ↗
+                            </a>
+                          ) : (
+                            <span className="text-muted">none</span>
+                          )}
+                        </td>
+                        <td className="min-w-[8rem] font-mono text-xs text-muted">
+                          {fact.clause_ids?.length ? fact.clause_ids.join(", ") : ""}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : null}
+            {(trace.events || []).length > 0 ? (
+              <ol className="mt-5 border-b border-white/10">
+                {(trace.events || []).map((event, index) => (
+                  <li
+                    key={`${event.kind}-${index}`}
+                    className="border-t border-white/10 py-2 font-mono text-xs uppercase tracking-[0.1em] text-muted"
+                  >
+                    {event.kind}
+                    {event.by ? <span className="normal-case"> · by {event.by}</span> : null}
+                  </li>
+                ))}
+              </ol>
+            ) : null}
+          </div>
         </aside>
       ) : null}
     </div>

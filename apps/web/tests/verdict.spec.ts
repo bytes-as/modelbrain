@@ -9,8 +9,8 @@ test("OPEA is BLOCKED for DE and amber for US", async ({ page }) => {
   fs.mkdirSync(evidence, { recursive: true });
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto("/");
-  await page.getByPlaceholder("owner/model").fill(OPEA);
-  await page.getByRole("button", { name: "Check" }).click();
+  await page.getByLabel("Hugging Face model id").fill(OPEA);
+  await page.getByRole("button", { name: "Check the terms" }).click();
   await expect(page).toHaveURL(new RegExp(`/m/OPEA/`));
   await expect(page.getByTestId("verdict-done")).toBeVisible({ timeout: 120_000 });
   await expect(page.getByTestId("verdict-badge")).toContainText(/BLOCKED/i);

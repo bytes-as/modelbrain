@@ -194,16 +194,22 @@ export function VerdictView({
 
   if (state === "loading") {
     return (
-      <p className="mt-6 text-muted" data-testid="verdict-loading">
+      <p
+        role="status"
+        className="pt-10 font-mono text-xs uppercase tracking-[0.12em] text-muted"
+        data-testid="verdict-loading"
+      >
         Following the model&apos;s ancestry in FalkorDB…
       </p>
     );
   }
   if (state === "queued") {
     return (
-      <div className="mt-6 space-y-2" data-testid="verdict-queued">
-        <p className="text-muted">Ingesting ancestry…</p>
-        <ul className="font-mono text-xs text-muted">
+      <div className="space-y-3 pt-10" data-testid="verdict-queued">
+        <p role="status" className="font-mono text-xs uppercase tracking-[0.12em] text-muted">
+          Ingesting ancestry…
+        </p>
+        <ul className="break-all font-mono text-xs text-muted">
           {progress.map((line) => (
             <li key={line}>{line}</li>
           ))}
@@ -213,7 +219,11 @@ export function VerdictView({
   }
   if (state === "error" || !verdict) {
     return (
-      <p className="mt-6 text-[#f0605a]" data-testid="verdict-error">
+      <p
+        role="alert"
+        className="pt-10 font-mono text-xs uppercase tracking-[0.12em] text-redline"
+        data-testid="verdict-error"
+      >
         {error} Try again from the check page.
       </p>
     );
@@ -229,7 +239,7 @@ export function VerdictView({
   const hasMerge = (verdict.paths ?? []).some((row) => row.methods?.includes("weights_merge"));
 
   return (
-    <div className="mt-6 space-y-6" data-testid="verdict-done">
+    <div className="space-y-8 pt-10" data-testid="verdict-done">
       <div className="flex flex-wrap items-end gap-x-10 gap-y-4">
         <p
           className="stamp font-mono text-xl md:text-2xl"
@@ -238,7 +248,10 @@ export function VerdictView({
         >
           {label}
         </p>
-        <p className="font-serif text-2xl leading-snug md:text-3xl" data-testid="declared-differs">
+        <p
+          className="min-w-0 font-serif text-2xl leading-snug [overflow-wrap:anywhere] md:text-3xl"
+          data-testid="declared-differs"
+        >
           The card says{" "}
           {verdict.declared_differs ? (
             <span className="strike">{verdict.declared_license ?? "nothing"}</span>
@@ -257,10 +270,13 @@ export function VerdictView({
           ) : null}
         </p>
       </div>
-      <p className="text-sm" data-testid="context-chips">
+      <p
+        className="font-mono text-[11px] uppercase tracking-[0.14em] text-muted"
+        data-testid="context-chips"
+      >
         Context: {hq}, {commercial ? "commercial" : "non-commercial"}.{" "}
         <Link
-          className="text-accent"
+          className="ml-2 text-accent underline decoration-white/25 underline-offset-4 hover:decoration-accent"
           data-testid="flip-hq"
           href={`/m/${owner}/${name}?hq=${flip}&c=${commercial ? "1" : "0"}`}
         >
@@ -268,32 +284,39 @@ export function VerdictView({
         </Link>
       </p>
       {path.length > 0 ? (
-        <ol
-          className="flex flex-wrap items-center gap-2 font-mono text-xs"
-          data-testid="lineage-path"
-        >
-          {path.map((id, index) => {
-            const chip = index > 0 ? edgeChip(pathRow, index - 1, id) : null;
-            return (
-              <li key={id} className="flex items-center gap-2">
-                {index > 0 ? <span className="text-muted">→</span> : null}
-                {chip ? (
-                  <span
-                    className="rounded border border-accent/40 px-2 py-1 font-sans text-accent"
-                    data-testid="weights-chip"
-                    title="We compared a small sample of the actual weight values (about 2 KB). The model card does not declare this parent."
-                  >
-                    {chip}
+        <section>
+          <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-muted">
+            Chain of title
+          </p>
+          <ol
+            className="mt-3 flex flex-wrap items-center gap-2 font-mono text-xs"
+            data-testid="lineage-path"
+          >
+            {path.map((id, index) => {
+              const chip = index > 0 ? edgeChip(pathRow, index - 1, id) : null;
+              return (
+                <li key={id} className="flex min-w-0 max-w-full flex-wrap items-center gap-2">
+                  {index > 0 ? <span className="text-muted">→</span> : null}
+                  {chip ? (
+                    <span
+                      className="border border-accent/40 px-2 py-1 font-sans text-accent"
+                      data-testid="weights-chip"
+                      title="We compared a small sample of the actual weight values (about 2 KB). The model card does not declare this parent."
+                    >
+                      {chip}
+                    </span>
+                  ) : null}
+                  <span className="min-w-0 break-all border border-white/10 bg-surface px-2 py-1">
+                    {id}
                   </span>
-                ) : null}
-                <span className="rounded bg-surface px-2 py-1">{id}</span>
-              </li>
-            );
-          })}
-        </ol>
+                </li>
+              );
+            })}
+          </ol>
+        </section>
       ) : null}
       {hasMerge && exposure.length > 0 ? (
-        <ul className="text-sm text-muted" data-testid="weights-exposure">
+        <ul className="text-sm text-muted [overflow-wrap:anywhere]" data-testid="weights-exposure">
           {exposure.map((row) => (
             <li key={row.root}>
               About {Math.round(row.exposure * 100)}% of the sampled weights trace to {row.root}
@@ -303,27 +326,42 @@ export function VerdictView({
         </ul>
       ) : null}
       {inherits && inherits.rows.length > 0 ? (
-        <section
-          className="rounded border border-accent/40 p-4 text-sm"
-          data-testid="weights-inherits"
-        >
-          <h2 className="font-medium">What the weights carry, in one FalkorDB query</h2>
-          <p className="mt-1 text-muted">
+        <section className="border-t border-white/15 pt-5 text-sm" data-testid="weights-inherits">
+          <h2 className="font-serif text-2xl font-light leading-tight">
+            What the weights carry, in one FalkorDB query
+          </h2>
+          <p className="mt-2 max-w-3xl text-muted [overflow-wrap:anywhere]">
             Vector search over the sampled weights found {inherits.rows[0].weights_parent}{" "}
             (similarity {inherits.rows[0].sim.toFixed(3)}), then the same query walked its trusted
             ancestry to the licences and clauses: {inherits.ms} ms.
           </p>
-          <ul className="mt-2 space-y-1">
-            {inherits.rows.map((row) => (
-              <li key={row.path.join(">") + row.license}>
-                <span className="font-mono text-xs">{row.path.join(" → ")}</span>: {row.license}
-                {row.clauses.length ? ` (${row.clauses.length} clauses)` : ""}
-              </li>
-            ))}
-          </ul>
-          <details className="mt-2">
-            <summary className="cursor-pointer text-accent">The query</summary>
-            <pre className="mt-2 overflow-x-auto rounded bg-surface p-3 text-xs">
+          <div className="ledger-wrap mt-4">
+            <table className="ledger">
+              <thead>
+                <tr>
+                  <th>Path</th>
+                  <th>Licence</th>
+                  <th className="num">Clauses</th>
+                </tr>
+              </thead>
+              <tbody>
+                {inherits.rows.map((row) => (
+                  <tr key={row.path.join(">") + row.license}>
+                    <td className="min-w-[16rem] break-all font-mono text-xs">
+                      {row.path.join(" → ")}
+                    </td>
+                    <td className="font-mono text-[13px]">{row.license}</td>
+                    <td className="num">{row.clauses.length || "–"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <details className="mt-4">
+            <summary className="cursor-pointer font-mono text-xs uppercase tracking-[0.12em] text-accent">
+              The query
+            </summary>
+            <pre className="mt-2 overflow-x-auto border border-white/10 bg-surface p-4 font-mono text-[13px] leading-relaxed">
               {inherits.cypher}
             </pre>
           </details>
@@ -333,7 +371,7 @@ export function VerdictView({
         {cards.map((hit, index) => (
           <article
             key={hit.clause_id}
-            className={`grid gap-4 border-t border-white/15 py-5 md:grid-cols-[190px_1fr] ${
+            className={`grid gap-3 border-t border-white/15 py-5 md:grid-cols-[190px_minmax(0,1fr)] md:gap-4 ${
               verdict.blocking.some((b) => b.clause_id === hit.clause_id) ? "border-t-redline" : ""
             }`}
           >
@@ -341,7 +379,7 @@ export function VerdictView({
               §{index + 1}
               <span className="block break-all normal-case tracking-normal">{hit.clause_id}</span>
             </p>
-            <div>
+            <div className="min-w-0 [overflow-wrap:anywhere]">
               <p className="font-serif text-xl leading-snug">{hit.summary}</p>
               {hit.quote ? (
                 <blockquote className="mt-3 border-l-2 border-redline/70 pl-3 font-serif text-[15px] italic text-muted">
@@ -349,12 +387,17 @@ export function VerdictView({
                 </blockquote>
               ) : null}
               {hit.source_url ? (
-                <a className="mt-2 inline-block text-sm text-accent" href={hit.source_url}>
+                <a
+                  className="mt-2 inline-block font-mono text-xs uppercase tracking-[0.12em] text-accent underline decoration-white/25 underline-offset-4 hover:decoration-accent"
+                  href={hit.source_url}
+                >
                   Source{hit.section ? `, ${hit.section}` : ""}
                 </a>
               ) : null}
               {hit.status ? (
-                <p className="mt-2 text-xs text-muted">Obligation: {hit.status}</p>
+                <p className="mt-2 font-mono text-[11px] uppercase tracking-[0.12em] text-muted">
+                  Obligation: {hit.status}
+                </p>
               ) : null}
             </div>
           </article>
@@ -362,22 +405,38 @@ export function VerdictView({
       </div>
       <HostedPanel modelId={modelId} hq={hq} />
       {verdict.verdict === "BLOCKED" ? (
-        <section data-testid="alternatives">
-          <h2 className="text-lg">Alternatives in our candidate set</h2>
+        <section className="border-t border-white/15 pt-5" data-testid="alternatives">
+          <h2 className="font-serif text-2xl font-light leading-tight">
+            Alternatives in our candidate set
+          </h2>
           {verdict.alternatives.length > 0 ? (
-            <ul className="mt-2 space-y-1 text-sm">
-              {verdict.alternatives.map((alt) => (
-                <li key={alt.model_id}>
-                  <Link
-                    className="text-accent"
-                    href={`/m/${alt.model_id.split("/")[0]}/${alt.model_id.split("/")[1]}?hq=${hq}`}
-                  >
-                    {alt.model_id}
-                  </Link>{" "}
-                  <span className="text-muted">{alt.verdict.replaceAll("_", " ")}</span>
-                </li>
-              ))}
-            </ul>
+            <div className="ledger-wrap mt-4">
+              <table className="ledger">
+                <thead>
+                  <tr>
+                    <th>Model</th>
+                    <th>Verdict</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {verdict.alternatives.map((alt) => (
+                    <tr key={alt.model_id}>
+                      <td className="min-w-[12rem] break-all font-mono text-[13px]">
+                        <Link
+                          className="text-text decoration-white/30 hover:underline"
+                          href={`/m/${alt.model_id.split("/")[0]}/${alt.model_id.split("/")[1]}?hq=${hq}`}
+                        >
+                          {alt.model_id}
+                        </Link>
+                      </td>
+                      <td className="whitespace-nowrap font-mono text-xs uppercase text-muted">
+                        {alt.verdict.replaceAll("_", " ")}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           ) : (
             <p className="mt-2 text-sm text-muted">
               {verdict.alternatives_message || "No compliant alternative in our candidate set."}
@@ -386,28 +445,36 @@ export function VerdictView({
         </section>
       ) : null}
       {verdict.incomplete_reasons.length > 0 ? (
-        <ul className="text-sm text-muted">
+        <ul className="text-sm text-muted [overflow-wrap:anywhere]">
           {verdict.incomplete_reasons.map((reason) => (
             <li key={reason}>{reason}</li>
           ))}
         </ul>
       ) : null}
       <details className="text-sm" data-testid="how-we-decided">
-        <summary className="cursor-pointer text-accent">How we decided</summary>
-        <p className="mt-2 text-muted">Computed in {verdict.computed_ms ?? 0} ms.</p>
+        <summary className="cursor-pointer font-mono text-xs uppercase tracking-[0.12em] text-accent">
+          How we decided
+        </summary>
+        <p className="mt-2 font-mono text-[11px] uppercase tracking-[0.12em] text-muted">
+          Computed in {verdict.computed_ms ?? 0} ms
+        </p>
         {verdict.cypher?.q1 ? (
-          <pre className="mt-2 overflow-x-auto rounded bg-surface p-3 text-xs">
+          <pre className="mt-2 overflow-x-auto border border-white/10 bg-surface p-4 font-mono text-[13px] leading-relaxed">
             {verdict.cypher.q1}
           </pre>
         ) : null}
         {verdict.cypher?.q2 ? (
-          <pre className="mt-2 overflow-x-auto rounded bg-surface p-3 text-xs">
+          <pre className="mt-2 overflow-x-auto border border-white/10 bg-surface p-4 font-mono text-[13px] leading-relaxed">
             {verdict.cypher.q2}
           </pre>
         ) : null}
       </details>
-      <p className="text-sm">{verdict.explanation}</p>
-      <p className="text-sm text-muted">{verdict.disclaimer}</p>
+      <p className="max-w-3xl text-sm leading-relaxed [overflow-wrap:anywhere]">
+        {verdict.explanation}
+      </p>
+      <p className="border-t border-white/10 pt-4 font-mono text-[11px] uppercase tracking-[0.14em] text-muted">
+        {verdict.disclaimer}
+      </p>
     </div>
   );
 }

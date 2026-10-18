@@ -1,3 +1,5 @@
+import { Breakable, Exhibit, ExhibitHeader } from "../../../components/exhibit";
+
 import { VerdictView } from "./verdict-view";
 
 export default async function ModelVerdictPage({
@@ -14,17 +16,18 @@ export default async function ModelVerdictPage({
   const modelId = `${owner}/${name}`;
 
   return (
-    <main>
-      <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-muted">
-        §1 · Verdict for a company in {hq} · {commercial ? "commercial" : "non-commercial"} use
-      </p>
-      <h1
-        className="mt-3 break-all font-serif font-light leading-[1.05] tracking-[-0.02em]"
-        style={{ fontSize: "clamp(1.9rem, 4.4vw, 3.6rem)" }}
-      >
-        {modelId}
-      </h1>
+    <Exhibit>
+      <ExhibitHeader
+        mark={`§1 · Verdict for a company in ${hq} · ${commercial ? "commercial" : "non-commercial"} use`}
+        source="Read from FalkorDB"
+        title={
+          <span className="block text-[0.78em] [overflow-wrap:anywhere]">
+            <span className="text-ink-soft">{owner}/</span>
+            <Breakable text={name} />
+          </span>
+        }
+      />
       <VerdictView modelId={modelId} hq={hq} commercial={commercial} />
-    </main>
+    </Exhibit>
   );
 }

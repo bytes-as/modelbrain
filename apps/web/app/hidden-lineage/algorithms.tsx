@@ -1,17 +1,27 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
+
+import { ModelRef, Status } from "../components/exhibit";
 
 type Scored = { model: string; score: number };
 type Family = { communityId: number; size: number; sample: string[] };
 
-function ModelLink({ id }: { id: string }) {
-  const [owner, name] = id.split("/");
+function Block({
+  title,
+  note,
+  children,
+}: {
+  title: string;
+  note: string;
+  children: React.ReactNode;
+}) {
   return (
-    <Link className="text-accent" href={`/m/${owner}/${name}`}>
-      {id}
-    </Link>
+    <div className="min-w-0">
+      <h3 className="font-serif text-xl font-light text-text">{title}</h3>
+      <p className="mt-1 text-sm text-muted">{note}</p>
+      <div className="ledger-wrap mt-4">{children}</div>
+    </div>
   );
 }
 
@@ -38,53 +48,86 @@ export function Algorithms() {
       .catch(() => setError(true));
   }, []);
 
-  if (error) return <p className="mt-6 text-sm text-muted">Graph algorithms unavailable.</p>;
+  if (error) return <Status state="error" error="Graph algorithms unavailable." />;
 
   return (
-    <section className="mt-8" data-testid="algorithms">
-      <h2 className="text-xl">Graph algorithms over the whole lineage</h2>
-      <p className="mt-1 text-sm text-muted">
-        Computed by FalkorDB inside Cypher over every model in the hub.
-      </p>
-      <div className="mt-3 grid gap-4 md:grid-cols-3">
-        <div className="rounded border border-white/10 bg-surface p-3">
-          <p className="font-medium">Relabel hubs (PageRank)</p>
-          <p className="text-xs text-muted">
-            Permissive card, restrictive ancestor, ranked by influence over descendants.
-          </p>
-          <ol className="mt-2 space-y-1 text-sm">
-            {hubs.map((row) => (
-              <li key={row.model}>
-                <ModelLink id={row.model} />
-              </li>
-            ))}
-          </ol>
-        </div>
-        <div className="rounded border border-white/10 bg-surface p-3">
-          <p className="font-medium">Chokepoints (betweenness)</p>
-          <p className="text-xs text-muted">A licence fix here reaches the most descendants.</p>
-          <ol className="mt-2 space-y-1 text-sm">
-            {choke.map((row) => (
-              <li key={row.model}>
-                <ModelLink id={row.model} />{" "}
-                <span className="font-mono text-xs text-muted">{row.score.toFixed(0)}</span>
-              </li>
-            ))}
-          </ol>
-        </div>
-        <div className="rounded border border-white/10 bg-surface p-3">
-          <p className="font-medium">Families (label propagation)</p>
-          <p className="text-xs text-muted">Communities in the lineage graph.</p>
-          <ul className="mt-2 space-y-2 text-sm">
-            {families.map((family) => (
-              <li key={family.communityId}>
-                <span className="font-mono text-xs text-muted">{family.size} models</span>{" "}
-                {family.sample.slice(0, 2).join(", ")}
-              </li>
-            ))}
-          </ul>
-        </div>
+    <div className="space-y-12" data-testid="algorithms">
+      <div className="grid gap-12 lg:grid-cols-2 lg:gap-10">
+        <Block
+          title="Relabel hubs · PageRank"
+          note="Permissive card, restrictive ancestor, ranked by influence over descendants."
+        >
+          <table className="ledger">
+            <thead>
+              <tr>
+                <th className="num">#</th>
+                <th>Model</th>
+              </tr>
+            </thead>
+            <tbody>
+              {hubs.map((row, index) => (
+                <tr key={row.model}>
+                  <td className="num w-8 text-muted">{index + 1}</td>
+                  <td className="min-w-[14rem]">
+                    <ModelRef id={row.model} />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </Block>
+        <Block
+          title="Chokepoints · betweenness"
+          note="A licence fix here reaches the most descendants."
+        >
+          <table className="ledger">
+            <thead>
+              <tr>
+                <th className="num">#</th>
+                <th>Model</th>
+                <th className="num">Betweenness</th>
+              </tr>
+            </thead>
+            <tbody>
+              {choke.map((row, index) => (
+                <tr key={row.model}>
+                  <td className="num w-8 text-muted">{index + 1}</td>
+                  <td className="min-w-[14rem]">
+                    <ModelRef id={row.model} />
+                  </td>
+                  <td className="num">{row.score.toFixed(0)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </Block>
       </div>
-    </section>
+      <Block title="Families · label propagation" note="Communities in the lineage graph.">
+        <table className="ledger">
+          <thead>
+            <tr>
+              <th className="num">Community</th>
+              <th className="num">Models</th>
+              <th>Sample</th>
+            </tr>
+          </thead>
+          <tbody>
+            {families.map((family) => (
+              <tr key={family.communityId}>
+                <td className="num text-muted">{family.communityId}</td>
+                <td className="num">{family.size}</td>
+                <td className="min-w-[16rem]">
+                  <span className="flex flex-col gap-1">
+                    {family.sample.slice(0, 2).map((id) => (
+                      <ModelRef key={id} id={id} hub={false} />
+                    ))}
+                  </span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </Block>
+    </div>
   );
 }

@@ -3,6 +3,17 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
+import {
+  Disclaimer,
+  Exhibit,
+  ExhibitHeader,
+  Licence,
+  ModelRef,
+  Part,
+  Status,
+  Tag,
+} from "../../components/exhibit";
+
 type Step = { date: string; kind: string; label: string; ref: string };
 type Child = { id: string; relation: string };
 type Affected = { graph: string; ruling_id: string; deployment_id: string; owner_id: string };
@@ -109,147 +120,260 @@ export default function XkevReplayPage() {
     setBusy(false);
   }
 
+  const row =
+    "grid grid-cols-[96px_minmax(0,1fr)] gap-4 border-t border-white/10 py-3 md:grid-cols-[140px_minmax(0,1fr)]";
+  const date = "font-mono text-[11px] uppercase tracking-[0.12em] text-muted";
+  const remembered = data?.discussions?.filter((d) => d.outcome) ?? [];
+  let part = 0;
+  const next = () => String(++part);
+
   return (
-    <main className="[overflow-wrap:anywhere]">
-      <h1 className="text-3xl">Xkev replay</h1>
-      <p className="mt-2 max-w-3xl text-muted">
-        A real upstream licence fix, replayed through the graph. One model fixed its licence files
-        130 days after someone asked. None of its children inherited the fix. ModelBrain walks the
-        lineage in FalkorDB and reopens every company decision that rested on any of them.
-      </p>
-      {error ? <p className="mt-4 text-[#f0605a]">{error}</p> : null}
-      {!data && !error ? <p className="mt-6 text-muted">Loading…</p> : null}
-      {data ? (
-        <>
-          <section className="mt-8">
-            <h2 className="text-xl">What happened on the Hub</h2>
-            <ol
-              className="mt-3 space-y-2 border-l border-white/10 pl-4 text-sm"
-              data-testid="replay-timeline"
+    <Exhibit>
+      <ExhibitHeader
+        mark="Exhibit D · Amendment"
+        source="Live from FalkorDB · Hugging Face commits and discussions"
+        title={
+          <>
+            The licence was amended upstream. <em>No descendant was served notice.</em>
+          </>
+        }
+        lede="A real upstream licence fix, replayed through the graph. One model fixed its licence files 130 days after someone asked. None of its children inherited the fix. ModelBrain walks the lineage in FalkorDB and reopens every company decision that rested on any of them."
+        facts={
+          data
+            ? [
+                { value: data.fix.days_after_report, label: "Days from report to fix" },
+                { value: data.children.length, label: "Children on the Hub" },
+                { value: data.leverage.descendants, label: "Descendants in graph" },
+                { value: data.leverage.not_inherited, label: "Without the notice" },
+              ]
+            : undefined
+        }
+      />
+
+      <div className="[overflow-wrap:anywhere]">
+        {error ? (
+          <div className="pt-8">
+            <Status state="error" error={error} />
+          </div>
+        ) : null}
+        {!data && !error ? (
+          <div className="pt-8">
+            <Status state="loading" />
+          </div>
+        ) : null}
+
+        {data ? (
+          <>
+            <Part
+              n={next()}
+              title="What happened on the Hub"
+              note={
+                <>
+                  Today the card of <ModelRef id={data.model_id} /> still declares{" "}
+                  <Licence name={data.card_license_now} />; its weights come from{" "}
+                  <ModelRef id={data.base_model} />.
+                </>
+              }
             >
-              {data.timeline.map((step) => (
-                <li key={`${step.date}-${step.ref}`}>
-                  <span className="font-mono text-xs text-muted">{step.date}</span>{" "}
-                  <span className={step.kind === "LICENSE_FILE_ADDED" ? "text-accent" : ""}>
-                    {step.label}
-                  </span>{" "}
-                  <a
-                    className="text-xs text-muted"
-                    href={refLink(data.model_id, step.ref)}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    source ↗
-                  </a>
-                </li>
-              ))}
-            </ol>
-            <p className="mt-3 text-sm text-muted">
-              Today the card of {data.model_id} still declares {data.card_license_now}; its weights
-              come from {data.base_model}.
-            </p>
-          </section>
-
-          {data.discussions && data.discussions.some((d) => d.outcome) ? (
-            <section className="mt-8" data-testid="discussion-memory">
-              <h2 className="text-xl">What the graph remembers</h2>
-              <ul className="mt-2 space-y-1 text-sm">
-                {data.discussions
-                  .filter((d) => d.outcome)
-                  .map((d) => (
-                    <li key={d.num}>
-                      <a className="text-accent" href={d.url} target="_blank" rel="noreferrer">
-                        Discussion #{d.num} &quot;{d.title}&quot;
-                      </a>{" "}
-                      opened {d.opened_at.slice(0, 10)}: outcome{" "}
-                      <span className="font-mono">{d.outcome}</span> after {d.days} days.
-                    </li>
-                  ))}
-              </ul>
-              <p className="mt-1 text-xs text-muted">
-                {data.discussions.length} discussions on this model are stored as graph nodes linked
-                to it.
-              </p>
-            </section>
-          ) : null}
-
-          <section className="mt-8">
-            <h2 className="text-xl">Who did not get the fix</h2>
-            <p className="mt-2 text-sm text-muted" data-testid="fix-leverage">
-              {data.children.length} children on the Hub. In our graph: {data.leverage.descendants}{" "}
-              descendants, {data.leverage.not_inherited} without the upstream notice.
-            </p>
-            <ul className="mt-2 grid gap-1 text-sm sm:grid-cols-2">
-              {data.children.map((child) => (
-                <li key={child.id}>
-                  <a
-                    className="text-accent"
-                    href={`${HUB}/${child.id}`}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    {child.id}
-                  </a>{" "}
-                  <span className="text-xs text-muted">{child.relation}</span>
-                </li>
-              ))}
-            </ul>
-          </section>
-
-          <section className="mt-8">
-            <h2 className="text-xl">Decisions that rest on this lineage</h2>
-            <ul className="mt-2 space-y-1 text-sm" data-testid="would-reopen">
-              {data.would_reopen.map((row) => (
-                <li key={`${row.graph}-${row.ruling_id}`}>
-                  {row.graph.replace("tenant_", "")}: ruling {row.ruling_id} for {row.deployment_id}{" "}
-                  (owner {row.owner_id})
-                </li>
-              ))}
-              {data.would_reopen.length === 0 ? (
-                <li className="text-muted">No company decision rests on this lineage yet.</li>
-              ) : null}
-            </ul>
-            <button
-              type="button"
-              className="mt-4 rounded bg-accent px-4 py-2 text-sm font-medium text-[#0f1419] disabled:opacity-50"
-              onClick={runReplay}
-              disabled={busy}
-              data-testid="run-replay"
-            >
-              {busy ? "Replaying…" : "Replay the fix in my sandbox"}
-            </button>
-            <p className="mt-2 text-xs text-muted">
-              Runs only inside your private sandbox (a copy of the fictional Kestrel company).
-              Nothing is posted anywhere.
-            </p>
-          </section>
-
-          {run ? (
-            <section
-              className="mt-8 rounded border border-white/10 bg-surface p-4"
-              data-testid="replay-result"
-            >
-              <h2 className="text-lg">Fan-out result</h2>
-              <p className="mt-1 text-sm text-muted">
-                Walked {run.descendants} descendants and reopened {run.reopened.length} decision
-                {run.reopened.length === 1 ? "" : "s"} in {run.ms} ms.
-              </p>
-              <ul className="mt-2 space-y-1 text-sm">
-                {run.reopened.map((row) => (
-                  <li key={row.task_id}>
-                    Ruling {row.ruling_id} ({row.deployment_id}) reopened; review task {row.task_id}{" "}
-                    assigned to {row.owner_id}. Affected: {row.affected_models.join(", ")}
+              <ol className="border-b border-white/10" data-testid="replay-timeline">
+                {data.timeline.map((step) => (
+                  <li key={`${step.date}-${step.ref}`} className={row}>
+                    <span className={date}>{step.date}</span>
+                    <span className="text-[15px] leading-relaxed">
+                      <span
+                        className={
+                          step.kind === "LICENSE_FILE_ADDED"
+                            ? "font-serif text-xl italic text-accent"
+                            : ""
+                        }
+                      >
+                        {step.label}
+                      </span>{" "}
+                      <a
+                        className="whitespace-nowrap font-mono text-[11px] uppercase tracking-[0.12em] text-muted hover:text-text"
+                        href={refLink(data.model_id, step.ref)}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        source ↗
+                      </a>
+                    </span>
                   </li>
                 ))}
-              </ul>
-              <Link className="mt-3 inline-block text-sm text-accent" href="/companies">
-                Open the company view to approve or reject →
-              </Link>
-            </section>
-          ) : null}
-        </>
-      ) : null}
-      <p className="mt-10 text-sm text-muted">Automated screening, not legal advice.</p>
-    </main>
+              </ol>
+            </Part>
+
+            {remembered.length > 0 ? (
+              <Part
+                n={next()}
+                title="What the graph remembers"
+                note={`${data.discussions?.length ?? 0} discussions on this model are stored as graph nodes linked to it.`}
+                testId="discussion-memory"
+              >
+                <ol className="border-b border-white/10">
+                  {remembered.map((d) => (
+                    <li key={d.num} className={row}>
+                      <span className={date}>{d.opened_at.slice(0, 10)}</span>
+                      <span className="text-[15px] leading-relaxed">
+                        <a
+                          className="text-text underline decoration-white/30 underline-offset-4 hover:decoration-text"
+                          href={d.url}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          Discussion #{d.num} &quot;{d.title}&quot;
+                        </a>
+                        <span className="text-muted">
+                          {" "}
+                          · outcome{" "}
+                          <span className="font-mono text-[13px] text-text">
+                            {d.outcome}
+                          </span> after {d.days} days
+                        </span>
+                      </span>
+                    </li>
+                  ))}
+                </ol>
+              </Part>
+            ) : null}
+
+            <Part
+              n={next()}
+              title="Who did not get the fix"
+              note={
+                <span data-testid="fix-leverage">
+                  {data.children.length} children on the Hub. In our graph:{" "}
+                  {data.leverage.descendants} descendants, {data.leverage.not_inherited} without the
+                  upstream notice.
+                </span>
+              }
+            >
+              <div className="ledger-wrap">
+                <table className="ledger">
+                  <thead>
+                    <tr>
+                      <th>Child</th>
+                      <th>Relation</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {data.children.map((child) => (
+                      <tr key={child.id}>
+                        <td>
+                          <a
+                            className="break-all font-mono text-[13px] text-text hover:underline"
+                            href={`${HUB}/${child.id}`}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            {child.id} <span className="font-sans text-[11px] text-muted">↗</span>
+                          </a>
+                        </td>
+                        <td>
+                          <Tag>{child.relation}</Tag>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </Part>
+
+            <Part
+              n={next()}
+              title="Decisions that rest on this lineage"
+              note="Runs only inside your private sandbox (a copy of the fictional Kestrel company). Nothing is posted anywhere."
+            >
+              <div className="ledger-wrap">
+                <table className="ledger" data-testid="would-reopen">
+                  <thead>
+                    <tr>
+                      <th>Company</th>
+                      <th>Ruling</th>
+                      <th>Deployment</th>
+                      <th>Owner</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {data.would_reopen.map((r) => (
+                      <tr key={`${r.graph}-${r.ruling_id}`}>
+                        <td>{r.graph.replace("tenant_", "")}</td>
+                        <td className="font-mono text-[13px]">{r.ruling_id}</td>
+                        <td className="font-mono text-[13px]">{r.deployment_id}</td>
+                        <td>{r.owner_id}</td>
+                      </tr>
+                    ))}
+                    {data.would_reopen.length === 0 ? (
+                      <tr>
+                        <td colSpan={4} className="text-muted">
+                          No company decision rests on this lineage yet.
+                        </td>
+                      </tr>
+                    ) : null}
+                  </tbody>
+                </table>
+              </div>
+              <button
+                type="button"
+                className="mt-6 rounded-sm bg-paper px-4 py-2 font-medium text-ink hover:bg-white disabled:opacity-50"
+                onClick={runReplay}
+                disabled={busy}
+                data-testid="run-replay"
+              >
+                {busy ? "Replaying…" : "Replay the fix in my sandbox"}
+              </button>
+            </Part>
+
+            {run ? (
+              <Part
+                n={next()}
+                title="Fan-out result"
+                note={`Walked ${run.descendants} descendants and reopened ${run.reopened.length} decision${run.reopened.length === 1 ? "" : "s"} in ${run.ms} ms.`}
+                testId="replay-result"
+              >
+                <div className="ledger-wrap">
+                  <table className="ledger">
+                    <thead>
+                      <tr>
+                        <th>Ruling reopened</th>
+                        <th>Deployment</th>
+                        <th>Review task</th>
+                        <th>Assigned to</th>
+                        <th>Affected</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {run.reopened.map((r) => (
+                        <tr key={r.task_id}>
+                          <td className="font-mono text-[13px]">{r.ruling_id}</td>
+                          <td className="font-mono text-[13px]">{r.deployment_id}</td>
+                          <td className="font-mono text-[13px]">{r.task_id}</td>
+                          <td>{r.owner_id}</td>
+                          <td className="min-w-[14rem]">
+                            {r.affected_models.map((m) => (
+                              <span key={m} className="block">
+                                <ModelRef id={m} hub={false} />
+                              </span>
+                            ))}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <Link
+                  className="mt-6 inline-block font-mono text-xs uppercase tracking-[0.12em] text-accent underline decoration-white/25 underline-offset-4 hover:decoration-accent"
+                  href="/companies"
+                >
+                  Open the company view to approve or reject →
+                </Link>
+              </Part>
+            ) : null}
+          </>
+        ) : null}
+
+        <Disclaimer />
+      </div>
+    </Exhibit>
   );
 }

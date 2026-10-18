@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 
+import { Disclaimer, Exhibit, ExhibitHeader, Part } from "../components/exhibit";
+
 const TOOLS: [string, string][] = [
   [
     "can_i_use",
@@ -41,81 +43,117 @@ export default function McpPage() {
   }
 
   return (
-    <main className="[overflow-wrap:anywhere]">
-      <h1 className="text-3xl">Use ModelBrain from your coding agent</h1>
-      <p className="mt-2 max-w-3xl text-muted">
-        ModelBrain is an MCP server. Your agent calls it before it writes{" "}
-        <code className="font-mono">from_pretrained</code>, and gets the verdict, the lineage path
-        and the clause straight from FalkorDB.
-      </p>
+    <Exhibit>
+      <ExhibitHeader
+        mark="Exhibit F · Obligations of the agent"
+        source="MCP server · HTTP transport"
+        title={
+          <>
+            The agent shall call <span className="font-mono text-[0.8em]">can_i_use</span> before{" "}
+            <span className="font-mono text-[0.8em]">from_pretrained</span>.
+          </>
+        }
+        lede={
+          <>
+            ModelBrain is an MCP server. Your agent calls it before it writes from_pretrained, and
+            gets the verdict, the lineage path and the clause straight from FalkorDB.
+          </>
+        }
+      />
 
-      <section className="mt-6">
-        <h2 className="text-xl">Claude Code</h2>
-        <div className="mt-2 flex flex-wrap items-center gap-2">
-          <pre className="overflow-x-auto rounded bg-surface p-3 text-sm" data-testid="mcp-command">
-            {command}
-          </pre>
-          <button
-            type="button"
-            className="rounded border border-white/10 px-3 py-2 text-sm text-accent"
-            onClick={() => copy(command, "claude")}
-          >
-            {copied === "claude" ? "Copied" : "Copy"}
-          </button>
-        </div>
-        <p className="mt-2 text-sm text-muted">
+      <Part n="1" title="Claude Code">
+        <Code
+          caption="claude mcp add · one command"
+          testId="mcp-command"
+          copied={copied === "claude"}
+          onCopy={() => copy(command, "claude")}
+        >
+          {command}
+        </Code>
+        <p className="mt-5 max-w-3xl font-serif text-xl leading-relaxed">
           Then ask: &quot;add OPEA/Llama-3.2V-11B-cot-int4-sym-inc to our pipeline for our German
-          product&quot;. The agent calls <code className="font-mono">can_i_use</code> and reports
-          BLOCKED with the path.
+          product&quot;. The agent calls <code className="font-mono text-base">can_i_use</code> and
+          reports <span className="font-mono text-base text-redline">BLOCKED</span> with the path.
         </p>
-      </section>
+      </Part>
 
-      <section className="mt-6">
-        <h2 className="text-xl">Cursor and other MCP clients</h2>
-        <div className="mt-2 flex flex-wrap items-start gap-2">
-          <pre className="overflow-x-auto rounded bg-surface p-3 text-sm">{cursor}</pre>
-          <button
-            type="button"
-            className="rounded border border-white/10 px-3 py-2 text-sm text-accent"
-            onClick={() => copy(cursor, "cursor")}
-          >
-            {copied === "cursor" ? "Copied" : "Copy"}
-          </button>
-        </div>
-      </section>
+      <Part n="2" title="Cursor and other MCP clients">
+        <Code
+          caption="mcp.json · mcpServers"
+          copied={copied === "cursor"}
+          onCopy={() => copy(cursor, "cursor")}
+        >
+          {cursor}
+        </Code>
+      </Part>
 
-      <section className="mt-8">
-        <h2 className="text-xl">Tools</h2>
-        <div className="mt-3 overflow-x-auto">
-          <table className="w-full text-left text-sm" data-testid="mcp-tools">
-            <thead className="text-xs text-muted">
+      <Part n="3" title="Tools" note={`${TOOLS.length} tools, each answered by one graph query.`}>
+        <div className="ledger-wrap">
+          <table className="ledger" data-testid="mcp-tools">
+            <thead>
               <tr>
-                <th className="py-2 pr-4">Tool</th>
-                <th className="py-2 pr-4">What it answers</th>
+                <th>Tool</th>
+                <th>What it answers</th>
               </tr>
             </thead>
             <tbody>
               {TOOLS.map(([name, text]) => (
-                <tr key={name} className="border-t border-white/10">
-                  <td className="py-2 pr-4 font-mono">{name}</td>
-                  <td className="py-2 pr-4">{text}</td>
+                <tr key={name}>
+                  <td className="whitespace-nowrap font-mono text-[13px]">{name}</td>
+                  <td className="min-w-[14rem] text-muted">{text}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
-      </section>
+      </Part>
 
-      <section className="mt-8">
-        <h2 className="text-xl">In CI</h2>
-        <p className="mt-2 max-w-3xl text-sm text-muted">
-          The <code className="font-mono">actions/modelbrain-check</code> GitHub Action scans a pull
-          request for Hugging Face model ids, asks the same graph, writes a job summary with path
-          and blocking clauses, and fails the check when a model is BLOCKED for your headquarters.
+      <Part n="4" title="In CI">
+        <p className="max-w-3xl font-serif text-xl leading-relaxed">
+          <span className="font-mono text-sm text-muted">(b)</span> The{" "}
+          <code className="font-mono text-base">actions/modelbrain-check</code> GitHub Action scans
+          a pull request for Hugging Face model ids, asks the same graph, writes a job summary with
+          path and blocking clauses, and fails the check when a model is{" "}
+          <span className="font-mono text-base text-redline">BLOCKED</span> for your headquarters.
         </p>
-      </section>
+      </Part>
 
-      <p className="mt-10 text-sm text-muted">Automated screening, not legal advice.</p>
-    </main>
+      <Disclaimer />
+    </Exhibit>
+  );
+}
+
+function Code({
+  caption,
+  children,
+  testId,
+  copied,
+  onCopy,
+}: {
+  caption: string;
+  children: string;
+  testId?: string;
+  copied: boolean;
+  onCopy: () => void;
+}) {
+  return (
+    <figure className="min-w-0">
+      <figcaption className="flex items-baseline justify-between gap-3 font-mono text-[11px] uppercase tracking-[0.14em] text-muted">
+        <span>{caption}</span>
+        <button
+          type="button"
+          onClick={onCopy}
+          className="font-mono text-xs uppercase tracking-[0.12em] text-accent underline decoration-white/25 underline-offset-4 hover:decoration-accent"
+        >
+          {copied ? "Copied" : "Copy"}
+        </button>
+      </figcaption>
+      <pre
+        className="mt-2 overflow-x-auto border border-white/10 bg-surface p-4 font-mono text-[13px] leading-relaxed text-text"
+        data-testid={testId}
+      >
+        {children}
+      </pre>
+    </figure>
   );
 }

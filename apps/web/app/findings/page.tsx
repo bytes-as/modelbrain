@@ -1,7 +1,18 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
+
+import {
+  Disclaimer,
+  Exhibit,
+  ExhibitHeader,
+  Licence,
+  ModelRef,
+  Part,
+  Status,
+  Tag,
+  TextButton,
+} from "../components/exhibit";
 
 type Hidden = {
   model: string;
@@ -37,27 +48,12 @@ function severity(row: Hidden): number {
 
 type Coverage = { total: number; by_status: Record<string, number> };
 
-const HUB = "https://huggingface.co";
-
-function ModelLink({ id }: { id: string }) {
-  const [owner, name] = id.split("/");
-  return (
-    <span className="whitespace-nowrap">
-      <Link className="text-accent" href={`/m/${owner}/${name}`}>
-        {id}
-      </Link>{" "}
-      <a className="text-xs text-muted" href={`${HUB}/${id}`} target="_blank" rel="noreferrer">
-        Hub ↗
-      </a>
-    </span>
-  );
-}
-
 export default function FindingsPage() {
   const [hidden, setHidden] = useState<Hidden[]>([]);
   const [conflicts, setConflicts] = useState<Conflict[]>([]);
   const [coverage, setCoverage] = useState<Coverage | null>(null);
   const [state, setState] = useState<"loading" | "done" | "error">("loading");
+  const [showAll, setShowAll] = useState(false);
 
   useEffect(() => {
     const base = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
@@ -80,7 +76,6 @@ export default function FindingsPage() {
   const singles = hidden
     .filter((row) => row.share === null)
     .sort((a, b) => severity(b) - severity(a) || (b.score ?? 0) - (a.score ?? 0));
-  const [showAll, setShowAll] = useState(false);
   const important = singles.filter((row) => severity(row) >= 2);
   const shown = showAll ? singles : important.length > 0 ? important : singles;
   const merges = hidden.filter((row) => row.share !== null);
@@ -88,138 +83,187 @@ export default function FindingsPage() {
   const gated = coverage?.by_status.GATED ?? 0;
   const quantized =
     (coverage?.by_status.QUANTIZED ?? 0) + (coverage?.by_status.UNSUPPORTED_ARCH ?? 0);
+  const dash = state === "done" ? 0 : "–";
 
   return (
-    <main className="[overflow-wrap:anywhere]">
-      <h1 className="text-3xl">Where metadata and weights disagree</h1>
-      <p className="mt-2 max-w-3xl text-muted">
-        We read about 2 KB of each model&apos;s actual weight values with HTTP range requests and
-        compare them in FalkorDB&apos;s vector index. A close match means the parent&apos;s
-        obligations may apply, whatever the model card declares. Many cards explain their lineage in
-        prose; these rows are about the machine-readable metadata.
-      </p>
-      {coverage ? (
-        <p className="mt-3 text-sm text-muted" data-testid="dna-coverage">
-          Fingerprinted {ok} of {coverage.total} models; {gated} gated; {quantized} in formats we
-          don&apos;t sample yet.
-        </p>
-      ) : null}
-      {state === "loading" ? <p className="mt-6 text-muted">Loading findings…</p> : null}
-      {state === "error" ? (
-        <p className="mt-6 text-[#f0605a]">Could not load findings. FalkorDB may be unavailable.</p>
-      ) : null}
-
-      <section className="mt-8">
-        <h2 className="text-xl">Weights match a parent the card does not declare</h2>
-        {state === "done" && singles.length === 0 ? (
-          <p className="mt-2 text-sm text-muted">No findings yet. Run the fingerprint crawl.</p>
+    <Exhibit>
+      <ExhibitHeader
+        mark="Exhibit A · Weight DNA"
+        source="Live from FalkorDB · vector index, cosine"
+        title={
+          <>
+            Where the metadata and <em className="text-redline">the weights</em> disagree.
+          </>
+        }
+        lede="We read about 2 KB of each model's real weight values with HTTP range requests and compare them in FalkorDB's vector index. A close match means the parent's obligations may apply, whatever the card declares. Many cards explain lineage in prose; these rows are about the machine-readable metadata."
+        facts={[
+          { value: coverage ? ok : "–", label: `Fingerprinted of ${coverage?.total ?? "–"}` },
+          { value: singles.length || dash, label: "Undeclared parents" },
+          { value: important.length || dash, label: "Restrictive root" },
+          { value: conflicts.length || dash, label: "Declared parent contradicted" },
+        ]}
+      >
+        {coverage ? (
+          <p className="mt-4 font-mono text-[11px] text-ink-soft" data-testid="dna-coverage">
+            Fingerprinted {ok} of {coverage.total} models; {gated} gated; {quantized} in formats we
+            don&apos;t sample yet.
+          </p>
         ) : null}
-        <div className="mt-3 overflow-x-auto">
-          <table className="w-full text-left text-sm" data-testid="findings-hidden">
-            <thead className="text-xs text-muted">
+      </ExhibitHeader>
+
+      <div className="pt-6">
+        <Status state={state === "loading" ? "loading" : state === "error" ? "error" : "done"} />
+      </div>
+
+      <Part
+        n="1"
+        title="Weights match a parent the card does not declare"
+        note={
+          showAll
+            ? "Every undeclared parent, most severe first."
+            : "Rows whose root carries conditions a permissive card label would hide. The card's licence is struck where the root's terms differ."
+        }
+      >
+        <Status
+          state={state === "done" && singles.length === 0 ? "empty" : "done"}
+          empty="No findings yet. Run the fingerprint crawl."
+        />
+        <div className="ledger-wrap">
+          <table className="ledger min-w-[880px]" data-testid="findings-hidden">
+            <thead>
               <tr>
-                <th className="py-2 pr-4">Model</th>
-                <th className="py-2 pr-4">Card licence</th>
-                <th className="py-2 pr-4">Weights parent</th>
-                <th className="py-2 pr-4">Similarity</th>
-                <th className="py-2 pr-4">Root</th>
-                <th className="py-2 pr-4">Root licence</th>
+                <th>Model</th>
+                <th>Card says</th>
+                <th>Weights parent</th>
+                <th className="num">Cosine</th>
+                <th>Root · licence</th>
               </tr>
             </thead>
             <tbody>
-              {shown.map((row) => (
-                <tr key={`${row.model}-${row.weights_parent}`} className="border-t border-white/10">
-                  <td className="py-2 pr-4">
-                    <ModelLink id={row.model} />
-                    {row.format === "gguf" ? (
-                      <span className="ml-2 rounded border border-white/20 px-1 text-xs text-muted">
-                        GGUF
+              {shown.map((row) => {
+                const contradicted = severity(row) >= 2 && row.card_license !== row.root_license;
+                return (
+                  <tr key={`${row.model}-${row.weights_parent}`}>
+                    <td className="w-[30%]">
+                      <ModelRef id={row.model} />
+                      {row.format === "gguf" ? (
+                        <span className="ml-2">
+                          <Tag>GGUF</Tag>
+                        </span>
+                      ) : null}
+                    </td>
+                    <td>
+                      <Licence name={row.card_license} struck={contradicted} />
+                    </td>
+                    <td className="w-[30%]">
+                      <ModelRef id={row.weights_parent} />
+                    </td>
+                    <td className="num">{row.score?.toFixed(3) ?? "?"}</td>
+                    <td>
+                      <span className="block break-all font-mono text-[13px] text-muted">
+                        {row.root ?? "unknown"}
                       </span>
-                    ) : null}
-                  </td>
-                  <td className="py-2 pr-4">{row.card_license ?? "none"}</td>
-                  <td className="py-2 pr-4">
-                    <ModelLink id={row.weights_parent} />
-                  </td>
-                  <td className="py-2 pr-4 font-mono">{row.score?.toFixed(3) ?? "?"}</td>
-                  <td className="py-2 pr-4">{row.root ?? "unknown"}</td>
-                  <td className="py-2 pr-4">{row.root_license ?? "unknown"}</td>
-                </tr>
-              ))}
+                      <span
+                        className={`font-mono text-[13px] ${contradicted ? "text-redline" : "text-text"}`}
+                      >
+                        {row.root_license ?? "unknown"}
+                      </span>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
         {singles.length > shown.length || showAll ? (
-          <button
-            type="button"
-            className="mt-3 text-sm text-accent"
-            onClick={() => setShowAll(!showAll)}
-            data-testid="toggle-all"
-          >
+          <TextButton onClick={() => setShowAll(!showAll)} testId="toggle-all">
             {showAll
               ? "Show only restrictive-licence findings"
               : `Show all ${singles.length} (including ${singles.length - shown.length} with permissive roots)`}
-          </button>
+          </TextButton>
         ) : null}
-      </section>
+      </Part>
 
-      <section className="mt-10">
-        <h2 className="text-xl">Declared parent and weights disagree</h2>
-        {state === "done" && conflicts.length === 0 ? (
-          <p className="mt-2 text-sm text-muted">
-            No disagreements found in the fingerprinted set.
-          </p>
-        ) : null}
-        <div className="mt-3 overflow-x-auto">
-          <table className="w-full text-left text-sm" data-testid="findings-conflicts">
-            <thead className="text-xs text-muted">
+      <Part
+        n="2"
+        title="The declared parent and the weights disagree"
+        note="The card names a base model; the sampled weights sit measurably closer to another."
+      >
+        <Status
+          state={state === "done" && conflicts.length === 0 ? "empty" : "done"}
+          empty="No disagreements found in the fingerprinted set."
+        />
+        <div className="ledger-wrap">
+          <table className="ledger min-w-[880px]" data-testid="findings-conflicts">
+            <thead>
               <tr>
-                <th className="py-2 pr-4">Model</th>
-                <th className="py-2 pr-4">Declared parent</th>
-                <th className="py-2 pr-4">Weights parent</th>
-                <th className="py-2 pr-4">Similarity</th>
+                <th>Model</th>
+                <th>Card declares</th>
+                <th>Weights say</th>
+                <th className="num">Cosine</th>
               </tr>
             </thead>
             <tbody>
               {conflicts.map((row) => (
-                <tr key={row.model} className="border-t border-white/10">
-                  <td className="py-2 pr-4">
-                    <ModelLink id={row.model} />
+                <tr key={row.model}>
+                  <td className="w-[28%]">
+                    <ModelRef id={row.model} />
                   </td>
-                  <td className="py-2 pr-4">
-                    <ModelLink id={row.declared_parent} />
+                  <td className="w-[28%]">
+                    <span className="strike text-muted">
+                      <ModelRef id={row.declared_parent} hub={false} />
+                    </span>
                   </td>
-                  <td className="py-2 pr-4">
-                    <ModelLink id={row.weights_parent} />
+                  <td className="w-[28%]">
+                    <ModelRef id={row.weights_parent} />
+                    <span className="mt-1 block text-xs text-muted">{row.reason}</span>
                   </td>
-                  <td className="py-2 pr-4 font-mono">
+                  <td className="num">
                     {row.sim.toFixed(3)}
-                    {row.declared_sim !== null ? ` vs ${row.declared_sim.toFixed(3)} declared` : ""}
-                    <span className="block font-sans text-xs text-muted">{row.reason}</span>
+                    {row.declared_sim !== null ? (
+                      <span className="block text-xs text-muted">
+                        vs {row.declared_sim.toFixed(3)}
+                      </span>
+                    ) : null}
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
-      </section>
+      </Part>
 
       {merges.length > 0 ? (
-        <section className="mt-10">
-          <h2 className="text-xl">Merges recovered from the weights</h2>
-          <ul className="mt-3 space-y-2 text-sm" data-testid="findings-merges">
+        <Part
+          n="3"
+          title="Merges recovered from the weights"
+          note="Least-squares fit of two parents to the sampled weights; accepted only when one parent cannot explain them."
+        >
+          <ul data-testid="findings-merges">
             {merges.map((row) => (
-              <li key={`${row.model}-${row.weights_parent}`}>
-                <ModelLink id={row.model} />: {Math.round((row.share ?? 0) * 100)}% of sampled
-                weights from <ModelLink id={row.weights_parent} />
-                {row.root_license ? ` (root licence ${row.root_license})` : ""}
+              <li
+                key={`${row.model}-${row.weights_parent}`}
+                className="grid gap-2 border-t border-white/10 py-4 md:grid-cols-[minmax(0,1fr)_120px_minmax(0,1fr)]"
+              >
+                <ModelRef id={row.model} />
+                <span className="font-mono text-[13px] text-accent md:text-right">
+                  {Math.round((row.share ?? 0) * 100)}% from
+                </span>
+                <span>
+                  <ModelRef id={row.weights_parent} />
+                  {row.root_license ? (
+                    <span className="block font-mono text-xs text-muted">
+                      root licence {row.root_license}
+                    </span>
+                  ) : null}
+                </span>
               </li>
             ))}
           </ul>
-        </section>
+        </Part>
       ) : null}
 
-      <p className="mt-10 text-sm text-muted">Automated screening, not legal advice.</p>
-    </main>
+      <Disclaimer />
+    </Exhibit>
   );
 }

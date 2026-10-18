@@ -10,7 +10,7 @@ for (const width of [375, 1280]) {
     await expect(page.getByRole("link", { name: "ModelBrain" })).toBeVisible();
     await expect(page.getByRole("heading", { name: /The card says/ })).toBeVisible();
     await expect(page.getByText("Automated screening, not legal advice")).toBeVisible();
-    await expect(page.getByTestId("health-dot")).toContainText(/Graph up|Degraded|Graph down/);
+    await expect(page.getByTestId("health-dot")).toContainText(/In force|Hub degraded|Suspended/);
     await page.screenshot({
       path: path.join(evidence, `g008-${width}.png`),
       fullPage: true,
