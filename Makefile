@@ -41,4 +41,5 @@ export:        ## snapshot hub + tenant graphs to exports/ (DUMP), for seeding a
 	docker compose run --rm --no-deps -v "$(CURDIR):/repo" -w /repo api python scripts/graphs.py export --host falkordb --port 6379 --out exports
 
 import:        ## restore exports/ into FALKOR_HOST:FALKOR_PORT (password from FALKORDB_PASSWORD)
-	python3 scripts/graphs.py import --host $(FALKOR_HOST) --port $(FALKOR_PORT) --in exports --replace
+	docker run --rm -v "$(CURDIR):/repo" -w /repo -e FALKORDB_PASSWORD modelbrain-api \
+	  python scripts/graphs.py import --host $(FALKOR_HOST) --port $(FALKOR_PORT) --in exports --replace
