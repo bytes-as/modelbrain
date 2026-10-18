@@ -389,12 +389,15 @@ WHERE node <> c AND node.dna_sig = c.dna_sig AND node.created_at < c.created_at 
 RETURN node.id AS parent, sim, coalesce(node.is_root, false) AS is_root, node.created_at AS created_at
 ORDER BY sim DESC, is_root DESC, created_at ASC LIMIT 5
 
-// W3: write or corroborate a single-parent weight edge (never changes a declared edge's source or tier)
+// W3: write or corroborate a single-parent weight edge; upgrades a weaker inferred edge, never changes a declared one
 MATCH (c:Model {id:$child}), (p:Model {id:$parent})
 MERGE (c)-[e:DERIVED_FROM]->(p)
 ON CREATE SET e.relation = 'inferred', e.source = 'inferred', e.method = 'weights', e.conf = $sim, e.tier = $tier,
   e.evidence = $evidence, e.confirmations = 0, e.confirmers = []
-SET e.weights_sim = $sim
+SET e.weights_sim = $sim,
+    e.method = CASE WHEN e.source = 'inferred' AND coalesce(e.tier, 0) <= $tier THEN 'weights' ELSE e.method END,
+    e.evidence = CASE WHEN e.source = 'inferred' AND coalesce(e.tier, 0) <= $tier THEN $evidence ELSE e.evidence END,
+    e.tier = CASE WHEN e.source = 'inferred' AND coalesce(e.tier, 0) < $tier THEN $tier ELSE e.tier END
 RETURN e.source AS source, e.method AS method, e.tier AS tier, e.weights_sim AS weights_sim
 
 // W4: models whose weights match a parent the card does not declare (the headline finding); root = the top-most root above the parent

@@ -112,7 +112,7 @@ Milestones: **M1** = G001-G019 (O1), **M2** = G020-G029 (O4), **M3 (core, never 
 - [ ] **G092** Watchlist file `data/watchlist.json` (Xkev, its children, meta-llama roots in the demo). **Verify:** watcher log.
 - [ ] **G093** Resolver runs after prewarm and nightly. **Verify:** `/api/admin/resolver/last`.
 - [x] **G094** Sandbox users can run "check now" only for models in their sandbox's deployments. **Verify:** test. Done 18 Oct 2026 (sandbox token may only check its own deployments; 403 otherwise).
-- [ ] **G095** Eval re-run after M6 still has false ALLOW = 0. **Verify:** report.
+- [x] **G095** Eval re-run after M6 still has false ALLOW = 0. **Verify:** report. Done 18 Oct 2026: 160 cases, false ALLOW 0, default accuracy 0.85 (was 0.75). 12 misses are label-vs-rule disagreements listed in docs/TASKS.md for the owner's label review.
 - [ ] **G096** All web pages in UI exist and link from the nav. **Verify:** Playwright crawl.
 - [x] **G097** Copy rules (UI "Copy rules") enforced: a test greps `apps/web` and API templates for "violat", "illegal", "infring". **Verify:** `pytest tests/test_copy_rules.py`. Done 18 Oct 2026 (`tests/test_copy_rules.py`).
 - [ ] **G098** `/how-it-works` page per UI. **Verify:** visual check. *(cuttable: move to README)*

@@ -372,6 +372,46 @@ async def fingerprint_into_graph(
     return write_result(graph, model_id, result)
 
 
+async def after_ingest(
+    model_ids: list[str], *, graph: str = "hub", limit: int = 8
+) -> dict[str, Any]:
+    """Fingerprint newly ingested models and resolve their parents from the weights.
+
+    Runs after every ingest so a model whose card names no parent still gets lineage.
+    Failures are logged and never fail the ingest.
+    """
+    report: dict[str, Any] = {"fingerprinted": 0, "resolved": 0}
+    reference_ids = {ref["id"] for ref in references()}
+    rows = {str(r["id"]): r for r in as_rows(db.ro_query(graph, W13, {"ids": model_ids}))}
+    todo = [
+        mid
+        for mid in model_ids
+        if mid in rows and not rows[mid].get("status") and mid not in reference_ids
+    ][:limit]
+    if not todo:
+        return report
+    settings = get_settings()
+    client = _client()
+    try:
+        sampler = Sampler(client, settings.dna_per_tensor)
+        for mid in todo:
+            try:
+                status = await fingerprint_into_graph(
+                    sampler, graph, mid, str(rows[mid].get("sha") or "main")
+                )
+                report["fingerprinted"] += 1
+                if status == OK and resolve_model(graph, mid):
+                    report["resolved"] += 1
+            except HubUnavailable:
+                log.warning("hub unavailable; weight DNA skipped", extra={"model_id": mid})
+                break
+            except Exception:
+                log.exception("weight DNA after ingest failed", extra={"model_id": mid})
+    finally:
+        await client.aclose()
+    return report
+
+
 def crawl_status() -> dict[str, Any]:
     return dict(_crawl)
 

@@ -287,3 +287,56 @@ def test_conflicts_need_weight_proof(graph: str) -> None:
     kept = {r["model"]: r for r in dna.verified_conflicts(graph, rows)}
     assert set(kept) == {"k/orpo", "b/qwen-claim"}
     assert kept["b/qwen-claim"]["reason"] == "declared parent has a different shape"
+
+
+def test_weights_upgrade_a_weaker_inferred_edge_but_not_a_declared_one(graph: str) -> None:
+    from app.graph.queries import W3
+
+    _model(graph, "x/child", "2025-01-01")
+    _model(graph, "meta/base", "2024-01-01", root=True)
+    _model(graph, "y/child", "2025-01-01")
+    db.query(
+        graph,
+        "MATCH (c:Model {id:'x/child'}),(p:Model {id:'meta/base'})"
+        " CREATE (c)-[:DERIVED_FROM {relation:'inferred', source:'inferred', tier:0, conf:0.5}]->(p)",
+    )
+    db.query(
+        graph,
+        "MATCH (c:Model {id:'y/child'}),(p:Model {id:'meta/base'})"
+        " CREATE (c)-[:DERIVED_FROM {relation:'finetune', source:'declared', tier:2, conf:1.0}]->(p)",
+    )
+    params = {"parent": "meta/base", "sim": 0.999, "tier": 1, "evidence": "weights"}
+    up = as_rows(db.query(graph, W3, {"child": "x/child", **params}))[0]
+    assert up["tier"] == 1 and up["method"] == "weights"
+    kept = as_rows(db.query(graph, W3, {"child": "y/child", **params}))[0]
+    assert kept["tier"] == 2 and kept["source"] == "declared" and kept["method"] is None
+
+
+def test_after_ingest_fingerprints_new_models_and_resolves_them(graph: str, monkeypatch) -> None:
+    import asyncio
+
+    rng = random.Random(29)
+    base = _vec(rng)
+    _model(graph, "meta/base", "2024-01-01", root=True)
+    _fp(graph, "meta/base", base)
+    db.query(graph, W10, {"ids": ["meta/base"]})
+    _model(graph, "new/child", "2025-05-01")
+
+    class Dummy:
+        async def aclose(self) -> None:
+            return None
+
+    async def fake_fingerprint(_sampler, g, model_id, _sha, **_kw):
+        return dna.write_result(g, model_id, DnaResult(OK, vector=_near(rng, base, 0.05), sig=SIG))
+
+    monkeypatch.setattr(dna, "_client", lambda: Dummy())
+    monkeypatch.setattr(dna, "fingerprint_into_graph", fake_fingerprint)
+    report = asyncio.run(dna.after_ingest(["new/child", "meta/base"], graph=graph))
+    assert report == {"fingerprinted": 1, "resolved": 1}
+    edge = as_rows(
+        db.ro_query(
+            graph,
+            "MATCH (:Model {id:'new/child'})-[e:DERIVED_FROM]->(p) RETURN p.id AS p, e.method AS m",
+        )
+    )
+    assert edge == [{"p": "meta/base", "m": "weights"}]

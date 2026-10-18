@@ -90,3 +90,15 @@ The build can continue without these. They block a public demo, gated model file
 ## Questions for the owner
 - This machine already runs Homebrew Redis on port 6379, so `docker compose up` cannot publish FalkorDB on host port 6379. A local untracked `docker-compose.override.yml` publishes host port 6380 instead. The API container still uses `falkordb:6379` on the compose network, and the Browser stays on `localhost:3000`. Should the committed compose file keep 6379 (clean machines) and leave the override local?
 - BLUEPRINT section 16.5 and G115 suggest MIT. On 18 Oct 2026 the owner asked for free use with a royalty if someone commercialises the project. No OSI licence can require a royalty, so the repo uses PolyForm Noncommercial 1.0.0 plus `COMMERCIAL.md` for a separate royalty-bearing commercial licence. G115 is not ticked as MIT.
+
+
+## Eval label review (owner, 18 Oct 2026)
+
+After the weight DNA and canonical-id fixes the eval is 160 cases, false ALLOW 0, default accuracy 0.85. The 12 misses are all cases where the label and the clause rules disagree; decide per row whether the label or the rule is right:
+
+| Model | Label | Product | Why the product says this |
+|---|---|---|---|
+| `NousResearch/Llama-3.2-1B` (EU, US) | CANNOT_DETERMINE | ALLOWED_WITH_OBLIGATIONS | Weight DNA: identical to Meta's Llama 3.2 1B (tier 1). Comparable re-uploads (alpindale, Sicarius) are labelled ALLOWED_WITH_OBLIGATIONS |
+| `unsloth/gemma-2-9b-it` (EU, US) | CANNOT_DETERMINE | ALLOWED_WITH_OBLIGATIONS | Weight DNA: identical to google/gemma-2-9b-it |
+| `shanchen/llama3-8B-slerp-med-chinese`, `...-biomed-chat-chinese` (EU, US) | ALLOWED_WITH_OBLIGATIONS | CANNOT_DETERMINE | An ancestor declares a custom ("other") licence: `other.custom` is NEEDS_COUNSEL |
+| `grimjim/Llama-3-Instruct-8B-SimPO-SPPO-Iter3-merge`, `...-SPPO-Iter3-SimPO-merge` (EU, US) | ALLOWED_WITH_OBLIGATIONS | CANNOT_DETERMINE | Lineage is complete (weights link both parents to Llama 3 8B Instruct), but one ancestor declares no licence: `unknown.no_license` is NEEDS_COUNSEL |

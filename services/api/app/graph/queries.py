@@ -382,7 +382,10 @@ MATCH (c:Model {id:$child}), (p:Model {id:$parent})
 MERGE (c)-[e:DERIVED_FROM]->(p)
 ON CREATE SET e.relation = 'inferred', e.source = 'inferred', e.method = 'weights', e.conf = $sim, e.tier = $tier,
   e.evidence = $evidence, e.confirmations = 0, e.confirmers = []
-SET e.weights_sim = $sim
+SET e.weights_sim = $sim,
+    e.method = CASE WHEN e.source = 'inferred' AND coalesce(e.tier, 0) <= $tier THEN 'weights' ELSE e.method END,
+    e.evidence = CASE WHEN e.source = 'inferred' AND coalesce(e.tier, 0) <= $tier THEN $evidence ELSE e.evidence END,
+    e.tier = CASE WHEN e.source = 'inferred' AND coalesce(e.tier, 0) < $tier THEN $tier ELSE e.tier END
 RETURN e.source AS source, e.method AS method, e.tier AS tier, e.weights_sim AS weights_sim
 """
 

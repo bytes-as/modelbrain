@@ -35,7 +35,7 @@ async def _ingest_once(model_id: str, *, children: bool = False) -> None:
     settings = get_settings()
     client = HFClient(token=settings.hf_token, cache=DiskCache(Path("/tmp/modelbrain-hf")))
     try:
-        await ingest(
+        result = await ingest(
             model_id,
             LiveHub(client),
             table=table,
@@ -52,6 +52,12 @@ async def _ingest_once(model_id: str, *, children: bool = False) -> None:
         ) from exc
     finally:
         await client.aclose()
+    try:
+        from app.engine.dna import after_ingest
+
+        await after_ingest(result.model_ids)
+    except Exception:
+        log.exception("weight DNA after ingest failed", extra={"model_id": model_id})
 
 
 async def start_ingest(
@@ -86,11 +92,17 @@ async def _run_job(job_id: str, model_id: str, *, children: bool) -> None:
     client = HFClient(token=settings.hf_token, cache=DiskCache(Path("/tmp/modelbrain-hf")))
     registry = jobs()
 
+    done: dict[str, object] = {}
+
     def emit(event: dict[str, object]) -> None:
+        # Hold "done" until weight DNA has run, so the first verdict sees weight lineage.
+        if event.get("type") == "done":
+            done.update(event)
+            return
         registry.emit(job_id, event)
 
     try:
-        await ingest(
+        result = await ingest(
             model_id,
             LiveHub(client),
             table=table,
@@ -99,6 +111,15 @@ async def _run_job(job_id: str, model_id: str, *, children: bool) -> None:
             children=children,
             emit=emit,
         )
+        try:
+            from app.engine.dna import after_ingest
+
+            report = await after_ingest(result.model_ids)
+            if report.get("fingerprinted"):
+                registry.emit(job_id, {"type": "dna", **report})
+        except Exception:
+            log.exception("weight DNA after ingest failed", extra={"model_id": model_id})
+        registry.emit(job_id, done or {"type": "done"})
     except HubUnavailable as exc:
         registry.emit(job_id, {"type": "error", "message": str(exc)})
     except Exception:
