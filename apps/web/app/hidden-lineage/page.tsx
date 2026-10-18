@@ -26,13 +26,16 @@ export default function HiddenLineagePage() {
     <main>
       <h1 className="text-3xl">Hidden lineage</h1>
       <p className="mt-2 max-w-2xl text-muted">
-        Models that share file fingerprints. Inferred parents are dashed edges in the graph;
-        Confirm raises trust when two organisations agree.
+        Models that share file fingerprints. Inferred parents are dashed edges in the graph; Confirm
+        raises trust when two organisations agree.
       </p>
       {error ? <p className="mt-4 text-[#f0605a]">{error}</p> : null}
       <ul className="mt-6 space-y-4">
         {rows.map((row) => (
-          <li key={String(row.component_id)} className="rounded border border-white/10 bg-surface p-4">
+          <li
+            key={String(row.component_id)}
+            className="rounded border border-white/10 bg-surface p-4"
+          >
             <p className="font-mono text-xs text-muted">component {row.component_id}</p>
             <p className="mt-2 text-sm">{row.model_ids.join(" · ")}</p>
             {row.inferred_edges?.length ? (

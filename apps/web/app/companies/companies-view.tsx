@@ -138,7 +138,9 @@ export function CompaniesView() {
       .then(async (response) => {
         if (!response.ok) throw new Error("tenants");
         const listed = (await response.json()) as Tenant[];
-        const fixed = listed.filter((item) => item.kind !== "sandbox" || item.name.startsWith("sbx_"));
+        const fixed = listed.filter(
+          (item) => item.kind !== "sandbox" || item.name.startsWith("sbx_"),
+        );
         // Prefer fixed tenants for the two-column demo; include caller's sandbox if present.
         const chosen = listed.filter((item) => item.kind === "fixed" || item.kind === "sandbox");
         setTenants(chosen.length ? chosen : fixed);

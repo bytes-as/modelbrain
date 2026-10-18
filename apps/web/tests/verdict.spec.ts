@@ -15,7 +15,9 @@ test("OPEA is BLOCKED for DE and amber for US", async ({ page }) => {
   await expect(page.getByTestId("verdict-done")).toBeVisible({ timeout: 120_000 });
   await expect(page.getByTestId("verdict-badge")).toContainText(/BLOCKED/i);
   await expect(
-    page.getByTestId("verdict-done").getByText("Automated screening, not legal advice.", { exact: true }),
+    page
+      .getByTestId("verdict-done")
+      .getByText("Automated screening, not legal advice.", { exact: true }),
   ).toBeVisible();
   await page.screenshot({ path: path.join(evidence, "m3.png"), fullPage: true });
   await page.getByTestId("flip-hq").click();
