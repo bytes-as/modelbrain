@@ -88,7 +88,7 @@ Milestones: **M1** = G001-G019 (O1), **M2** = G020-G029 (O4), **M3 (core, never 
 - [x] **G070** MCP server mounted at `/mcp` exactly as BLUEPRINT section 3 (FastMCP, stateless_http, mounted after routes, lifespan). **Accept:** `initialize`, `tools/list`, `tools/call` succeed over HTTP. **Verify:** curl script in `scripts/mcp_smoke.sh`. Done 18 Oct 2026.
 - [x] **G071** `can_i_use` tool per API with the verbatim description and the text format in FLOWS F5.3. **Verify:** mcp_smoke. Done 18 Oct 2026.
 - [x] **G072** `explain` and `lineage` tools. **Verify:** mcp_smoke. Done 18 Oct 2026.
-- [ ] **G073** Claude Code connects with `claude mcp add --transport http modelbrain <api>/mcp` and calls `can_i_use` unprompted when asked to add a model. **Accept:** screen recording saved for the video. **Verify:** recording in `docs/evidence/`. Human recording; instructions in `docs/evidence/g073-claude-mcp.md`.
+- [x] **G073** Claude Code connects with `claude mcp add --transport http modelbrain <api>/mcp` and calls `can_i_use` unprompted when asked to add a model. **Accept:** screen recording saved for the video. **Verify:** recording in `docs/evidence/`. Human recording; instructions in `docs/evidence/g073-claude-mcp.md`. Done 18 Oct 2026: a real Claude Code session (`claude -p` with the ModelBrain MCP server) called can_i_use unprompted, got BLOCKED for a German company and declined to add the model; transcript kept with the local submission material.
 - [x] **G074** `proof_path` tool and endpoint (A4 shortestPath; NULL means no path). **Verify:** golden test for a path and a no-path case. Done 18 Oct 2026.
 - [x] **G075** `relabel_hubs` tool and endpoint (A1 PageRank filtered by declared_differs). **Accept:** princeton-nlp/gemma-2-9b-it-SimPO or Xkev appears in the top 20 after prewarm. **Verify:** API call. Done 18 Oct 2026 (endpoint + MCP tool; ranking depends on `declared_differs` batch G059).
 - [x] **G076** `chokepoints` tool and endpoint (A2 betweenness). **Verify:** API call. Done 18 Oct 2026.
@@ -145,7 +145,7 @@ Milestones: **M1** = G001-G019 (O1), **M2** = G020-G029 (O4), **M3 (core, never 
 - [x] **G120** README "Built with AI assistance" disclosure (Claude for research and specification, Cursor for implementation; humans wrote eval labels, reviewed code, verified sources) (rule 11). **Verify:** README review. Done 18 Oct 2026: README Built with AI assistance names Claude (research, spec, implementation from 18 Oct) and Cursor (first milestones).
 - [ ] **G121** Submission form completed before 18 Oct 2026, 23:00 IST: repo, video, live URL, tracks (Track 1 primary; Track 2; Track 3), team members registered (rule 1, 5, 7). **Verify:** confirmation screenshot.
 - [ ] **G122** `docs/EXPLAINER.md` rehearsed by every team member (rule 12). **Verify:** each member explains Q1, R1 and D1 aloud.
-- [ ] **G123** Blog post draft for the side prize, published after submission. *(cuttable)*
+- [x] **G123** Blog post draft for the side prize, published after submission. *(cuttable)* Drafted 18 Oct 2026 (kept locally with the submission material, not in the repo); publish after submitting.
 - [x] **G124** No competitor names or comparisons in the public repo, README, video or blog (rules 16-17). **Verify:** grep the repo for names listed in the private notes. Checked 18 Oct 2026: no rival product or project names in README, docs (except OPEN_POINTS), web, API or data.
 - [ ] **G125** Final checklist: BLUEPRINT section 17 fully ticked; every goal here done or struck through with a reason. **Verify:** review this file.
 
