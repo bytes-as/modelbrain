@@ -5,8 +5,9 @@ WORKDIR /app
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
 
-COPY pyproject.toml ./
-COPY app ./app
+COPY services/api/pyproject.toml ./
+COPY services/api/app ./app
+COPY data ./data
 
 RUN pip install --no-cache-dir .
 
