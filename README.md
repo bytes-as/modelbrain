@@ -1,12 +1,245 @@
 # ModelBrain
 
-Control plane for a company's AI supply chain. FalkorDB decides every verdict.
+ModelBrain is the control plane for a company's AI model supply chain.
 
-This is the ModelBrain v3 build for Graph Hacks (WeMakeDevs x FalkorDB).
+A model card on Hugging Face can say `apache-2.0` while the weights come from Llama or Gemma. The obligations travel with the weights, through every finetune, adapter, quantisation and merge, including re-uploads that name no parent. ModelBrain pulls that real ancestry into [FalkorDB](https://www.falkordb.com/), carries the licence clauses down the graph, and answers one question:
 
-- Rules: [`AGENTS.md`](AGENTS.md)
-- Product and architecture: [`BLUEPRINT.md`](BLUEPRINT.md)
-- Work list: [`docs/GOALS.md`](docs/GOALS.md)
-- Cypher: [`docs/queries.cypher`](docs/queries.cypher)
+**Can this team ship this product on this model, for users in these countries, and who has to sign off?**
+
+The answer is a verdict, the path that produced it, and a quote taken from the upstream licence. FalkorDB decides. An optional language model may only phrase the explanation. With no language-model key set, a template is used and the product still works.
 
 Automated screening, not legal advice.
+
+Built for [Graph Hacks: Context for AI Agents](https://www.wemakedevs.org/hackathons/falkordb) (WeMakeDevs × FalkorDB). Primary track: **Track 1, Agents That Act on Connected Data**. Also entered: **Track 2** and **Track 3**.
+
+Repository: [github.com/bytes-as/modelbrain](https://github.com/bytes-as/modelbrain)
+
+## What a judge should be able to see
+
+1. **A blocked ship decision.** Ask whether a Berlin company may load `OPEA/Llama-3.2V-11B-cot-int4-sym-inc` for a commercial product. The card says `apache-2.0`. The path is `OPEA → Xkev → meta-llama/Llama-3.2-11B-Vision-Instruct`, and the Llama 3.2 community licence restricts that multimodal model for EU users. The verdict is **BLOCKED**, with the clause quoted from the official text. The same model with a US headquarters is **ALLOWED WITH OBLIGATIONS**.
+2. **A fix that never reached the children.** On 9 July 2025 a licence discussion opened on `Xkev/Llama-3.2V-11B-cot`. Months later the author added Meta's licence file. The card still says `apache-2.0`, and the children still say `apache-2.0`. The watcher shows the upstream change and which descendants did not inherit it.
+3. **Two companies, one shared fact.** A re-upload names no parent, but its tokenizer and config hashes match a Meta model. Company A confirms the edge. Company B's strict verdict changes, because the hub now trusts that edge. The hub stores a salted hash of who confirmed, not the company name.
+
+## How a verdict is decided
+
+The verdict is deterministic code over FalkorDB rows. It is not a language-model opinion.
+
+1. Ingest the model and its ancestors from the public Hugging Face Hub, up to 6 hops.
+2. Walk every ancestry path with query **Q1**, including every parent of a merge, and collect each licence clause.
+3. Check lineage with **Q2**. If a path ends on a model that is not a known base and has no parent at the required trust tier, the lineage is incomplete.
+4. Apply the clauses to the company's context: headquarters, markets, commercial use, monthly active users, whether the product redistributes weights.
+5. Decide, in order: any applicable block, then an incomplete or unknown lineage, then obligations, then allowed.
+6. If the card's declared licence is more permissive than what the ancestors impose, say so. The wording is "the declared licence differs from the obligations inherited from its ancestors."
+
+Trust on each edge is a tier:
+
+| Tier | Meaning |
+|---|---|
+| 0 | Weak inference, config fingerprint only |
+| 1 | Strong inference, identical weights or tokenizer plus config |
+| 2 | Declared on the model card or tags |
+| 3 | Confirmed by two independent organisations, or by public evidence |
+| 4 | Confirmed by the model author |
+
+Default verdicts use tier 1 and above. Strict mode uses tier 2 and above, and answers **CANNOT DETERMINE** when a parent is only inferred.
+
+Every verdict is meant to show: **Automated screening, not legal advice.**
+
+## Graph data model
+
+FalkorDB cannot query across graphs, so the application joins them. The **hub** answers "what does this model inherit?" A **tenant** graph answers "who uses it, under which context, and what did we decide?" One FalkorDB instance holds all of them.
+
+```mermaid
+flowchart LR
+  subgraph hub [hub graph, public facts]
+    Child[Model] -->|DERIVED_FROM| Parent[Model]
+    Child -->|DECLARES| License
+    License -->|IMPOSES| Clause
+    Child -->|HAS_FP| Fingerprint
+  end
+  subgraph tenant [tenant graph, one company]
+    Person -->|OWNS| Deployment
+    Product -->|RUNS| Deployment
+    Ruling -->|FOR| Deployment
+    Ruling -->|RESTS_ON| Fact
+  end
+  Ruling -.->|the model id only| Child
+```
+
+The hub never stores which tenant uses which model. A confirmation arrives as a salted hash on the edge.
+
+### Hub
+
+| Node | What it stores |
+|---|---|
+| `Model` | Hub id, commit sha, declared licence, pipeline, whether it is a known root, file and notice flags |
+| `License` | Normalised key such as `llama3_2`, `apache-2.0`, `gemma` |
+| `Clause` | Effect (`BLOCK`, `OBLIGATION`, `NEEDS_COUNSEL`), the rule that decides when it applies, and a quote extracted at runtime |
+| `Fingerprint` | Weights sha256, tokenizer hash, or config fingerprint |
+| `Snapshot` | One observed revision. Append-only |
+| `Discussion` / `Outcome` | A Hub discussion and what happened after it |
+
+| Relationship | Meaning |
+|---|---|
+| `DERIVED_FROM` | Child to parent. Carries relation, source, tier, confidence, evidence, and confirmer hashes |
+| `DECLARES` | The licence the card declared at a commit sha |
+| `IMPOSES` | The clauses that licence imposes |
+| `HAS_FP` | A file hash attached to a model |
+
+### Tenant
+
+Each company is a graph named `tenant_<slug>`. A visitor sandbox is `sbx_<id>`, copied from a tenant template with `GRAPH.COPY` and deleted after two hours.
+
+| Node | What it stores |
+|---|---|
+| `Company`, `Team`, `Person` | The fictional organisation. Names are labelled "(fictional)" |
+| `Product`, `Deployment` | What ships, on which model, pinned to which commit |
+| `Ruling` | ALLOWED, ALLOWED_WITH_OBLIGATIONS, BLOCKED, or CANNOT_DETERMINE. Never edited in place |
+| `Fact` | The model shas, licences, clauses and edge tiers the ruling relied on |
+| `Event` | Reopened, superseded, approved, rejected, or an edge confirmation |
+| `Task` | Review, approve, or confirm, handed from one agent to a person |
+| `Playbook` | The steps an agent follows for that task kind |
+
+A changed answer is a new ruling that `SUPERSEDES` the old one.
+
+Demo tenants, both fictional: **Kestrel Analytics GmbH** (Germany) and **Harbor Apps Inc.** (United States).
+
+## Queries and algorithms
+
+Every query the product depends on is in [`docs/queries.cypher`](docs/queries.cypher) and copied into `services/api/app/graph/queries.py`. Paths are bounded (`*0..6` or `*1..6`). Reads use `ro_query`. Writes `MERGE` on ids.
+
+| Query | What it answers |
+|---|---|
+| **Q1** | Every licence and clause inherited along every ancestry path, at a minimum trust tier. This is the verdict. |
+| **Q2** | The top of each path. A top that is not a known base model means the lineage is incomplete, so the honest answer is CANNOT DETERMINE. |
+| **Q3** | Nodes and edges for the lineage picture, with duplicate edges removed. |
+| **R1** | Connected components (`algo.WCC`) over models that share a file fingerprint. This unmasks a re-upload that names no parent. |
+| **D1** | Every descendant of a model whose card just changed, up to 6 hops downstream. |
+| **P1** | Add a salted hash of a confirming organisation. Two distinct hashes raise the edge to tier 3. The hub still does not learn the organisation's name. |
+| **T3** | Active rulings in one company that rest on a model which just changed, and the person who owns that deployment. |
+| **A1** | PageRank over lineage, kept to models whose declared licence differs from what they inherit. These are the relabel hubs. |
+| **A2** | Betweenness. A fix on a high-scoring model reaches the most descendants. |
+| **A3** | Label propagation. Model families in the lineage graph. |
+| **A4** | Shortest derivation path from a model to a given base, or proof that no path exists. |
+
+FalkorDB is load-bearing. If it is stopped, `/api/verdict` is specified to return `503 GRAPH_UNAVAILABLE` rather than an answer from a cache. Caches hold raw Hugging Face responses only.
+
+### Explore in FalkorDB Browser
+
+With the local stack running, open [http://localhost:3000](http://localhost:3000). Select the `hub` graph and run:
+
+```cypher
+MATCH (c:Model)-[e:DERIVED_FROM]->(p:Model)
+RETURN c.id, e.tier, e.relation, p.id
+LIMIT 50
+```
+
+That is the ancestry the verdict walks. A tenant trace, once rulings exist, is:
+
+```cypher
+MATCH (r:Ruling)-[:RESTS_ON]->(f:Fact)
+OPTIONAL MATCH (e:Event)-[:ON]->(r)
+RETURN r.id, r.verdict, f.model_id, f.sha, e.kind
+LIMIT 50
+```
+
+Run the second query in `tenant_kestrel` or `tenant_harbor`, not in `hub`.
+
+## Architecture
+
+```
+Browser (Next.js)  ----HTTPS---->  FastAPI
+Coding agent       ----MCP------>  /mcp
+                                      |
+                                      | Cypher
+                                      v
+                                   FalkorDB
+                          hub + one graph per company
+                          + a sandbox graph per visitor
+```
+
+| Piece | Role |
+|---|---|
+| `services/api` | Python 3.12, FastAPI. Verdicts, ingest, tenants, MCP |
+| `apps/web` | Next.js App Router. The check page, companies, replay, eval |
+| FalkorDB | The only database. Docker image `falkordb/falkordb` |
+| `actions/modelbrain-check` | GitHub Action that fails a pull request when a scanned model is BLOCKED |
+
+Agents are workers with narrow tools: Scout ingests, Resolver infers hidden parents, Auditor writes rulings, Watcher reopens them when an upstream sha changes, Notifier drafts a discussion, Publisher promotes a confirmed edge. They hand work to each other through `Task` nodes. Nothing is posted to Hugging Face unless an authenticated person clicks Approve, and only to repos on `HF_POST_ALLOWLIST`.
+
+Licence quotes are not stored in this repository. The clause loader fetches the official text at runtime and extracts the quote with a locator. A clause it cannot extract is `NEEDS_COUNSEL`.
+
+## Tracks
+
+- **Track 1, primary.** Multi-hop ancestry, graph algorithms as tools, an MCP server a coding agent can call before it adds `from_pretrained`, and an explanation that cites the path and the clause.
+- **Track 2.** One graph per company, rulings remembered across sessions, tasks handed from the watcher to the owner.
+- **Track 3.** Each deployment has an owner, each ruling points at the commit and the clause that justified it, and an upstream change reopens the ruling.
+
+## Run locally
+
+You need Docker, and Node.js 22 for the web app.
+
+```bash
+cp .env.example .env
+# Set ADMIN_TOKEN and PUBLISHER_SALT. HF_TOKEN is optional.
+# A missing HF_TOKEN still boots; Hub calls are anonymous and rate-limited.
+
+docker compose up --build
+```
+
+| URL | What |
+|---|---|
+| http://localhost:8000/api/health | API. `falkordb` should be `"up"` |
+| http://localhost:3000 | FalkorDB Browser |
+| http://localhost:3001 | Web app, after the next command |
+
+The Browser owns port 3000, so the web app uses 3001:
+
+```bash
+cd apps/web
+npm install
+npm run dev -- -p 3001
+```
+
+If something else is already listening on port 6379, publish FalkorDB on another host port in a `docker-compose.override.yml`. The API container still reaches it at `falkordb:6379` on the Compose network.
+
+API tests, against the FalkorDB service container:
+
+```bash
+docker compose run --rm -v "$PWD:/repo" -w /repo/services/api -e PYTHONPATH=/repo/services/api api pytest
+```
+
+## Deploy
+
+The intended deployment is the web app on Vercel and the API plus FalkorDB on Railway, with FalkorDB on private networking, a volume at `/var/lib/falkordb/data`, and `requirepass` set. That deployment is not up yet. Until it is, `docker compose up` is the way to run ModelBrain.
+
+## What is in the repo
+
+| Path | What |
+|---|---|
+| [`docs/queries.cypher`](docs/queries.cypher) | Every Cypher query |
+| [`docs/API.md`](docs/API.md) | HTTP and MCP contract |
+| [`docs/FLOWS.md`](docs/FLOWS.md) | Runtime flows, including failures |
+| [`docs/UI.md`](docs/UI.md) | Pages and copy |
+| [`docs/GOALS.md`](docs/GOALS.md) | The build list and acceptance tests |
+| [`docs/EXPLAINER.md`](docs/EXPLAINER.md) | Two-minute explanation of the graph |
+| [`data/`](data/) | Clause locators, EU country list, roots, demo tenants. No licence prose |
+| [`services/api`](services/api) | The API |
+| [`apps/web`](apps/web) | The web app |
+| [`eval/`](eval/) | Frozen eval set. A human writes `eval/labels.json` before the clause rules |
+
+## Licence
+
+Noncommercial use is free under the [PolyForm Noncommercial License 1.0.0](LICENSE).
+
+Commercial use needs a royalty-bearing licence from the copyright holder. Read [COMMERCIAL.md](COMMERCIAL.md) and email [arunsin997@gmail.com](mailto:arunsin997@gmail.com).
+
+Copyright 2026 Arun Singh.
+
+## Built with AI assistance
+
+Claude was used for research and for the product specification. Cursor was used to implement the repository. People review the code, verify the licence sources, and write the eval labels. The graph, not a language model, decides each verdict.
+
+## Wording
+
+ModelBrain says "the declared licence differs from the obligations inherited from its ancestors", "this use may not be permitted", and "needs counsel". It does not say a named person or company is violating anything. Demo companies and people are fictional.

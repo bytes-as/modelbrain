@@ -76,3 +76,4 @@ H0 = the moment the build starts. A = backend and graph. B = frontend, eval, vid
 
 ## Questions for the owner
 - This machine already runs Homebrew Redis on port 6379, so `docker compose up` cannot publish FalkorDB on host port 6379. A local untracked `docker-compose.override.yml` publishes host port 6380 instead. The API container still uses `falkordb:6379` on the compose network, and the Browser stays on `localhost:3000`. Should the committed compose file keep 6379 (clean machines) and leave the override local?
+- BLUEPRINT section 16.5 and G115 suggest MIT. On 18 Oct 2026 the owner asked for free use with a royalty if someone commercialises the project. No OSI licence can require a royalty, so the repo uses PolyForm Noncommercial 1.0.0 plus `COMMERCIAL.md` for a separate royalty-bearing commercial licence. G115 is not ticked as MIT.
