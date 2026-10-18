@@ -17,8 +17,9 @@ Repository: [github.com/bytes-as/modelbrain](https://github.com/bytes-as/modelbr
 ## What a judge should be able to see
 
 1. **A blocked ship decision.** Ask whether a Berlin company may load `OPEA/Llama-3.2V-11B-cot-int4-sym-inc` for a commercial product. The card says `apache-2.0`. The path is `OPEA → Xkev → meta-llama/Llama-3.2-11B-Vision-Instruct`, and the Llama 3.2 community licence restricts that multimodal model for EU users. The verdict is **BLOCKED**, with the clause quoted from the official text. The same model with a US headquarters is **ALLOWED WITH OBLIGATIONS**.
-2. **A fix that never reached the children.** On 9 July 2025 a licence discussion opened on `Xkev/Llama-3.2V-11B-cot`. Months later the author added Meta's licence file. The card still says `apache-2.0`, and the children still say `apache-2.0`. The watcher shows the upstream change and which descendants did not inherit it.
-3. **Two companies, one shared fact.** A re-upload names no parent, but its tokenizer and config hashes match a Meta model. Company A confirms the edge. Company B's strict verdict changes, because the hub now trusts that edge. The hub stores a salted hash of who confirmed, not the company name.
+2. **A fix that never reached the children** (`/replay/xkev`). On 9 July 2025 a licence discussion opened on `Xkev/Llama-3.2V-11B-cot`. 130 days later, on 16 November 2025, the author uploaded `LICENSE_llama.txt` (commit `e8c2529775`). The card still says `apache-2.0`, and none of its 9 children got the fix. One click replays that change in your sandbox: FalkorDB walks the 9 descendants and reopens the company decision that rested on one of them, with a review task for its owner.
+3. **Two companies, one shared fact** (`/hidden-lineage`). `SicariusSicariiStuff/Llama-3.2-1B_Base_FP8` names no parent, but its tokenizer and config fingerprints match Meta's Llama 3.2 1B. A strict company gets CANNOT DETERMINE. Harbor (fictional) has confirmed the edge; when your sandbox company confirms it too, the edge reaches tier 3 and the strict verdict becomes ALLOWED WITH OBLIGATIONS for everyone. The hub stores a salted hash of who confirmed, not the company name.
+4. **Provenance from the weights, not the card** (`/findings`). ModelBrain reads about 2 KB of each model's actual weight values with HTTP range requests and searches them in FalkorDB's vector index. In the 289 models fingerprinted for the demo, 122 match a parent their card does not declare, 82 of those trace to a licence with conditions (Llama, Gemma, Qwen research, non-commercial), and 26 also carry a different card licence. Example: `TroyDoesAI/Llama-3.1-8B-Instruct` says `wtfpl`; its sampled weights are identical to Meta's Llama 3.1 8B Instruct. Four models declare a parent the weights contradict, for example `microsoft/UserLM-8b` declares Llama 3.1 8B but matches Llama 3 8B (0.9986 vs 0.9868).
 
 ## How a verdict is decided
 
@@ -44,6 +45,19 @@ Trust on each edge is a tier:
 Default verdicts use tier 1 and above. Strict mode uses tier 2 and above, and answers **CANNOT DETERMINE** when a parent is only inferred.
 
 Every verdict is meant to show: **Automated screening, not legal advice.**
+
+## Weight DNA
+
+A card's metadata can be wrong or missing; the weights cannot lie about where they came from. A fine-tune stays numerically close to its parent, and an independently trained model of the same shape does not.
+
+1. **Sample.** For each model, read the safetensors header and two windows of 512 values (an attention output projection at a quarter of the depth, an MLP down projection at 60%) with HTTP `Range` requests: about 100-250 KB per model, never the weight file. Gated, quantised and unsupported files are recorded with their status.
+2. **Search.** The 1,024 values go into a FalkorDB vector index (`CREATE VECTOR INDEX ... similarityFunction:'cosine'`). `db.idx.vector.queryNodes` finds the closest older models of the same shape (**W2**).
+3. **Decide.** Similarity of 0.60 or more writes an inferred `DERIVED_FROM` edge at tier 1 (**W3**), so the parent's clauses flow into default verdicts; strict mode still needs tier 2. A declared edge is never overwritten; when the weights agree, the edge records that too.
+4. **Merges.** For two-parent merges, a least-squares fit recovers the mix per window (**W7**). It is accepted only when no single parent explains the model and two parents remove at least 95% of what is left. A known 0.6/0.4 linear merge comes back as 0.600/0.402; near-identical copies and plain fine-tunes are rejected. **W8** multiplies merge shares along every path to report how much of the sampled weights trace to each root.
+
+Measured separation: real fine-tunes score 0.98-0.9995 against their parent, heavily retrained derivatives 0.56-0.95, unrelated models of the same shape -0.013 to +0.035. Foundation models listed in `data/dna_references.json` never get weight edges, so Llama 3.1 is not "derived" from Llama 3 just because they are close.
+
+Wording on every finding: "metadata and weights disagree" and "obligations of the parent may apply". Many cards explain their lineage in prose; the findings are about the machine-readable metadata. Each row links to both Hub pages.
 
 ## Graph data model
 
@@ -76,6 +90,9 @@ The hub never stores which tenant uses which model. A confirmation arrives as a 
 | `License` | Normalised key such as `llama3_2`, `apache-2.0`, `gemma` |
 | `Clause` | Effect (`BLOCK`, `OBLIGATION`, `NEEDS_COUNSEL`), the rule that decides when it applies, and a quote extracted at runtime |
 | `Fingerprint` | Weights sha256, tokenizer hash, or config fingerprint |
+| `Model.dna` | 1,024 sampled weight values (`vecf32`) in a cosine vector index, with the shape class and sampling status |
+| `FanOut` | Audit record of one reverse fan-out: what changed, descendants walked, decisions reopened |
+| `Sandbox` | A visitor sandbox: name, template, expiry and a hash of its token |
 | `Snapshot` | One observed revision. Append-only |
 | `Discussion` / `Outcome` | A Hub discussion and what happened after it |
 
@@ -131,6 +148,11 @@ Every query the product depends on is in [`docs/queries.cypher`](docs/queries.cy
 | **A2** | Betweenness. A fix on a high-scoring model reaches the most descendants. |
 | **A3** | Label propagation. Model families in the lineage graph. |
 | **A4** | Shortest derivation path from a model to a given base, or proof that no path exists. |
+| **W2** | Weight DNA: nearest older models of the same shape in the FalkorDB vector index. |
+| **W3** / **W7** | Write an inferred parent edge from the weights, or two merge edges with their shares. Declared edges are never changed. |
+| **W4** / **W5** | Models whose weights match a parent the card does not declare; and declared parents the weights contradict. |
+| **W8** | Weight exposure: the product of merge shares along every path to each root. |
+| **T4** / **X1** | Reopen a ruling with an event and a review task for its owner; record the fan-out run. |
 
 FalkorDB is load-bearing. If it is stopped, `/api/verdict` is specified to return `503 GRAPH_UNAVAILABLE` rather than an answer from a cache. Caches hold raw Hugging Face responses only.
 
@@ -181,7 +203,7 @@ Licence quotes are not stored in this repository. The clause loader fetches the 
 
 ## Tracks
 
-- **Track 1, primary.** Multi-hop ancestry, graph algorithms as tools, an MCP server a coding agent can call before it adds `from_pretrained`, and an explanation that cites the path and the clause.
+- **Track 1, primary.** Multi-hop ancestry, graph algorithms and vector search as tools, weight DNA that finds parents the card does not declare, an MCP server (`can_i_use`, `trace_weights`, `confirm_edge`, ...) a coding agent calls before it adds `from_pretrained`, and an explanation that cites the path and the clause.
 - **Track 2.** One graph per company, rulings remembered across sessions, tasks handed from the watcher to the owner.
 - **Track 3.** Each deployment has an owner, each ruling points at the commit and the clause that justified it, and an upstream change reopens the ruling.
 
@@ -248,7 +270,7 @@ Copyright 2026 Arun Singh.
 
 ## Built with AI assistance
 
-Claude was used for research and for the product specification. Cursor was used to implement the repository. People review the code, verify the licence sources, and write the eval labels. The graph, not a language model, decides each verdict.
+Claude was used for research and for the product specification. Cursor implemented the first milestones of the repository. On 18 October 2026 Claude (Claude Code) took over implementation: weight DNA, the reverse fan-out and replay, compounding, and fixes to ingest and sandboxes. The eval labels in `eval/labels.json` were drafted by an agent and are reviewed by a person. The graph, not a language model, decides each verdict.
 
 ## Wording
 

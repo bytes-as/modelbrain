@@ -149,3 +149,30 @@ Additional MCP tools:
 |---|---|---|---|
 | `where_can_i_run` | "List inference providers that serve a hosted model from allowed datacenter countries, or prove that none do." | `{hosted_model_id: string, residency: string \| string[]}` | providers + `residency_ok` |
 | `ask_company` | "Answer a question about how a company uses AI models (owners, deployments, reopened rulings, signatures) from its graph, with sources." | `{tenant, token, question}` | answer + Cypher + sources |
+
+## Weight DNA, fan-out and compounding (added 18 Oct 2026, ADDENDUM_WEIGHT_DNA)
+
+| Method and path | Auth | Returns |
+|---|---|---|
+| `GET /api/dna/hidden?limit=50` | none | W4 rows: `model, card_license, format, weights_parent, score, share, root, root_license` |
+| `GET /api/dna/conflicts?limit=50` | none | W5 rows kept only when the weights prove them: `model, declared_parent, weights_parent, sim, declared_sim, reason` |
+| `GET /api/dna/coverage` | none | `{total, by_status}` (W6) |
+| `GET /api/dna/exposure/{owner}/{name}?strict=false` | none | W8 rows: `root, is_root, root_license, exposure` |
+| `POST /api/admin/dna/crawl` `{model_ids[], include_scout_findings, force}` | admin | `{state:"started", queued}`; 409 `JOB_RUNNING` if one is running |
+| `GET /api/admin/dna/crawl` | admin | progress: `done, total, statuses, resolver` |
+| `POST /api/admin/dna/resolve` | admin | weight resolver report |
+| `POST /api/admin/dna/reset-edges` | admin | `{removed}` inferred weight edges (W14) |
+| `GET /api/replay/xkev` | none | real timeline, children, `graph_descendants`, `leverage`, `would_reopen` |
+| `POST /api/replay/xkev/run` `{tenant}` | `X-Tenant-Token` (sandbox) or admin | fan-out report: `descendants, reopened[], ms` |
+| `GET /api/fanouts?limit=20` | none | X4 audit rows |
+| `GET /api/models/{owner}/{name}/fix-leverage` | none | `{descendants, not_inherited}` (D2) |
+| `POST /api/tenants/{tenant}/confirm` `{child, parent, person_id}` | tenant token or admin | `{tier_before, tier_after, confirmations, fan_out?}` |
+| `GET /api/demo/compounding` | none | the demo edge and its trust state |
+| `POST /api/admin/demo/compounding` | admin | resets the demo edge to tier 1 with Harbor's confirmation |
+| `POST /api/admin/fan-out` `{model_id, reason}` | admin | fan-out report across every company graph |
+
+Verdict `paths[]` items gain `methods[]`, `weights_sims[]`, `shares[]`, aligned with `relations[]`.
+
+New error code: `JOB_RUNNING` 409.
+
+MCP tool `trace_weights(model_id)` returns `{dna_status, candidates (W2), written, exposure (W8)}`. `confirm_edge` now runs the Publisher.
