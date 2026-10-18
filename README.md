@@ -85,7 +85,7 @@ Wording on every finding: "metadata and weights disagree" and "obligations of th
 | **Licence text watch** | Daily hash of every licence text the clauses quote; a change reopens every ruling resting on those clauses | Live. First run is the baseline |
 | **Custom licence resolution** | A card declaring `other` with a `license_link` resolves to a known licence when the linked text carries that licence's name and clause wording | Live |
 | **Discussions as memory** | Hugging Face discussions on watched models with outcomes (Xkev #12: fixed after 130 days) | Live |
-| **Notifier** | Drafts a neutral notice to a model's authors; posts only after an approval, only to repos on `HF_POST_ALLOWLIST` | Built and tested; nothing has been posted |
+| **Notifier and live loop** | Drafts a neutral notice to a model's authors; posts only after an approval, only to repos on `HF_POST_ALLOWLIST`. `scripts/live_loop.py` closes the loop on our own test repo: notice posted, card edited, change detected, edge promoted to tier 4, outcome recorded | Live once, on our own repo [`arunsin997/modelbrain-loop-test`](https://huggingface.co/arunsin997/modelbrain-loop-test/discussions/1); never posts anywhere else |
 | **GitHub Action** | `actions/modelbrain-check` fails a pull request that loads a BLOCKED model | Live |
 | **LLM gateway** | Optional OpenRouter phrasing for explanations and drafts; the graph still decides | Built; no key configured, so templates are used |
 | **Multi-LLM card-only baseline** | `eval/baseline_llm.py` asks LLMs for verdicts from card metadata only | Built; not run (needs an OpenRouter key) |

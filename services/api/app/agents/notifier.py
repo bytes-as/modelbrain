@@ -96,6 +96,35 @@ async def draft_for(
     }
 
 
+def manual_draft(
+    model_id: str, title: str, body: str, target_repo: str | None, hub: str = "hub"
+) -> dict[str, Any]:
+    if SIGNATURE not in body:
+        body = f"{body.rstrip()}\n\n{SIGNATURE}"
+    draft_id = new_id("draft")
+    db.query(
+        hub,
+        X26,
+        {
+            "id": draft_id,
+            "model_id": model_id,
+            "target_repo": target_repo or model_id,
+            "title": title,
+            "body": body,
+            "now": int(time.time() * 1000),
+            "source": "manual",
+        },
+    )
+    return {
+        "id": draft_id,
+        "target_repo": target_repo or model_id,
+        "title": title,
+        "body": body,
+        "state": "AWAITING_APPROVAL",
+        "source": "manual",
+    }
+
+
 async def approve(
     draft_id: str, *, hub: str = "hub", transport: httpx.AsyncBaseTransport | None = None
 ) -> dict[str, Any]:

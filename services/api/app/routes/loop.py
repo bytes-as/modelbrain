@@ -216,6 +216,9 @@ async def resolve_custom(authorization: str | None = Header(default=None)) -> di
 class DraftIn(BaseModel):
     model_id: str
     target_repo: str | None = None
+    # A person may write the notice themselves (e.g. a model with no weights to compare).
+    title: str | None = Field(default=None, max_length=120)
+    body: str | None = Field(default=None, max_length=5000)
 
 
 @router.post("/api/admin/notices/draft")
@@ -224,6 +227,8 @@ async def notice_draft(body: DraftIn, authorization: str | None = Header(default
     from app.agents import notifier
 
     target = _check_model(body.target_repo) if body.target_repo else None
+    if body.title and body.body:
+        return notifier.manual_draft(_check_model(body.model_id), body.title, body.body, target)
     return await notifier.draft_for(_check_model(body.model_id), target_repo=target)
 
 
@@ -242,3 +247,53 @@ async def notice_approve(draft_id: str, authorization: str | None = Header(defau
     from app.agents import notifier
 
     return await notifier.approve(draft_id)
+
+
+class LoopCloseIn(BaseModel):
+    model_id: str
+    parent: str
+    discussion_url: str | None = None
+
+
+@router.post("/api/admin/loop/close")
+async def loop_close(body: LoopCloseIn, authorization: str | None = Header(default=None)) -> dict:
+    """The author answered a ModelBrain notice by declaring the parent: tier 4 + Outcome FIXED."""
+    require_admin(authorization)
+    import tempfile
+    import time
+    from pathlib import Path
+
+    from app.config import get_settings
+    from app.engine.discussions import discussions_for, ingest_discussions, record_outcome
+    from app.graph.db import query
+    from app.graph.queries import D3
+    from app.hf.cache import DiskCache
+    from app.hf.client import HFClient
+
+    child, parent = _check_model(body.model_id), _check_model(body.parent)
+    evidence = (
+        f"author declared {parent} after the ModelBrain notice {body.discussion_url or ''}".strip()
+    )
+    promoted = as_rows(query("hub", D3, {"child": child, "parent": parent, "evidence": evidence}))
+    with tempfile.TemporaryDirectory() as tmp:
+        client = HFClient(token=get_settings().hf_token, cache=DiskCache(Path(tmp)))
+        try:
+            await ingest_discussions(client, child)
+        finally:
+            await client.aclose()
+    outcome = False
+    if body.discussion_url and "/discussions/" in body.discussion_url:
+        num = int(body.discussion_url.rstrip("/").rsplit("/", 1)[1])
+        outcome = record_outcome(
+            child,
+            num,
+            kind="FIXED",
+            days=0,
+            observed_at=time.strftime("%Y-%m-%d"),
+            evidence_url=f"https://huggingface.co/{child}/commits/main",
+        )
+    return {
+        "edge_tier": promoted[0].get("e.tier") if promoted else None,
+        "outcome_recorded": outcome,
+        "discussions": discussions_for(child),
+    }
