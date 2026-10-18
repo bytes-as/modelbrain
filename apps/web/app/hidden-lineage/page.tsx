@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 
+import { Algorithms } from "./algorithms";
 import { Compounding } from "./compounding";
 
 type Component = {
@@ -28,10 +29,12 @@ export default function HiddenLineagePage() {
     <main>
       <h1 className="text-3xl">Hidden lineage</h1>
       <p className="mt-2 max-w-2xl text-muted">
-        Models that share file fingerprints. Inferred parents are dashed edges in the graph; Confirm
-        raises trust when two organisations agree.
+        Lineage the model cards do not declare: inferred from shared fingerprints and from the
+        weights, raised in trust when two independent companies agree.
       </p>
       <Compounding />
+      <Algorithms />
+      <h2 className="mt-8 text-xl">Models that share file fingerprints (WCC)</h2>
       {error ? <p className="mt-4 text-[#f0605a]">{error}</p> : null}
       <ul className="mt-6 space-y-4">
         {rows.map((row) => (

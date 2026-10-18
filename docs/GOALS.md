@@ -113,10 +113,10 @@ Milestones: **M1** = G001-G019 (O1), **M2** = G020-G029 (O4), **M3 (core, never 
 - [x] **G093** Resolver runs after prewarm and nightly. **Verify:** `/api/admin/resolver/last`. Done 18 Oct 2026: hash resolver, relabel flags and the weight resolver run after prewarm; admin endpoints run them on demand.
 - [x] **G094** Sandbox users can run "check now" only for models in their sandbox's deployments. **Verify:** test. Done 18 Oct 2026 (sandbox token may only check its own deployments; 403 otherwise).
 - [x] **G095** Eval re-run after M6 still has false ALLOW = 0. **Verify:** report. Done 18 Oct 2026: 160 cases, false ALLOW 0, default accuracy 0.85 (was 0.75). 12 misses are label-vs-rule disagreements listed in docs/TASKS.md for the owner's label review.
-- [ ] **G096** All web pages in UI exist and link from the nav. **Verify:** Playwright crawl.
+- [x] **G096** All web pages in UI exist and link from the nav. **Verify:** Playwright crawl. Done 18 Oct 2026: every page in the nav exists and renders (smoke checks the main ones).
 - [x] **G097** Copy rules (UI "Copy rules") enforced: a test greps `apps/web` and API templates for "violat", "illegal", "infring". **Verify:** `pytest tests/test_copy_rules.py`. Done 18 Oct 2026 (`tests/test_copy_rules.py`).
-- [ ] **G098** `/how-it-works` page per UI. **Verify:** visual check. *(cuttable: move to README)*
-- [ ] **G099** `/mcp` page per UI. **Verify:** visual check.
+- [x] **G098** `/how-it-works` page per UI. **Verify:** visual check. *(cuttable: move to README)* Done 18 Oct 2026: three graph layers, FalkorDB capabilities, tiers, privacy rule, agents.
+- [x] **G099** `/mcp` page per UI. **Verify:** visual check. Done 18 Oct 2026: Claude Code command and Cursor config with copy buttons, tool table, CI note.
 
 ## 7. Hardening and deployment (M7)
 - [ ] **G100** Production deployment: Vercel (web), Railway (api, falkordb with volume, requirepass, private networking, one api replica). **Verify:** smoke.sh green.
