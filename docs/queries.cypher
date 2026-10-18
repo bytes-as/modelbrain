@@ -494,3 +494,14 @@ RETURN count(f) AS copied
 MATCH (:Model {id: $child})-[e:DERIVED_FROM]->(:Model {id: $parent})
 SET e.confirmers = $confirmers, e.confirmations = size($confirmers), e.tier = $tier
 RETURN e.tier AS tier, e.confirmations AS confirmations
+
+// W14: remove inferred weight edges so the weight resolver can re-run (declared edges are untouched)
+MATCH ()-[e:DERIVED_FROM]->()
+WHERE e.source = 'inferred' AND e.method IN ['weights', 'weights_merge']
+WITH collect(e) AS edges
+FOREACH (x IN edges | DELETE x)
+RETURN size(edges) AS removed
+
+// W15: which of these models are foundation references
+MATCH (m:Model) WHERE m.id IN $ids AND coalesce(m.dna_reference, false)
+RETURN m.id AS id

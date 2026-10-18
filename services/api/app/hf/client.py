@@ -18,10 +18,21 @@ JSON_TTL_S = 6 * 60 * 60
 WINDOW_S = 5 * 60
 
 
+_last_failure_at = 0.0
+DEGRADED_FOR_S = 300
+
+
+def hub_status() -> str:
+    """'ok' unless a Hub call failed (rate limit, 5xx, network) in the last five minutes."""
+    return "degraded" if time.time() - _last_failure_at < DEGRADED_FOR_S else "ok"
+
+
 class HubUnavailable(Exception):
     def __init__(self, message: str, *, retry_after_s: int = 30) -> None:
+        global _last_failure_at
         super().__init__(message)
         self.retry_after_s = retry_after_s
+        _last_failure_at = time.time()
 
 
 class SlidingLimiter:

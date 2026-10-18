@@ -34,7 +34,8 @@ def hidden(limit: int = Query(default=50, ge=1, le=500)) -> list[dict[str, objec
 
 @router.get("/api/dna/conflicts")
 def conflicts(limit: int = Query(default=50, ge=1, le=500)) -> list[dict[str, object]]:
-    return as_rows(ro_query("hub", W5, {"limit": limit}))
+    rows = as_rows(ro_query("hub", W5, {"limit": 500}))
+    return dna.verified_conflicts("hub", rows)[:limit]
 
 
 @router.get("/api/dna/coverage")
@@ -94,3 +95,9 @@ def resolve(authorization: str | None = Header(default=None)) -> dict:
 def last(authorization: str | None = Header(default=None)) -> dict:
     require_admin(authorization)
     return dna.last_report()
+
+
+@router.post("/api/admin/dna/reset-edges")
+def reset_edges(authorization: str | None = Header(default=None)) -> dict:
+    require_admin(authorization)
+    return {"removed": dna.reset_weight_edges("hub")}

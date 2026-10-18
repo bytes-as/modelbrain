@@ -229,3 +229,61 @@ def test_gated_official_inherits_mirror_config_fingerprint(graph: str) -> None:
         )
     )
     assert rows == [{"k": "config_fp"}]
+
+
+def test_merge_of_close_parents_is_found_but_copies_are_not() -> None:
+    rng = random.Random(13)
+    base = _vec(rng)
+    delta = [rng.gauss(0, 0.05) for _ in range(D)]
+    instruct = [b + d for b, d in zip(base, delta, strict=True)]  # ~0.996 cosine to base
+    merged = [0.6 * i + 0.4 * b + rng.gauss(0, 1e-4) for i, b in zip(instruct, base, strict=True)]
+    found = dna.best_merge(merged, {"instruct": instruct, "base": base}, 512)
+    assert found is not None
+    shares = {p["id"]: p["share"] for p in found["parents"]}
+    assert abs(shares["instruct"] - 0.6) < 0.02
+    # Near-identical copies of one model: any mix fits, but nothing is explained beyond one parent.
+    copy_a = _near(rng, instruct, 0.002)
+    copy_b = _near(rng, instruct, 0.002)
+    child_copy = _near(rng, instruct, 0.002)
+    assert dna.best_merge(child_copy, {"a": copy_a, "b": copy_b, "instruct": instruct}, 512) is None
+
+
+def test_conflicts_need_weight_proof(graph: str) -> None:
+    rng = random.Random(17)
+    l3, l31 = _vec(rng), None
+    l31 = _near(rng, l3, 0.15)
+    child = _near(rng, l3, 0.01)  # declares 3.1, weights are 3
+    rows = [
+        {
+            "model": "k/orpo",
+            "declared_parent": "meta/l31",
+            "weights_parent": "meta/l3",
+            "sim": 0.9999,
+        },
+        {
+            "model": "u/bnb",
+            "declared_parent": "unsloth/bnb-4bit",
+            "weights_parent": "meta/l3",
+            "sim": 0.9999,
+        },
+        {
+            "model": "b/qwen-claim",
+            "declared_parent": "qwen/other-shape",
+            "weights_parent": "meta/l3",
+            "sim": 0.98,
+        },
+    ]
+    for mid, vec, sig in [
+        ("meta/l3", l3, SIG),
+        ("meta/l31", l31, SIG),
+        ("k/orpo", child, SIG),
+        ("u/bnb", _near(rng, l3, 0.01), SIG),
+        ("b/qwen-claim", _near(rng, l3, 0.05), SIG),
+        ("qwen/other-shape", _vec(rng), "h3584|L28|i18944"),
+    ]:
+        _model(graph, mid, "2025-01-01")
+        _fp(graph, mid, vec, sig)
+    _model(graph, "unsloth/bnb-4bit", "2025-01-01")  # never fingerprinted (4-bit)
+    kept = {r["model"]: r for r in dna.verified_conflicts(graph, rows)}
+    assert set(kept) == {"k/orpo", "b/qwen-claim"}
+    assert kept["b/qwen-claim"]["reason"] == "declared parent has a different shape"

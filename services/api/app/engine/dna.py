@@ -19,7 +19,7 @@ from typing import Any
 
 from app.config import get_settings
 from app.graph import db
-from app.graph.queries import R3, W0, W1, W1B, W2, W3, W7, W10, W11, W12, W13, X5
+from app.graph.queries import R3, W0, W1, W1B, W2, W3, W7, W10, W11, W12, W13, W14, W15, X5
 from app.graph.rows import as_rows
 from app.hf.cache import DiskCache
 from app.hf.client import HFClient, HubUnavailable
@@ -32,6 +32,13 @@ MERGE_MIN_SHARE = 0.10
 MERGE_SUM = (0.90, 1.10)
 MERGE_MIN_R2 = 0.995
 MERGE_TOP = 5
+# A merge must explain what no single parent can. Measured on real models (2x512 values):
+# the verified 0.6/0.4 linear merge leaves 0.06-0.09% unexplained by its best single parent
+# and two parents remove 99.2-99.5% of that; near-identical swarm copies leave ~0.002% and
+# two "parents" remove at most 53%; plain fine-tunes remove 0-6%.
+MERGE_MIN_RESIDUAL = 0.0001
+MERGE_MIN_REDUCTION = 0.95
+TIE_SIM = 0.0005
 
 _last: dict[str, Any] = {}
 _crawl: dict[str, Any] = {"state": "idle"}
@@ -113,6 +120,16 @@ def inherit_mirror_fingerprints(graph: str = "hub") -> int:
 # --- merge fit ----------------------------------------------------------------
 
 
+def single_r2(child: list[float], p: list[float]) -> float:
+    """R2 of the best scaled single parent: child ~ a*p."""
+    spp = sum(x * x for x in p)
+    tot = sum(x * x for x in child)
+    if spp == 0 or tot == 0:
+        return 0.0
+    scp = sum(x * y for x, y in zip(child, p, strict=True))
+    return (scp * scp) / (spp * tot)
+
+
 def fit_pair(child: list[float], p: list[float], q: list[float]) -> tuple[float, float, float]:
     """Least squares child ~ a*p + b*q. Returns (a, b, r2)."""
     spp = sum(x * x for x in p)
@@ -139,12 +156,17 @@ def best_merge(
     for pid, qid in itertools.combinations(list(candidates)[:MERGE_TOP], 2):
         p, q = candidates[pid], candidates[qid]
         fits = [fit_pair(child[s:e], p[s:e], q[s:e]) for s, e in windows]
+        singles = [
+            max(single_r2(child[s:e], p[s:e]), single_r2(child[s:e], q[s:e])) for s, e in windows
+        ]
         ok = all(
             a >= MERGE_MIN_SHARE
             and b >= MERGE_MIN_SHARE
             and MERGE_SUM[0] <= a + b <= MERGE_SUM[1]
             and r2 >= MERGE_MIN_R2
-            for a, b, r2 in fits
+            and (1.0 - one) >= MERGE_MIN_RESIDUAL
+            and (1.0 - r2) <= (1.0 - MERGE_MIN_REDUCTION) * (1.0 - one)
+            for (a, b, r2), one in zip(fits, singles, strict=True)
         )
         if not ok:
             continue
@@ -166,6 +188,11 @@ def best_merge(
 
 
 # --- resolver step ------------------------------------------------------------
+
+
+def _references_among(graph: str, ids: list[str]) -> set[str]:
+    rows = as_rows(db.ro_query(graph, W15, {"ids": ids}))
+    return {str(r["id"]) for r in rows}
 
 
 def _vectors(graph: str, ids: list[str]) -> dict[str, list[float]]:
@@ -220,7 +247,12 @@ def resolve_model(graph: str, model_id: str) -> dict[str, Any] | None:
                     },
                 )
                 return {"kind": "merge", "child": model_id, **merge, "tier": tier}
-    top = rows[0]
+    # Effectively tied candidates: prefer a foundation reference, then the earliest model.
+    best_sim = float(rows[0]["sim"])
+    tied = [r for r in rows if best_sim - float(r["sim"]) <= TIE_SIM]
+    refs = _references_among(graph, [str(r["parent"]) for r in tied])
+    tied.sort(key=lambda r: (str(r["parent"]) not in refs, str(r.get("created_at") or "")))
+    top = tied[0]
     sim = float(top["sim"])
     tier = 1 if sim >= settings.dna_derived_min else 0
     evidence = f"weights cosine {sim:.4f} over o_proj+down_proj, 2x{settings.dna_per_tensor} values"
@@ -277,6 +309,48 @@ def run_dna_resolver(graph: str = "hub") -> dict[str, Any]:
     _last.clear()
     _last.update(report)
     return report
+
+
+def reset_weight_edges(graph: str = "hub") -> int:
+    """Remove the inferred weight edges we wrote (declared edges keep their source and tier)."""
+    rows = as_rows(db.query(graph, W14))
+    return int(rows[0]["removed"]) if rows else 0
+
+
+CONFLICT_MARGIN = 0.005
+
+
+def verified_conflicts(graph: str, rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Keep only W5 rows the weights can prove.
+
+    A declared parent we could not fingerprint (gated, 4-bit) proves nothing, so the row is
+    dropped. A conflict stands when the declared parent has a different shape, or when the
+    child is clearly closer (by CONFLICT_MARGIN) to the weights parent than to the declared one.
+    """
+    ids = {str(r[k]) for r in rows for k in ("model", "declared_parent", "weights_parent")}
+    vectors = _vectors(graph, sorted(ids))
+    sigs = {
+        str(r["id"]): r.get("sig") for r in as_rows(db.ro_query(graph, W11, {"ids": sorted(ids)}))
+    }
+    kept: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    for row in rows:
+        child, declared = str(row["model"]), str(row["declared_parent"])
+        if child in seen or child not in vectors or declared not in vectors:
+            continue
+        if sigs.get(declared) != sigs.get(child):
+            kept.append(
+                {**row, "declared_sim": None, "reason": "declared parent has a different shape"}
+            )
+            seen.add(child)
+            continue
+        declared_sim = cosine(vectors[child], vectors[declared])
+        if float(row["sim"]) - declared_sim >= CONFLICT_MARGIN:
+            kept.append(
+                {**row, "declared_sim": round(declared_sim, 6), "reason": "closer to another model"}
+            )
+            seen.add(child)
+    return kept
 
 
 def last_report() -> dict[str, Any]:

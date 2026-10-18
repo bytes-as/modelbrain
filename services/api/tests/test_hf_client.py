@@ -124,3 +124,13 @@ async def test_stale_cache_when_hub_stays_down(tmp_path: Path) -> None:
         await client.aclose()
     assert response.stale is True
     assert json.loads(response.body) == {"cached": True}
+
+
+def test_hub_status_degrades_after_a_failure_and_recovers() -> None:
+    from app.hf import client as hf_client
+
+    hf_client._last_failure_at = 0.0
+    assert hf_client.hub_status() == "ok"
+    hf_client.HubUnavailable("rate limited")
+    assert hf_client.hub_status() == "degraded"
+    hf_client._last_failure_at = 0.0

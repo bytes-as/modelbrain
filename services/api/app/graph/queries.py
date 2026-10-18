@@ -496,6 +496,19 @@ SET e.confirmers = $confirmers, e.confirmations = size($confirmers), e.tier = $t
 RETURN e.tier AS tier, e.confirmations AS confirmations
 """
 
+W14 = """
+MATCH ()-[e:DERIVED_FROM]->()
+WHERE e.source = 'inferred' AND e.method IN ['weights', 'weights_merge']
+WITH collect(e) AS edges
+FOREACH (x IN edges | DELETE x)
+RETURN size(edges) AS removed
+"""
+
+W15 = """
+MATCH (m:Model) WHERE m.id IN $ids AND coalesce(m.dna_reference, false)
+RETURN m.id AS id
+"""
+
 QUERIES = {
     "SCHEMA": SCHEMA,
     "I1": I1,
@@ -560,4 +573,6 @@ QUERIES = {
     "X4": X4,
     "X5": X5,
     "X6": X6,
+    "W14": W14,
+    "W15": W15,
 }

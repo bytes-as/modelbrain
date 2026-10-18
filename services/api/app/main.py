@@ -15,6 +15,7 @@ from app.graph.db import connect, health_snapshot, ro_query
 from app.graph.queries import C4
 from app.graph.rows import as_rows
 from app.graph.schema import apply_schema
+from app.hf.client import hub_status
 from app.jobs.runner import schedule_prewarm
 from app.mcp_server import mcp, mcp_http_app
 from app.observe import OriginAllowlistMiddleware, RequestIdMiddleware, configure_logging
@@ -111,7 +112,7 @@ def health() -> dict[str, object]:
         "graphs": snap["graphs"],
         "hub_models": snap["hub_models"],
         "clauses": clauses,
-        "hf": "degraded",
+        "hf": hub_status(),
         "version": VERSION,
     }
 

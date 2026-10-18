@@ -14,7 +14,26 @@ type Hidden = {
   root_license: string | null;
 };
 
-type Conflict = { model: string; declared_parent: string; weights_parent: string; sim: number };
+type Conflict = {
+  model: string;
+  declared_parent: string;
+  weights_parent: string;
+  sim: number;
+  declared_sim: number | null;
+  reason: string;
+};
+
+// Licences with conditions that a permissive card label would hide.
+const RESTRICTIVE = /^(llama|gemma|other|cc-by-nc|qwen|deepseek|agpl)/i;
+
+function severity(row: Hidden): number {
+  const card = (row.card_license ?? "").toLowerCase();
+  const root = (row.root_license ?? "").toLowerCase();
+  let score = 0;
+  if (RESTRICTIVE.test(root)) score += 2;
+  if (card && root && card !== root) score += 1;
+  return score;
+}
 
 type Coverage = { total: number; by_status: Record<string, number> };
 
@@ -58,7 +77,12 @@ export default function FindingsPage() {
       .catch(() => setState("error"));
   }, []);
 
-  const singles = hidden.filter((row) => row.share === null);
+  const singles = hidden
+    .filter((row) => row.share === null)
+    .sort((a, b) => severity(b) - severity(a) || (b.score ?? 0) - (a.score ?? 0));
+  const [showAll, setShowAll] = useState(false);
+  const important = singles.filter((row) => severity(row) >= 2);
+  const shown = showAll ? singles : important.length > 0 ? important : singles;
   const merges = hidden.filter((row) => row.share !== null);
   const ok = coverage?.by_status.OK ?? 0;
   const gated = coverage?.by_status.GATED ?? 0;
@@ -103,7 +127,7 @@ export default function FindingsPage() {
               </tr>
             </thead>
             <tbody>
-              {singles.map((row) => (
+              {shown.map((row) => (
                 <tr key={`${row.model}-${row.weights_parent}`} className="border-t border-white/10">
                   <td className="py-2 pr-4">
                     <ModelLink id={row.model} />
@@ -120,6 +144,18 @@ export default function FindingsPage() {
             </tbody>
           </table>
         </div>
+        {singles.length > shown.length || showAll ? (
+          <button
+            type="button"
+            className="mt-3 text-sm text-accent"
+            onClick={() => setShowAll(!showAll)}
+            data-testid="toggle-all"
+          >
+            {showAll
+              ? "Show only restrictive-licence findings"
+              : `Show all ${singles.length} (including ${singles.length - shown.length} with permissive roots)`}
+          </button>
+        ) : null}
       </section>
 
       <section className="mt-10">
@@ -151,7 +187,11 @@ export default function FindingsPage() {
                   <td className="py-2 pr-4">
                     <ModelLink id={row.weights_parent} />
                   </td>
-                  <td className="py-2 pr-4 font-mono">{row.sim.toFixed(3)}</td>
+                  <td className="py-2 pr-4 font-mono">
+                    {row.sim.toFixed(3)}
+                    {row.declared_sim !== null ? ` vs ${row.declared_sim.toFixed(3)} declared` : ""}
+                    <span className="block font-sans text-xs text-muted">{row.reason}</span>
+                  </td>
                 </tr>
               ))}
             </tbody>
