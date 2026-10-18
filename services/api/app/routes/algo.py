@@ -32,25 +32,30 @@ def families() -> list[dict[str, object]]:
 
 @router.get("/api/algo/hidden-lineage")
 def hidden_lineage() -> list[dict[str, object]]:
+    from app.engine.resolver import last_report
     from app.graph.queries import R1
 
     try:
         rows = as_rows(ro_query("hub", R1))
     except Exception:
-        return []
-    groups: dict[object, list[str]] = {}
+        rows = []
+    edges = list(last_report().get("edges") or [])
+    out = []
     for row in rows:
-        # R1 yields node, componentId — shape depends on FalkorDB wrapper
-        component = row.get("componentId") or row.get("component_id")
-        node = row.get("node") or row.get("id")
-        if component is None:
+        model_ids = [str(m) for m in (row.get("model_ids") or []) if m]
+        if len(model_ids) < 2:
             continue
-        groups.setdefault(component, []).append(str(node))
-    return [
-        {"component_id": key, "model_ids": ids, "inferred_edges": []}
-        for key, ids in groups.items()
-        if len(ids) > 1
-    ]
+        related = [
+            e for e in edges if e.get("child") in model_ids or e.get("parent") in model_ids
+        ]
+        out.append(
+            {
+                "component_id": row.get("componentId"),
+                "model_ids": model_ids,
+                "inferred_edges": related,
+            }
+        )
+    return out
 
 
 @router.get("/api/models/{owner}/{name}/proof-path")

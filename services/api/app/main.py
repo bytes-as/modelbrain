@@ -17,7 +17,9 @@ from app.graph.schema import apply_schema
 from app.jobs.runner import schedule_prewarm
 from app.mcp_server import mcp, mcp_http_app
 from app.observe import OriginAllowlistMiddleware, RequestIdMiddleware, configure_logging
+from app.routes.admin import router as admin_router
 from app.routes.algo import router as algo_router
+from app.routes.eval import router as eval_router
 from app.routes.ingest import router as ingest_router
 from app.routes.models import router as models_router
 from app.routes.sandbox import router as tenants_router
@@ -70,6 +72,8 @@ app.include_router(verdict_router)
 app.include_router(ingest_router)
 app.include_router(models_router)
 app.include_router(algo_router)
+app.include_router(admin_router)
+app.include_router(eval_router)
 app.include_router(tenants_router)
 
 

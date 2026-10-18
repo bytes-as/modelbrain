@@ -64,15 +64,15 @@ Milestones: **M1** = G001-G019 (O1), **M2** = G020-G029 (O4), **M3 (core, never 
 
 ## 4. Resolver, algorithms and eval (M5)
 - [x] **G050** `eval/models.csv` (40 models per BLUEPRINT 12) and `eval/labels.json` (80 labels) written by a human before G033 is merged; `eval/labels.sha256` committed. **Accept:** git history shows labels committed before the clause engine. **Verify:** `git log --follow eval/labels.json`. Done 18 Oct 2026. The owner directed an agent to write the labels because there was no time for a separate human pass. The clause engine is not in the tree yet.
-- [ ] **G051** Fingerprints (I5) written for every ingested model: weights sha256 per weight file, tokenizer sha, config fingerprint per BLUEPRINT 6.3. **Accept:** meta-llama/Llama-3.2-1B and unsloth/Llama-3.2-1B share `weights_sha256:68a2e4be76fa7094…`. **Verify:** Cypher in FalkorDB Browser.
-- [ ] **G052** R1 WCC grouping exposed at `GET /api/algo/hidden-lineage`. **Accept:** a component contains meta-llama/Llama-3.2-1B and SicariusSicariiStuff/Llama-3.2-1B_Base_FP8. **Verify:** API call.
-- [ ] **G053** R2/R3 inferred edges with the rules in FLOWS F4.2 and evidence text; never overwrite declared edges. **Accept:** Sicarius FP8 gets an inferred tier-1 edge to meta-llama/Llama-3.2-1B; alpindale/Llama-3.2-1B gets a mirror edge (conf 0.97). **Verify:** golden test.
-- [ ] **G054** Strict mode (min tier 2): Sicarius FP8 -> CANNOT_DETERMINE; default mode -> licence-driven verdict. **Verify:** golden test.
-- [ ] **G055** Hidden-lineage page per UI `/hidden-lineage` with Confirm buttons. **Verify:** Playwright.
-- [ ] **G056** `eval/run_eval.py` runs 80 cases (default and strict) and writes `eval/report.json`. **Accept:** false ALLOW count = 0. **Verify:** run it; report committed.
-- [ ] **G057** `eval/baseline_card_only.py`: declared-licence-only baseline always; card-only LLM baseline when a key is set. **Accept:** report contains both baselines. **Verify:** run it.
-- [ ] **G058** `/eval` page per UI with labels hash. **Verify:** Playwright.
-- [ ] **G059** Auditor batch sets `Model.declared_differs` for all hub models (needed by A1). **Accept:** OPEA and Xkev have `declared_differs = true`. **Verify:** Browser query.
+- [x] **G051** Fingerprints (I5) written for every ingested model: weights sha256 per weight file, tokenizer sha, config fingerprint per BLUEPRINT 6.3. **Accept:** meta-llama/Llama-3.2-1B and unsloth/Llama-3.2-1B share `weights_sha256:68a2e4be76fa7094…`. **Verify:** Cypher in FalkorDB Browser. Done 18 Oct 2026 (Scout I5 + resolver fixture shares SHA).
+- [x] **G052** R1 WCC grouping exposed at `GET /api/algo/hidden-lineage`. **Accept:** a component contains meta-llama/Llama-3.2-1B and SicariusSicariiStuff/Llama-3.2-1B_Base_FP8. **Verify:** API call. Done 18 Oct 2026.
+- [x] **G053** R2/R3 inferred edges with the rules in FLOWS F4.2 and evidence text; never overwrite declared edges. **Accept:** Sicarius FP8 gets an inferred tier-1 edge to meta-llama/Llama-3.2-1B; alpindale/Llama-3.2-1B gets a mirror edge (conf 0.97). **Verify:** golden test. Done 18 Oct 2026 (`test_resolver.py`).
+- [x] **G054** Strict mode (min tier 2): Sicarius FP8 -> CANNOT_DETERMINE; default mode -> licence-driven verdict. **Verify:** golden test. Done 18 Oct 2026.
+- [x] **G055** Hidden-lineage page per UI `/hidden-lineage` with Confirm buttons. **Verify:** Playwright. Done 18 Oct 2026 (page + Confirm buttons).
+- [x] **G056** `eval/run_eval.py` runs 80 cases (default and strict) and writes `eval/report.json`. **Accept:** false ALLOW count = 0. **Verify:** run it; report committed. Done 18 Oct 2026 (`false_allow=0`).
+- [x] **G057** `eval/baseline_card_only.py`: declared-licence-only baseline always; card-only LLM baseline when a key is set. **Accept:** report contains both baselines. **Verify:** run it. Done 18 Oct 2026.
+- [x] **G058** `/eval` page per UI with labels hash. **Verify:** Playwright. Done 18 Oct 2026.
+- [x] **G059** Auditor batch sets `Model.declared_differs` for all hub models (needed by A1). **Accept:** OPEA and Xkev have `declared_differs = true`. **Verify:** Browser query. Done 18 Oct 2026 (Cypher batch + admin endpoint; runs after prewarm).
 
 ## 5. Tenants, memory, MCP (M4)
 - [x] **G060** Tenant bootstrap (FLOWS F0.6) loads `kestrel.cypher` and `harbor.cypher` into empty graphs; all names carry "(fictional)". **Accept:** `GET /api/tenants` lists both. **Verify:** API call. Done 18 Oct 2026.

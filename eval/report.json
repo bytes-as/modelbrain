@@ -1,1 +1,1860 @@
-{}
+{
+  "labels_sha256": "8794f109bc8445d7b873379b17081d588e8782c82dff82bc7d374710c652d92d",
+  "cases": 160,
+  "false_allow": 0,
+  "accuracy_default": 0.75,
+  "rows": [
+    {
+      "model_id": "OPEA/Llama-3.2V-11B-cot-int4-sym-inc",
+      "context": "EU_COMMERCIAL",
+      "mode": "default",
+      "expected": "BLOCKED",
+      "actual": "BLOCKED",
+      "match": true
+    },
+    {
+      "model_id": "OPEA/Llama-3.2V-11B-cot-int4-sym-inc",
+      "context": "EU_COMMERCIAL",
+      "mode": "strict",
+      "expected": "BLOCKED",
+      "actual": "BLOCKED",
+      "match": true
+    },
+    {
+      "model_id": "OPEA/Llama-3.2V-11B-cot-int4-sym-inc",
+      "context": "US_COMMERCIAL",
+      "mode": "default",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "ALLOWED_WITH_OBLIGATIONS",
+      "match": true
+    },
+    {
+      "model_id": "OPEA/Llama-3.2V-11B-cot-int4-sym-inc",
+      "context": "US_COMMERCIAL",
+      "mode": "strict",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "ALLOWED_WITH_OBLIGATIONS",
+      "match": true
+    },
+    {
+      "model_id": "Xkev/Llama-3.2V-11B-cot",
+      "context": "EU_COMMERCIAL",
+      "mode": "default",
+      "expected": "BLOCKED",
+      "actual": "BLOCKED",
+      "match": true
+    },
+    {
+      "model_id": "Xkev/Llama-3.2V-11B-cot",
+      "context": "EU_COMMERCIAL",
+      "mode": "strict",
+      "expected": "BLOCKED",
+      "actual": "BLOCKED",
+      "match": true
+    },
+    {
+      "model_id": "Xkev/Llama-3.2V-11B-cot",
+      "context": "US_COMMERCIAL",
+      "mode": "default",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "ALLOWED_WITH_OBLIGATIONS",
+      "match": true
+    },
+    {
+      "model_id": "Xkev/Llama-3.2V-11B-cot",
+      "context": "US_COMMERCIAL",
+      "mode": "strict",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "ALLOWED_WITH_OBLIGATIONS",
+      "match": true
+    },
+    {
+      "model_id": "unsloth/Llama-3.2-11B-Vision-Instruct",
+      "context": "EU_COMMERCIAL",
+      "mode": "default",
+      "expected": "BLOCKED",
+      "actual": "BLOCKED",
+      "match": true
+    },
+    {
+      "model_id": "unsloth/Llama-3.2-11B-Vision-Instruct",
+      "context": "EU_COMMERCIAL",
+      "mode": "strict",
+      "expected": "BLOCKED",
+      "actual": "BLOCKED",
+      "match": true
+    },
+    {
+      "model_id": "unsloth/Llama-3.2-11B-Vision-Instruct",
+      "context": "US_COMMERCIAL",
+      "mode": "default",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "ALLOWED_WITH_OBLIGATIONS",
+      "match": true
+    },
+    {
+      "model_id": "unsloth/Llama-3.2-11B-Vision-Instruct",
+      "context": "US_COMMERCIAL",
+      "mode": "strict",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "ALLOWED_WITH_OBLIGATIONS",
+      "match": true
+    },
+    {
+      "model_id": "unsloth/Llama-3.2-11B-Vision-Instruct-bnb-4bit",
+      "context": "EU_COMMERCIAL",
+      "mode": "default",
+      "expected": "BLOCKED",
+      "actual": "BLOCKED",
+      "match": true
+    },
+    {
+      "model_id": "unsloth/Llama-3.2-11B-Vision-Instruct-bnb-4bit",
+      "context": "EU_COMMERCIAL",
+      "mode": "strict",
+      "expected": "BLOCKED",
+      "actual": "BLOCKED",
+      "match": true
+    },
+    {
+      "model_id": "unsloth/Llama-3.2-11B-Vision-Instruct-bnb-4bit",
+      "context": "US_COMMERCIAL",
+      "mode": "default",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "ALLOWED_WITH_OBLIGATIONS",
+      "match": true
+    },
+    {
+      "model_id": "unsloth/Llama-3.2-11B-Vision-Instruct-bnb-4bit",
+      "context": "US_COMMERCIAL",
+      "mode": "strict",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "ALLOWED_WITH_OBLIGATIONS",
+      "match": true
+    },
+    {
+      "model_id": "mlx-community/Llama-3.2-11B-Vision-Instruct-4bit",
+      "context": "EU_COMMERCIAL",
+      "mode": "default",
+      "expected": "BLOCKED",
+      "actual": "BLOCKED",
+      "match": true
+    },
+    {
+      "model_id": "mlx-community/Llama-3.2-11B-Vision-Instruct-4bit",
+      "context": "EU_COMMERCIAL",
+      "mode": "strict",
+      "expected": "BLOCKED",
+      "actual": "BLOCKED",
+      "match": true
+    },
+    {
+      "model_id": "mlx-community/Llama-3.2-11B-Vision-Instruct-4bit",
+      "context": "US_COMMERCIAL",
+      "mode": "default",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "ALLOWED_WITH_OBLIGATIONS",
+      "match": true
+    },
+    {
+      "model_id": "mlx-community/Llama-3.2-11B-Vision-Instruct-4bit",
+      "context": "US_COMMERCIAL",
+      "mode": "strict",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "ALLOWED_WITH_OBLIGATIONS",
+      "match": true
+    },
+    {
+      "model_id": "mlx-community/Llama-3.2-11B-Vision-Instruct-8bit",
+      "context": "EU_COMMERCIAL",
+      "mode": "default",
+      "expected": "BLOCKED",
+      "actual": "BLOCKED",
+      "match": true
+    },
+    {
+      "model_id": "mlx-community/Llama-3.2-11B-Vision-Instruct-8bit",
+      "context": "EU_COMMERCIAL",
+      "mode": "strict",
+      "expected": "BLOCKED",
+      "actual": "BLOCKED",
+      "match": true
+    },
+    {
+      "model_id": "mlx-community/Llama-3.2-11B-Vision-Instruct-8bit",
+      "context": "US_COMMERCIAL",
+      "mode": "default",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "ALLOWED_WITH_OBLIGATIONS",
+      "match": true
+    },
+    {
+      "model_id": "mlx-community/Llama-3.2-11B-Vision-Instruct-8bit",
+      "context": "US_COMMERCIAL",
+      "mode": "strict",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "ALLOWED_WITH_OBLIGATIONS",
+      "match": true
+    },
+    {
+      "model_id": "Cannae-AI/MedicalLlama3.2-vision-11B-IT",
+      "context": "EU_COMMERCIAL",
+      "mode": "default",
+      "expected": "BLOCKED",
+      "actual": "BLOCKED",
+      "match": true
+    },
+    {
+      "model_id": "Cannae-AI/MedicalLlama3.2-vision-11B-IT",
+      "context": "EU_COMMERCIAL",
+      "mode": "strict",
+      "expected": "BLOCKED",
+      "actual": "BLOCKED",
+      "match": true
+    },
+    {
+      "model_id": "Cannae-AI/MedicalLlama3.2-vision-11B-IT",
+      "context": "US_COMMERCIAL",
+      "mode": "default",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "ALLOWED_WITH_OBLIGATIONS",
+      "match": true
+    },
+    {
+      "model_id": "Cannae-AI/MedicalLlama3.2-vision-11B-IT",
+      "context": "US_COMMERCIAL",
+      "mode": "strict",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "ALLOWED_WITH_OBLIGATIONS",
+      "match": true
+    },
+    {
+      "model_id": "AdaptLLM/biomed-Llama-3.2-11B-Vision-Instruct",
+      "context": "EU_COMMERCIAL",
+      "mode": "default",
+      "expected": "BLOCKED",
+      "actual": "BLOCKED",
+      "match": true
+    },
+    {
+      "model_id": "AdaptLLM/biomed-Llama-3.2-11B-Vision-Instruct",
+      "context": "EU_COMMERCIAL",
+      "mode": "strict",
+      "expected": "BLOCKED",
+      "actual": "BLOCKED",
+      "match": true
+    },
+    {
+      "model_id": "AdaptLLM/biomed-Llama-3.2-11B-Vision-Instruct",
+      "context": "US_COMMERCIAL",
+      "mode": "default",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "ALLOWED_WITH_OBLIGATIONS",
+      "match": true
+    },
+    {
+      "model_id": "AdaptLLM/biomed-Llama-3.2-11B-Vision-Instruct",
+      "context": "US_COMMERCIAL",
+      "mode": "strict",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "ALLOWED_WITH_OBLIGATIONS",
+      "match": true
+    },
+    {
+      "model_id": "OPEA/Llama-3.2-11B-Vision-Instruct-int4-sym-inc",
+      "context": "EU_COMMERCIAL",
+      "mode": "default",
+      "expected": "BLOCKED",
+      "actual": "BLOCKED",
+      "match": true
+    },
+    {
+      "model_id": "OPEA/Llama-3.2-11B-Vision-Instruct-int4-sym-inc",
+      "context": "EU_COMMERCIAL",
+      "mode": "strict",
+      "expected": "BLOCKED",
+      "actual": "BLOCKED",
+      "match": true
+    },
+    {
+      "model_id": "OPEA/Llama-3.2-11B-Vision-Instruct-int4-sym-inc",
+      "context": "US_COMMERCIAL",
+      "mode": "default",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "ALLOWED_WITH_OBLIGATIONS",
+      "match": true
+    },
+    {
+      "model_id": "OPEA/Llama-3.2-11B-Vision-Instruct-int4-sym-inc",
+      "context": "US_COMMERCIAL",
+      "mode": "strict",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "ALLOWED_WITH_OBLIGATIONS",
+      "match": true
+    },
+    {
+      "model_id": "fahadh4ilyas/llama3.2-11B-Vision-Instruct-INT4-GPTQ",
+      "context": "EU_COMMERCIAL",
+      "mode": "default",
+      "expected": "BLOCKED",
+      "actual": "BLOCKED",
+      "match": true
+    },
+    {
+      "model_id": "fahadh4ilyas/llama3.2-11B-Vision-Instruct-INT4-GPTQ",
+      "context": "EU_COMMERCIAL",
+      "mode": "strict",
+      "expected": "BLOCKED",
+      "actual": "BLOCKED",
+      "match": true
+    },
+    {
+      "model_id": "fahadh4ilyas/llama3.2-11B-Vision-Instruct-INT4-GPTQ",
+      "context": "US_COMMERCIAL",
+      "mode": "default",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "ALLOWED_WITH_OBLIGATIONS",
+      "match": true
+    },
+    {
+      "model_id": "fahadh4ilyas/llama3.2-11B-Vision-Instruct-INT4-GPTQ",
+      "context": "US_COMMERCIAL",
+      "mode": "strict",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "ALLOWED_WITH_OBLIGATIONS",
+      "match": true
+    },
+    {
+      "model_id": "meta-llama/Llama-3.2-1B",
+      "context": "EU_COMMERCIAL",
+      "mode": "default",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "ALLOWED_WITH_OBLIGATIONS",
+      "match": true
+    },
+    {
+      "model_id": "meta-llama/Llama-3.2-1B",
+      "context": "EU_COMMERCIAL",
+      "mode": "strict",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "ALLOWED_WITH_OBLIGATIONS",
+      "match": true
+    },
+    {
+      "model_id": "meta-llama/Llama-3.2-1B",
+      "context": "US_COMMERCIAL",
+      "mode": "default",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "ALLOWED_WITH_OBLIGATIONS",
+      "match": true
+    },
+    {
+      "model_id": "meta-llama/Llama-3.2-1B",
+      "context": "US_COMMERCIAL",
+      "mode": "strict",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "ALLOWED_WITH_OBLIGATIONS",
+      "match": true
+    },
+    {
+      "model_id": "meta-llama/Llama-3.2-1B-Instruct",
+      "context": "EU_COMMERCIAL",
+      "mode": "default",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "ALLOWED_WITH_OBLIGATIONS",
+      "match": true
+    },
+    {
+      "model_id": "meta-llama/Llama-3.2-1B-Instruct",
+      "context": "EU_COMMERCIAL",
+      "mode": "strict",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "ALLOWED_WITH_OBLIGATIONS",
+      "match": true
+    },
+    {
+      "model_id": "meta-llama/Llama-3.2-1B-Instruct",
+      "context": "US_COMMERCIAL",
+      "mode": "default",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "ALLOWED_WITH_OBLIGATIONS",
+      "match": true
+    },
+    {
+      "model_id": "meta-llama/Llama-3.2-1B-Instruct",
+      "context": "US_COMMERCIAL",
+      "mode": "strict",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "ALLOWED_WITH_OBLIGATIONS",
+      "match": true
+    },
+    {
+      "model_id": "meta-llama/Llama-3.1-8B-Instruct",
+      "context": "EU_COMMERCIAL",
+      "mode": "default",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "CANNOT_DETERMINE",
+      "match": false
+    },
+    {
+      "model_id": "meta-llama/Llama-3.1-8B-Instruct",
+      "context": "EU_COMMERCIAL",
+      "mode": "strict",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "CANNOT_DETERMINE",
+      "match": true
+    },
+    {
+      "model_id": "meta-llama/Llama-3.1-8B-Instruct",
+      "context": "US_COMMERCIAL",
+      "mode": "default",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "CANNOT_DETERMINE",
+      "match": false
+    },
+    {
+      "model_id": "meta-llama/Llama-3.1-8B-Instruct",
+      "context": "US_COMMERCIAL",
+      "mode": "strict",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "CANNOT_DETERMINE",
+      "match": true
+    },
+    {
+      "model_id": "unsloth/Llama-3.2-1B",
+      "context": "EU_COMMERCIAL",
+      "mode": "default",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "ALLOWED_WITH_OBLIGATIONS",
+      "match": true
+    },
+    {
+      "model_id": "unsloth/Llama-3.2-1B",
+      "context": "EU_COMMERCIAL",
+      "mode": "strict",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "ALLOWED_WITH_OBLIGATIONS",
+      "match": true
+    },
+    {
+      "model_id": "unsloth/Llama-3.2-1B",
+      "context": "US_COMMERCIAL",
+      "mode": "default",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "ALLOWED_WITH_OBLIGATIONS",
+      "match": true
+    },
+    {
+      "model_id": "unsloth/Llama-3.2-1B",
+      "context": "US_COMMERCIAL",
+      "mode": "strict",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "ALLOWED_WITH_OBLIGATIONS",
+      "match": true
+    },
+    {
+      "model_id": "unsloth/Llama-3.1-8B-Instruct",
+      "context": "EU_COMMERCIAL",
+      "mode": "default",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "CANNOT_DETERMINE",
+      "match": false
+    },
+    {
+      "model_id": "unsloth/Llama-3.1-8B-Instruct",
+      "context": "EU_COMMERCIAL",
+      "mode": "strict",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "CANNOT_DETERMINE",
+      "match": true
+    },
+    {
+      "model_id": "unsloth/Llama-3.1-8B-Instruct",
+      "context": "US_COMMERCIAL",
+      "mode": "default",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "CANNOT_DETERMINE",
+      "match": false
+    },
+    {
+      "model_id": "unsloth/Llama-3.1-8B-Instruct",
+      "context": "US_COMMERCIAL",
+      "mode": "strict",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "CANNOT_DETERMINE",
+      "match": true
+    },
+    {
+      "model_id": "unsloth/Meta-Llama-3.1-8B-Instruct",
+      "context": "EU_COMMERCIAL",
+      "mode": "default",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "CANNOT_DETERMINE",
+      "match": false
+    },
+    {
+      "model_id": "unsloth/Meta-Llama-3.1-8B-Instruct",
+      "context": "EU_COMMERCIAL",
+      "mode": "strict",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "CANNOT_DETERMINE",
+      "match": true
+    },
+    {
+      "model_id": "unsloth/Meta-Llama-3.1-8B-Instruct",
+      "context": "US_COMMERCIAL",
+      "mode": "default",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "CANNOT_DETERMINE",
+      "match": false
+    },
+    {
+      "model_id": "unsloth/Meta-Llama-3.1-8B-Instruct",
+      "context": "US_COMMERCIAL",
+      "mode": "strict",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "CANNOT_DETERMINE",
+      "match": true
+    },
+    {
+      "model_id": "osllmai-community/Llama-3.2-1B",
+      "context": "EU_COMMERCIAL",
+      "mode": "default",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "ALLOWED_WITH_OBLIGATIONS",
+      "match": true
+    },
+    {
+      "model_id": "osllmai-community/Llama-3.2-1B",
+      "context": "EU_COMMERCIAL",
+      "mode": "strict",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "ALLOWED_WITH_OBLIGATIONS",
+      "match": true
+    },
+    {
+      "model_id": "osllmai-community/Llama-3.2-1B",
+      "context": "US_COMMERCIAL",
+      "mode": "default",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "ALLOWED_WITH_OBLIGATIONS",
+      "match": true
+    },
+    {
+      "model_id": "osllmai-community/Llama-3.2-1B",
+      "context": "US_COMMERCIAL",
+      "mode": "strict",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "ALLOWED_WITH_OBLIGATIONS",
+      "match": true
+    },
+    {
+      "model_id": "NousResearch/Llama-3.2-1B",
+      "context": "EU_COMMERCIAL",
+      "mode": "default",
+      "expected": "CANNOT_DETERMINE",
+      "actual": "CANNOT_DETERMINE",
+      "match": true
+    },
+    {
+      "model_id": "NousResearch/Llama-3.2-1B",
+      "context": "EU_COMMERCIAL",
+      "mode": "strict",
+      "expected": "CANNOT_DETERMINE",
+      "actual": "CANNOT_DETERMINE",
+      "match": true
+    },
+    {
+      "model_id": "NousResearch/Llama-3.2-1B",
+      "context": "US_COMMERCIAL",
+      "mode": "default",
+      "expected": "CANNOT_DETERMINE",
+      "actual": "CANNOT_DETERMINE",
+      "match": true
+    },
+    {
+      "model_id": "NousResearch/Llama-3.2-1B",
+      "context": "US_COMMERCIAL",
+      "mode": "strict",
+      "expected": "CANNOT_DETERMINE",
+      "actual": "CANNOT_DETERMINE",
+      "match": true
+    },
+    {
+      "model_id": "google/gemma-2-9b-it",
+      "context": "EU_COMMERCIAL",
+      "mode": "default",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "ALLOWED_WITH_OBLIGATIONS",
+      "match": true
+    },
+    {
+      "model_id": "google/gemma-2-9b-it",
+      "context": "EU_COMMERCIAL",
+      "mode": "strict",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "ALLOWED_WITH_OBLIGATIONS",
+      "match": true
+    },
+    {
+      "model_id": "google/gemma-2-9b-it",
+      "context": "US_COMMERCIAL",
+      "mode": "default",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "ALLOWED_WITH_OBLIGATIONS",
+      "match": true
+    },
+    {
+      "model_id": "google/gemma-2-9b-it",
+      "context": "US_COMMERCIAL",
+      "mode": "strict",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "ALLOWED_WITH_OBLIGATIONS",
+      "match": true
+    },
+    {
+      "model_id": "google/gemma-2-2b-it",
+      "context": "EU_COMMERCIAL",
+      "mode": "default",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "ALLOWED_WITH_OBLIGATIONS",
+      "match": true
+    },
+    {
+      "model_id": "google/gemma-2-2b-it",
+      "context": "EU_COMMERCIAL",
+      "mode": "strict",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "ALLOWED_WITH_OBLIGATIONS",
+      "match": true
+    },
+    {
+      "model_id": "google/gemma-2-2b-it",
+      "context": "US_COMMERCIAL",
+      "mode": "default",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "ALLOWED_WITH_OBLIGATIONS",
+      "match": true
+    },
+    {
+      "model_id": "google/gemma-2-2b-it",
+      "context": "US_COMMERCIAL",
+      "mode": "strict",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "ALLOWED_WITH_OBLIGATIONS",
+      "match": true
+    },
+    {
+      "model_id": "princeton-nlp/gemma-2-9b-it-SimPO",
+      "context": "EU_COMMERCIAL",
+      "mode": "default",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "ALLOWED_WITH_OBLIGATIONS",
+      "match": true
+    },
+    {
+      "model_id": "princeton-nlp/gemma-2-9b-it-SimPO",
+      "context": "EU_COMMERCIAL",
+      "mode": "strict",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "ALLOWED_WITH_OBLIGATIONS",
+      "match": true
+    },
+    {
+      "model_id": "princeton-nlp/gemma-2-9b-it-SimPO",
+      "context": "US_COMMERCIAL",
+      "mode": "default",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "ALLOWED_WITH_OBLIGATIONS",
+      "match": true
+    },
+    {
+      "model_id": "princeton-nlp/gemma-2-9b-it-SimPO",
+      "context": "US_COMMERCIAL",
+      "mode": "strict",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "ALLOWED_WITH_OBLIGATIONS",
+      "match": true
+    },
+    {
+      "model_id": "unsloth/gemma-2-9b-it-bnb-4bit",
+      "context": "EU_COMMERCIAL",
+      "mode": "default",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "ALLOWED_WITH_OBLIGATIONS",
+      "match": true
+    },
+    {
+      "model_id": "unsloth/gemma-2-9b-it-bnb-4bit",
+      "context": "EU_COMMERCIAL",
+      "mode": "strict",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "ALLOWED_WITH_OBLIGATIONS",
+      "match": true
+    },
+    {
+      "model_id": "unsloth/gemma-2-9b-it-bnb-4bit",
+      "context": "US_COMMERCIAL",
+      "mode": "default",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "ALLOWED_WITH_OBLIGATIONS",
+      "match": true
+    },
+    {
+      "model_id": "unsloth/gemma-2-9b-it-bnb-4bit",
+      "context": "US_COMMERCIAL",
+      "mode": "strict",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "ALLOWED_WITH_OBLIGATIONS",
+      "match": true
+    },
+    {
+      "model_id": "unsloth/gemma-2-9b-it",
+      "context": "EU_COMMERCIAL",
+      "mode": "default",
+      "expected": "CANNOT_DETERMINE",
+      "actual": "CANNOT_DETERMINE",
+      "match": true
+    },
+    {
+      "model_id": "unsloth/gemma-2-9b-it",
+      "context": "EU_COMMERCIAL",
+      "mode": "strict",
+      "expected": "CANNOT_DETERMINE",
+      "actual": "CANNOT_DETERMINE",
+      "match": true
+    },
+    {
+      "model_id": "unsloth/gemma-2-9b-it",
+      "context": "US_COMMERCIAL",
+      "mode": "default",
+      "expected": "CANNOT_DETERMINE",
+      "actual": "CANNOT_DETERMINE",
+      "match": true
+    },
+    {
+      "model_id": "unsloth/gemma-2-9b-it",
+      "context": "US_COMMERCIAL",
+      "mode": "strict",
+      "expected": "CANNOT_DETERMINE",
+      "actual": "CANNOT_DETERMINE",
+      "match": true
+    },
+    {
+      "model_id": "mlx-community/gemma-2-9b-it-4bit",
+      "context": "EU_COMMERCIAL",
+      "mode": "default",
+      "expected": "CANNOT_DETERMINE",
+      "actual": "CANNOT_DETERMINE",
+      "match": true
+    },
+    {
+      "model_id": "mlx-community/gemma-2-9b-it-4bit",
+      "context": "EU_COMMERCIAL",
+      "mode": "strict",
+      "expected": "CANNOT_DETERMINE",
+      "actual": "CANNOT_DETERMINE",
+      "match": true
+    },
+    {
+      "model_id": "mlx-community/gemma-2-9b-it-4bit",
+      "context": "US_COMMERCIAL",
+      "mode": "default",
+      "expected": "CANNOT_DETERMINE",
+      "actual": "CANNOT_DETERMINE",
+      "match": true
+    },
+    {
+      "model_id": "mlx-community/gemma-2-9b-it-4bit",
+      "context": "US_COMMERCIAL",
+      "mode": "strict",
+      "expected": "CANNOT_DETERMINE",
+      "actual": "CANNOT_DETERMINE",
+      "match": true
+    },
+    {
+      "model_id": "Qwen/Qwen2.5-7B",
+      "context": "EU_COMMERCIAL",
+      "mode": "default",
+      "expected": "ALLOWED",
+      "actual": "ALLOWED",
+      "match": true
+    },
+    {
+      "model_id": "Qwen/Qwen2.5-7B",
+      "context": "EU_COMMERCIAL",
+      "mode": "strict",
+      "expected": "ALLOWED",
+      "actual": "ALLOWED",
+      "match": true
+    },
+    {
+      "model_id": "Qwen/Qwen2.5-7B",
+      "context": "US_COMMERCIAL",
+      "mode": "default",
+      "expected": "ALLOWED",
+      "actual": "ALLOWED",
+      "match": true
+    },
+    {
+      "model_id": "Qwen/Qwen2.5-7B",
+      "context": "US_COMMERCIAL",
+      "mode": "strict",
+      "expected": "ALLOWED",
+      "actual": "ALLOWED",
+      "match": true
+    },
+    {
+      "model_id": "Qwen/Qwen2.5-7B-Instruct",
+      "context": "EU_COMMERCIAL",
+      "mode": "default",
+      "expected": "ALLOWED",
+      "actual": "ALLOWED",
+      "match": true
+    },
+    {
+      "model_id": "Qwen/Qwen2.5-7B-Instruct",
+      "context": "EU_COMMERCIAL",
+      "mode": "strict",
+      "expected": "ALLOWED",
+      "actual": "ALLOWED",
+      "match": true
+    },
+    {
+      "model_id": "Qwen/Qwen2.5-7B-Instruct",
+      "context": "US_COMMERCIAL",
+      "mode": "default",
+      "expected": "ALLOWED",
+      "actual": "ALLOWED",
+      "match": true
+    },
+    {
+      "model_id": "Qwen/Qwen2.5-7B-Instruct",
+      "context": "US_COMMERCIAL",
+      "mode": "strict",
+      "expected": "ALLOWED",
+      "actual": "ALLOWED",
+      "match": true
+    },
+    {
+      "model_id": "Qwen/Qwen2.5-1.5B-Instruct",
+      "context": "EU_COMMERCIAL",
+      "mode": "default",
+      "expected": "ALLOWED",
+      "actual": "ALLOWED",
+      "match": true
+    },
+    {
+      "model_id": "Qwen/Qwen2.5-1.5B-Instruct",
+      "context": "EU_COMMERCIAL",
+      "mode": "strict",
+      "expected": "ALLOWED",
+      "actual": "ALLOWED",
+      "match": true
+    },
+    {
+      "model_id": "Qwen/Qwen2.5-1.5B-Instruct",
+      "context": "US_COMMERCIAL",
+      "mode": "default",
+      "expected": "ALLOWED",
+      "actual": "ALLOWED",
+      "match": true
+    },
+    {
+      "model_id": "Qwen/Qwen2.5-1.5B-Instruct",
+      "context": "US_COMMERCIAL",
+      "mode": "strict",
+      "expected": "ALLOWED",
+      "actual": "ALLOWED",
+      "match": true
+    },
+    {
+      "model_id": "Qwen/Qwen2.5-0.5B-Instruct",
+      "context": "EU_COMMERCIAL",
+      "mode": "default",
+      "expected": "ALLOWED",
+      "actual": "ALLOWED",
+      "match": true
+    },
+    {
+      "model_id": "Qwen/Qwen2.5-0.5B-Instruct",
+      "context": "EU_COMMERCIAL",
+      "mode": "strict",
+      "expected": "ALLOWED",
+      "actual": "ALLOWED",
+      "match": true
+    },
+    {
+      "model_id": "Qwen/Qwen2.5-0.5B-Instruct",
+      "context": "US_COMMERCIAL",
+      "mode": "default",
+      "expected": "ALLOWED",
+      "actual": "ALLOWED",
+      "match": true
+    },
+    {
+      "model_id": "Qwen/Qwen2.5-0.5B-Instruct",
+      "context": "US_COMMERCIAL",
+      "mode": "strict",
+      "expected": "ALLOWED",
+      "actual": "ALLOWED",
+      "match": true
+    },
+    {
+      "model_id": "mistralai/Mistral-7B-v0.3",
+      "context": "EU_COMMERCIAL",
+      "mode": "default",
+      "expected": "ALLOWED",
+      "actual": "ALLOWED",
+      "match": true
+    },
+    {
+      "model_id": "mistralai/Mistral-7B-v0.3",
+      "context": "EU_COMMERCIAL",
+      "mode": "strict",
+      "expected": "ALLOWED",
+      "actual": "ALLOWED",
+      "match": true
+    },
+    {
+      "model_id": "mistralai/Mistral-7B-v0.3",
+      "context": "US_COMMERCIAL",
+      "mode": "default",
+      "expected": "ALLOWED",
+      "actual": "ALLOWED",
+      "match": true
+    },
+    {
+      "model_id": "mistralai/Mistral-7B-v0.3",
+      "context": "US_COMMERCIAL",
+      "mode": "strict",
+      "expected": "ALLOWED",
+      "actual": "ALLOWED",
+      "match": true
+    },
+    {
+      "model_id": "mistralai/Mistral-7B-Instruct-v0.3",
+      "context": "EU_COMMERCIAL",
+      "mode": "default",
+      "expected": "ALLOWED",
+      "actual": "ALLOWED",
+      "match": true
+    },
+    {
+      "model_id": "mistralai/Mistral-7B-Instruct-v0.3",
+      "context": "EU_COMMERCIAL",
+      "mode": "strict",
+      "expected": "ALLOWED",
+      "actual": "ALLOWED",
+      "match": true
+    },
+    {
+      "model_id": "mistralai/Mistral-7B-Instruct-v0.3",
+      "context": "US_COMMERCIAL",
+      "mode": "default",
+      "expected": "ALLOWED",
+      "actual": "ALLOWED",
+      "match": true
+    },
+    {
+      "model_id": "mistralai/Mistral-7B-Instruct-v0.3",
+      "context": "US_COMMERCIAL",
+      "mode": "strict",
+      "expected": "ALLOWED",
+      "actual": "ALLOWED",
+      "match": true
+    },
+    {
+      "model_id": "grimjim/llama-3-Nephilim-v1-8B",
+      "context": "EU_COMMERCIAL",
+      "mode": "default",
+      "expected": "BLOCKED",
+      "actual": "BLOCKED",
+      "match": true
+    },
+    {
+      "model_id": "grimjim/llama-3-Nephilim-v1-8B",
+      "context": "EU_COMMERCIAL",
+      "mode": "strict",
+      "expected": "BLOCKED",
+      "actual": "BLOCKED",
+      "match": true
+    },
+    {
+      "model_id": "grimjim/llama-3-Nephilim-v1-8B",
+      "context": "US_COMMERCIAL",
+      "mode": "default",
+      "expected": "BLOCKED",
+      "actual": "BLOCKED",
+      "match": true
+    },
+    {
+      "model_id": "grimjim/llama-3-Nephilim-v1-8B",
+      "context": "US_COMMERCIAL",
+      "mode": "strict",
+      "expected": "BLOCKED",
+      "actual": "BLOCKED",
+      "match": true
+    },
+    {
+      "model_id": "shanchen/llama3-8B-slerp-med-chinese",
+      "context": "EU_COMMERCIAL",
+      "mode": "default",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "CANNOT_DETERMINE",
+      "match": false
+    },
+    {
+      "model_id": "shanchen/llama3-8B-slerp-med-chinese",
+      "context": "EU_COMMERCIAL",
+      "mode": "strict",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "CANNOT_DETERMINE",
+      "match": true
+    },
+    {
+      "model_id": "shanchen/llama3-8B-slerp-med-chinese",
+      "context": "US_COMMERCIAL",
+      "mode": "default",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "CANNOT_DETERMINE",
+      "match": false
+    },
+    {
+      "model_id": "shanchen/llama3-8B-slerp-med-chinese",
+      "context": "US_COMMERCIAL",
+      "mode": "strict",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "CANNOT_DETERMINE",
+      "match": true
+    },
+    {
+      "model_id": "shanchen/llama3-8B-slerp-biomed-chat-chinese",
+      "context": "EU_COMMERCIAL",
+      "mode": "default",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "CANNOT_DETERMINE",
+      "match": false
+    },
+    {
+      "model_id": "shanchen/llama3-8B-slerp-biomed-chat-chinese",
+      "context": "EU_COMMERCIAL",
+      "mode": "strict",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "CANNOT_DETERMINE",
+      "match": true
+    },
+    {
+      "model_id": "shanchen/llama3-8B-slerp-biomed-chat-chinese",
+      "context": "US_COMMERCIAL",
+      "mode": "default",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "CANNOT_DETERMINE",
+      "match": false
+    },
+    {
+      "model_id": "shanchen/llama3-8B-slerp-biomed-chat-chinese",
+      "context": "US_COMMERCIAL",
+      "mode": "strict",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "CANNOT_DETERMINE",
+      "match": true
+    },
+    {
+      "model_id": "grimjim/Llama-3-Instruct-8B-SimPO-SPPO-Iter3-merge",
+      "context": "EU_COMMERCIAL",
+      "mode": "default",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "CANNOT_DETERMINE",
+      "match": false
+    },
+    {
+      "model_id": "grimjim/Llama-3-Instruct-8B-SimPO-SPPO-Iter3-merge",
+      "context": "EU_COMMERCIAL",
+      "mode": "strict",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "CANNOT_DETERMINE",
+      "match": true
+    },
+    {
+      "model_id": "grimjim/Llama-3-Instruct-8B-SimPO-SPPO-Iter3-merge",
+      "context": "US_COMMERCIAL",
+      "mode": "default",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "CANNOT_DETERMINE",
+      "match": false
+    },
+    {
+      "model_id": "grimjim/Llama-3-Instruct-8B-SimPO-SPPO-Iter3-merge",
+      "context": "US_COMMERCIAL",
+      "mode": "strict",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "CANNOT_DETERMINE",
+      "match": true
+    },
+    {
+      "model_id": "grimjim/Llama-3-Instruct-8B-SPPO-Iter3-SimPO-merge",
+      "context": "EU_COMMERCIAL",
+      "mode": "default",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "CANNOT_DETERMINE",
+      "match": false
+    },
+    {
+      "model_id": "grimjim/Llama-3-Instruct-8B-SPPO-Iter3-SimPO-merge",
+      "context": "EU_COMMERCIAL",
+      "mode": "strict",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "CANNOT_DETERMINE",
+      "match": true
+    },
+    {
+      "model_id": "grimjim/Llama-3-Instruct-8B-SPPO-Iter3-SimPO-merge",
+      "context": "US_COMMERCIAL",
+      "mode": "default",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "CANNOT_DETERMINE",
+      "match": false
+    },
+    {
+      "model_id": "grimjim/Llama-3-Instruct-8B-SPPO-Iter3-SimPO-merge",
+      "context": "US_COMMERCIAL",
+      "mode": "strict",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "CANNOT_DETERMINE",
+      "match": true
+    },
+    {
+      "model_id": "SicariusSicariiStuff/Llama-3.2-1B_Base_FP8",
+      "context": "EU_COMMERCIAL",
+      "mode": "default",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "CANNOT_DETERMINE",
+      "match": false
+    },
+    {
+      "model_id": "SicariusSicariiStuff/Llama-3.2-1B_Base_FP8",
+      "context": "EU_COMMERCIAL",
+      "mode": "strict",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "CANNOT_DETERMINE",
+      "match": true
+    },
+    {
+      "model_id": "SicariusSicariiStuff/Llama-3.2-1B_Base_FP8",
+      "context": "US_COMMERCIAL",
+      "mode": "default",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "CANNOT_DETERMINE",
+      "match": false
+    },
+    {
+      "model_id": "SicariusSicariiStuff/Llama-3.2-1B_Base_FP8",
+      "context": "US_COMMERCIAL",
+      "mode": "strict",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "CANNOT_DETERMINE",
+      "match": true
+    },
+    {
+      "model_id": "shuyuej/Llama-3.2-1B-GPTQ",
+      "context": "EU_COMMERCIAL",
+      "mode": "default",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "CANNOT_DETERMINE",
+      "match": false
+    },
+    {
+      "model_id": "shuyuej/Llama-3.2-1B-GPTQ",
+      "context": "EU_COMMERCIAL",
+      "mode": "strict",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "CANNOT_DETERMINE",
+      "match": true
+    },
+    {
+      "model_id": "shuyuej/Llama-3.2-1B-GPTQ",
+      "context": "US_COMMERCIAL",
+      "mode": "default",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "CANNOT_DETERMINE",
+      "match": false
+    },
+    {
+      "model_id": "shuyuej/Llama-3.2-1B-GPTQ",
+      "context": "US_COMMERCIAL",
+      "mode": "strict",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "CANNOT_DETERMINE",
+      "match": true
+    },
+    {
+      "model_id": "alpindale/Llama-3.2-1B",
+      "context": "EU_COMMERCIAL",
+      "mode": "default",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "CANNOT_DETERMINE",
+      "match": false
+    },
+    {
+      "model_id": "alpindale/Llama-3.2-1B",
+      "context": "EU_COMMERCIAL",
+      "mode": "strict",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "CANNOT_DETERMINE",
+      "match": true
+    },
+    {
+      "model_id": "alpindale/Llama-3.2-1B",
+      "context": "US_COMMERCIAL",
+      "mode": "default",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "CANNOT_DETERMINE",
+      "match": false
+    },
+    {
+      "model_id": "alpindale/Llama-3.2-1B",
+      "context": "US_COMMERCIAL",
+      "mode": "strict",
+      "expected": "ALLOWED_WITH_OBLIGATIONS",
+      "actual": "CANNOT_DETERMINE",
+      "match": true
+    },
+    {
+      "model_id": "open-unlearning/tofu_Llama-3.2-1B-Instruct_full",
+      "context": "EU_COMMERCIAL",
+      "mode": "default",
+      "expected": "CANNOT_DETERMINE",
+      "actual": "CANNOT_DETERMINE",
+      "match": true
+    },
+    {
+      "model_id": "open-unlearning/tofu_Llama-3.2-1B-Instruct_full",
+      "context": "EU_COMMERCIAL",
+      "mode": "strict",
+      "expected": "CANNOT_DETERMINE",
+      "actual": "CANNOT_DETERMINE",
+      "match": true
+    },
+    {
+      "model_id": "open-unlearning/tofu_Llama-3.2-1B-Instruct_full",
+      "context": "US_COMMERCIAL",
+      "mode": "default",
+      "expected": "CANNOT_DETERMINE",
+      "actual": "CANNOT_DETERMINE",
+      "match": true
+    },
+    {
+      "model_id": "open-unlearning/tofu_Llama-3.2-1B-Instruct_full",
+      "context": "US_COMMERCIAL",
+      "mode": "strict",
+      "expected": "CANNOT_DETERMINE",
+      "actual": "CANNOT_DETERMINE",
+      "match": true
+    },
+    {
+      "model_id": "DavidAU/Llama-3.2-1B-Instruct-NEO-SI-FI-GGUF",
+      "context": "EU_COMMERCIAL",
+      "mode": "default",
+      "expected": "CANNOT_DETERMINE",
+      "actual": "CANNOT_DETERMINE",
+      "match": true
+    },
+    {
+      "model_id": "DavidAU/Llama-3.2-1B-Instruct-NEO-SI-FI-GGUF",
+      "context": "EU_COMMERCIAL",
+      "mode": "strict",
+      "expected": "CANNOT_DETERMINE",
+      "actual": "CANNOT_DETERMINE",
+      "match": true
+    },
+    {
+      "model_id": "DavidAU/Llama-3.2-1B-Instruct-NEO-SI-FI-GGUF",
+      "context": "US_COMMERCIAL",
+      "mode": "default",
+      "expected": "CANNOT_DETERMINE",
+      "actual": "CANNOT_DETERMINE",
+      "match": true
+    },
+    {
+      "model_id": "DavidAU/Llama-3.2-1B-Instruct-NEO-SI-FI-GGUF",
+      "context": "US_COMMERCIAL",
+      "mode": "strict",
+      "expected": "CANNOT_DETERMINE",
+      "actual": "CANNOT_DETERMINE",
+      "match": true
+    }
+  ],
+  "baselines": {
+    "declared_licence_only": {
+      "cases": 80,
+      "match_rate": 0.35,
+      "rows": [
+        {
+          "model_id": "OPEA/Llama-3.2V-11B-cot-int4-sym-inc",
+          "context": "EU_COMMERCIAL",
+          "card_only": "ALLOWED",
+          "label": "BLOCKED",
+          "match_label": false
+        },
+        {
+          "model_id": "OPEA/Llama-3.2V-11B-cot-int4-sym-inc",
+          "context": "US_COMMERCIAL",
+          "card_only": "ALLOWED",
+          "label": "ALLOWED_WITH_OBLIGATIONS",
+          "match_label": false
+        },
+        {
+          "model_id": "Xkev/Llama-3.2V-11B-cot",
+          "context": "EU_COMMERCIAL",
+          "card_only": "ALLOWED",
+          "label": "BLOCKED",
+          "match_label": false
+        },
+        {
+          "model_id": "Xkev/Llama-3.2V-11B-cot",
+          "context": "US_COMMERCIAL",
+          "card_only": "ALLOWED",
+          "label": "ALLOWED_WITH_OBLIGATIONS",
+          "match_label": false
+        },
+        {
+          "model_id": "unsloth/Llama-3.2-11B-Vision-Instruct",
+          "context": "EU_COMMERCIAL",
+          "card_only": "ALLOWED",
+          "label": "BLOCKED",
+          "match_label": false
+        },
+        {
+          "model_id": "unsloth/Llama-3.2-11B-Vision-Instruct",
+          "context": "US_COMMERCIAL",
+          "card_only": "ALLOWED",
+          "label": "ALLOWED_WITH_OBLIGATIONS",
+          "match_label": false
+        },
+        {
+          "model_id": "unsloth/Llama-3.2-11B-Vision-Instruct-bnb-4bit",
+          "context": "EU_COMMERCIAL",
+          "card_only": "ALLOWED",
+          "label": "BLOCKED",
+          "match_label": false
+        },
+        {
+          "model_id": "unsloth/Llama-3.2-11B-Vision-Instruct-bnb-4bit",
+          "context": "US_COMMERCIAL",
+          "card_only": "ALLOWED",
+          "label": "ALLOWED_WITH_OBLIGATIONS",
+          "match_label": false
+        },
+        {
+          "model_id": "mlx-community/Llama-3.2-11B-Vision-Instruct-4bit",
+          "context": "EU_COMMERCIAL",
+          "card_only": "ALLOWED",
+          "label": "BLOCKED",
+          "match_label": false
+        },
+        {
+          "model_id": "mlx-community/Llama-3.2-11B-Vision-Instruct-4bit",
+          "context": "US_COMMERCIAL",
+          "card_only": "ALLOWED",
+          "label": "ALLOWED_WITH_OBLIGATIONS",
+          "match_label": false
+        },
+        {
+          "model_id": "mlx-community/Llama-3.2-11B-Vision-Instruct-8bit",
+          "context": "EU_COMMERCIAL",
+          "card_only": "ALLOWED",
+          "label": "BLOCKED",
+          "match_label": false
+        },
+        {
+          "model_id": "mlx-community/Llama-3.2-11B-Vision-Instruct-8bit",
+          "context": "US_COMMERCIAL",
+          "card_only": "ALLOWED",
+          "label": "ALLOWED_WITH_OBLIGATIONS",
+          "match_label": false
+        },
+        {
+          "model_id": "Cannae-AI/MedicalLlama3.2-vision-11B-IT",
+          "context": "EU_COMMERCIAL",
+          "card_only": "ALLOWED",
+          "label": "BLOCKED",
+          "match_label": false
+        },
+        {
+          "model_id": "Cannae-AI/MedicalLlama3.2-vision-11B-IT",
+          "context": "US_COMMERCIAL",
+          "card_only": "ALLOWED",
+          "label": "ALLOWED_WITH_OBLIGATIONS",
+          "match_label": false
+        },
+        {
+          "model_id": "AdaptLLM/biomed-Llama-3.2-11B-Vision-Instruct",
+          "context": "EU_COMMERCIAL",
+          "card_only": "ALLOWED",
+          "label": "BLOCKED",
+          "match_label": false
+        },
+        {
+          "model_id": "AdaptLLM/biomed-Llama-3.2-11B-Vision-Instruct",
+          "context": "US_COMMERCIAL",
+          "card_only": "ALLOWED",
+          "label": "ALLOWED_WITH_OBLIGATIONS",
+          "match_label": false
+        },
+        {
+          "model_id": "OPEA/Llama-3.2-11B-Vision-Instruct-int4-sym-inc",
+          "context": "EU_COMMERCIAL",
+          "card_only": "ALLOWED",
+          "label": "BLOCKED",
+          "match_label": false
+        },
+        {
+          "model_id": "OPEA/Llama-3.2-11B-Vision-Instruct-int4-sym-inc",
+          "context": "US_COMMERCIAL",
+          "card_only": "ALLOWED",
+          "label": "ALLOWED_WITH_OBLIGATIONS",
+          "match_label": false
+        },
+        {
+          "model_id": "fahadh4ilyas/llama3.2-11B-Vision-Instruct-INT4-GPTQ",
+          "context": "EU_COMMERCIAL",
+          "card_only": "ALLOWED",
+          "label": "BLOCKED",
+          "match_label": false
+        },
+        {
+          "model_id": "fahadh4ilyas/llama3.2-11B-Vision-Instruct-INT4-GPTQ",
+          "context": "US_COMMERCIAL",
+          "card_only": "ALLOWED",
+          "label": "ALLOWED_WITH_OBLIGATIONS",
+          "match_label": false
+        },
+        {
+          "model_id": "meta-llama/Llama-3.2-1B",
+          "context": "EU_COMMERCIAL",
+          "card_only": "ALLOWED",
+          "label": "ALLOWED_WITH_OBLIGATIONS",
+          "match_label": false
+        },
+        {
+          "model_id": "meta-llama/Llama-3.2-1B",
+          "context": "US_COMMERCIAL",
+          "card_only": "ALLOWED",
+          "label": "ALLOWED_WITH_OBLIGATIONS",
+          "match_label": false
+        },
+        {
+          "model_id": "meta-llama/Llama-3.2-1B-Instruct",
+          "context": "EU_COMMERCIAL",
+          "card_only": "ALLOWED",
+          "label": "ALLOWED_WITH_OBLIGATIONS",
+          "match_label": false
+        },
+        {
+          "model_id": "meta-llama/Llama-3.2-1B-Instruct",
+          "context": "US_COMMERCIAL",
+          "card_only": "ALLOWED",
+          "label": "ALLOWED_WITH_OBLIGATIONS",
+          "match_label": false
+        },
+        {
+          "model_id": "meta-llama/Llama-3.1-8B-Instruct",
+          "context": "EU_COMMERCIAL",
+          "card_only": "ALLOWED",
+          "label": "ALLOWED_WITH_OBLIGATIONS",
+          "match_label": false
+        },
+        {
+          "model_id": "meta-llama/Llama-3.1-8B-Instruct",
+          "context": "US_COMMERCIAL",
+          "card_only": "ALLOWED",
+          "label": "ALLOWED_WITH_OBLIGATIONS",
+          "match_label": false
+        },
+        {
+          "model_id": "unsloth/Llama-3.2-1B",
+          "context": "EU_COMMERCIAL",
+          "card_only": "ALLOWED",
+          "label": "ALLOWED_WITH_OBLIGATIONS",
+          "match_label": false
+        },
+        {
+          "model_id": "unsloth/Llama-3.2-1B",
+          "context": "US_COMMERCIAL",
+          "card_only": "ALLOWED",
+          "label": "ALLOWED_WITH_OBLIGATIONS",
+          "match_label": false
+        },
+        {
+          "model_id": "unsloth/Llama-3.1-8B-Instruct",
+          "context": "EU_COMMERCIAL",
+          "card_only": "ALLOWED",
+          "label": "ALLOWED_WITH_OBLIGATIONS",
+          "match_label": false
+        },
+        {
+          "model_id": "unsloth/Llama-3.1-8B-Instruct",
+          "context": "US_COMMERCIAL",
+          "card_only": "ALLOWED",
+          "label": "ALLOWED_WITH_OBLIGATIONS",
+          "match_label": false
+        },
+        {
+          "model_id": "unsloth/Meta-Llama-3.1-8B-Instruct",
+          "context": "EU_COMMERCIAL",
+          "card_only": "ALLOWED",
+          "label": "ALLOWED_WITH_OBLIGATIONS",
+          "match_label": false
+        },
+        {
+          "model_id": "unsloth/Meta-Llama-3.1-8B-Instruct",
+          "context": "US_COMMERCIAL",
+          "card_only": "ALLOWED",
+          "label": "ALLOWED_WITH_OBLIGATIONS",
+          "match_label": false
+        },
+        {
+          "model_id": "osllmai-community/Llama-3.2-1B",
+          "context": "EU_COMMERCIAL",
+          "card_only": "ALLOWED",
+          "label": "ALLOWED_WITH_OBLIGATIONS",
+          "match_label": false
+        },
+        {
+          "model_id": "osllmai-community/Llama-3.2-1B",
+          "context": "US_COMMERCIAL",
+          "card_only": "ALLOWED",
+          "label": "ALLOWED_WITH_OBLIGATIONS",
+          "match_label": false
+        },
+        {
+          "model_id": "NousResearch/Llama-3.2-1B",
+          "context": "EU_COMMERCIAL",
+          "card_only": "ALLOWED",
+          "label": "CANNOT_DETERMINE",
+          "match_label": false
+        },
+        {
+          "model_id": "NousResearch/Llama-3.2-1B",
+          "context": "US_COMMERCIAL",
+          "card_only": "ALLOWED",
+          "label": "CANNOT_DETERMINE",
+          "match_label": false
+        },
+        {
+          "model_id": "google/gemma-2-9b-it",
+          "context": "EU_COMMERCIAL",
+          "card_only": "ALLOWED_WITH_OBLIGATIONS",
+          "label": "ALLOWED_WITH_OBLIGATIONS",
+          "match_label": true
+        },
+        {
+          "model_id": "google/gemma-2-9b-it",
+          "context": "US_COMMERCIAL",
+          "card_only": "ALLOWED_WITH_OBLIGATIONS",
+          "label": "ALLOWED_WITH_OBLIGATIONS",
+          "match_label": true
+        },
+        {
+          "model_id": "google/gemma-2-2b-it",
+          "context": "EU_COMMERCIAL",
+          "card_only": "ALLOWED_WITH_OBLIGATIONS",
+          "label": "ALLOWED_WITH_OBLIGATIONS",
+          "match_label": true
+        },
+        {
+          "model_id": "google/gemma-2-2b-it",
+          "context": "US_COMMERCIAL",
+          "card_only": "ALLOWED_WITH_OBLIGATIONS",
+          "label": "ALLOWED_WITH_OBLIGATIONS",
+          "match_label": true
+        },
+        {
+          "model_id": "princeton-nlp/gemma-2-9b-it-SimPO",
+          "context": "EU_COMMERCIAL",
+          "card_only": "ALLOWED",
+          "label": "ALLOWED_WITH_OBLIGATIONS",
+          "match_label": false
+        },
+        {
+          "model_id": "princeton-nlp/gemma-2-9b-it-SimPO",
+          "context": "US_COMMERCIAL",
+          "card_only": "ALLOWED",
+          "label": "ALLOWED_WITH_OBLIGATIONS",
+          "match_label": false
+        },
+        {
+          "model_id": "unsloth/gemma-2-9b-it-bnb-4bit",
+          "context": "EU_COMMERCIAL",
+          "card_only": "ALLOWED_WITH_OBLIGATIONS",
+          "label": "ALLOWED_WITH_OBLIGATIONS",
+          "match_label": true
+        },
+        {
+          "model_id": "unsloth/gemma-2-9b-it-bnb-4bit",
+          "context": "US_COMMERCIAL",
+          "card_only": "ALLOWED_WITH_OBLIGATIONS",
+          "label": "ALLOWED_WITH_OBLIGATIONS",
+          "match_label": true
+        },
+        {
+          "model_id": "unsloth/gemma-2-9b-it",
+          "context": "EU_COMMERCIAL",
+          "card_only": "ALLOWED_WITH_OBLIGATIONS",
+          "label": "CANNOT_DETERMINE",
+          "match_label": false
+        },
+        {
+          "model_id": "unsloth/gemma-2-9b-it",
+          "context": "US_COMMERCIAL",
+          "card_only": "ALLOWED_WITH_OBLIGATIONS",
+          "label": "CANNOT_DETERMINE",
+          "match_label": false
+        },
+        {
+          "model_id": "mlx-community/gemma-2-9b-it-4bit",
+          "context": "EU_COMMERCIAL",
+          "card_only": "ALLOWED_WITH_OBLIGATIONS",
+          "label": "CANNOT_DETERMINE",
+          "match_label": false
+        },
+        {
+          "model_id": "mlx-community/gemma-2-9b-it-4bit",
+          "context": "US_COMMERCIAL",
+          "card_only": "ALLOWED_WITH_OBLIGATIONS",
+          "label": "CANNOT_DETERMINE",
+          "match_label": false
+        },
+        {
+          "model_id": "Qwen/Qwen2.5-7B",
+          "context": "EU_COMMERCIAL",
+          "card_only": "ALLOWED",
+          "label": "ALLOWED",
+          "match_label": true
+        },
+        {
+          "model_id": "Qwen/Qwen2.5-7B",
+          "context": "US_COMMERCIAL",
+          "card_only": "ALLOWED",
+          "label": "ALLOWED",
+          "match_label": true
+        },
+        {
+          "model_id": "Qwen/Qwen2.5-7B-Instruct",
+          "context": "EU_COMMERCIAL",
+          "card_only": "ALLOWED",
+          "label": "ALLOWED",
+          "match_label": true
+        },
+        {
+          "model_id": "Qwen/Qwen2.5-7B-Instruct",
+          "context": "US_COMMERCIAL",
+          "card_only": "ALLOWED",
+          "label": "ALLOWED",
+          "match_label": true
+        },
+        {
+          "model_id": "Qwen/Qwen2.5-1.5B-Instruct",
+          "context": "EU_COMMERCIAL",
+          "card_only": "ALLOWED",
+          "label": "ALLOWED",
+          "match_label": true
+        },
+        {
+          "model_id": "Qwen/Qwen2.5-1.5B-Instruct",
+          "context": "US_COMMERCIAL",
+          "card_only": "ALLOWED",
+          "label": "ALLOWED",
+          "match_label": true
+        },
+        {
+          "model_id": "Qwen/Qwen2.5-0.5B-Instruct",
+          "context": "EU_COMMERCIAL",
+          "card_only": "ALLOWED",
+          "label": "ALLOWED",
+          "match_label": true
+        },
+        {
+          "model_id": "Qwen/Qwen2.5-0.5B-Instruct",
+          "context": "US_COMMERCIAL",
+          "card_only": "ALLOWED",
+          "label": "ALLOWED",
+          "match_label": true
+        },
+        {
+          "model_id": "mistralai/Mistral-7B-v0.3",
+          "context": "EU_COMMERCIAL",
+          "card_only": "ALLOWED",
+          "label": "ALLOWED",
+          "match_label": true
+        },
+        {
+          "model_id": "mistralai/Mistral-7B-v0.3",
+          "context": "US_COMMERCIAL",
+          "card_only": "ALLOWED",
+          "label": "ALLOWED",
+          "match_label": true
+        },
+        {
+          "model_id": "mistralai/Mistral-7B-Instruct-v0.3",
+          "context": "EU_COMMERCIAL",
+          "card_only": "ALLOWED",
+          "label": "ALLOWED",
+          "match_label": true
+        },
+        {
+          "model_id": "mistralai/Mistral-7B-Instruct-v0.3",
+          "context": "US_COMMERCIAL",
+          "card_only": "ALLOWED",
+          "label": "ALLOWED",
+          "match_label": true
+        },
+        {
+          "model_id": "grimjim/llama-3-Nephilim-v1-8B",
+          "context": "EU_COMMERCIAL",
+          "card_only": "BLOCKED",
+          "label": "BLOCKED",
+          "match_label": true
+        },
+        {
+          "model_id": "grimjim/llama-3-Nephilim-v1-8B",
+          "context": "US_COMMERCIAL",
+          "card_only": "BLOCKED",
+          "label": "BLOCKED",
+          "match_label": true
+        },
+        {
+          "model_id": "shanchen/llama3-8B-slerp-med-chinese",
+          "context": "EU_COMMERCIAL",
+          "card_only": "ALLOWED_WITH_OBLIGATIONS",
+          "label": "ALLOWED_WITH_OBLIGATIONS",
+          "match_label": true
+        },
+        {
+          "model_id": "shanchen/llama3-8B-slerp-med-chinese",
+          "context": "US_COMMERCIAL",
+          "card_only": "ALLOWED_WITH_OBLIGATIONS",
+          "label": "ALLOWED_WITH_OBLIGATIONS",
+          "match_label": true
+        },
+        {
+          "model_id": "shanchen/llama3-8B-slerp-biomed-chat-chinese",
+          "context": "EU_COMMERCIAL",
+          "card_only": "ALLOWED_WITH_OBLIGATIONS",
+          "label": "ALLOWED_WITH_OBLIGATIONS",
+          "match_label": true
+        },
+        {
+          "model_id": "shanchen/llama3-8B-slerp-biomed-chat-chinese",
+          "context": "US_COMMERCIAL",
+          "card_only": "ALLOWED_WITH_OBLIGATIONS",
+          "label": "ALLOWED_WITH_OBLIGATIONS",
+          "match_label": true
+        },
+        {
+          "model_id": "grimjim/Llama-3-Instruct-8B-SimPO-SPPO-Iter3-merge",
+          "context": "EU_COMMERCIAL",
+          "card_only": "ALLOWED_WITH_OBLIGATIONS",
+          "label": "ALLOWED_WITH_OBLIGATIONS",
+          "match_label": true
+        },
+        {
+          "model_id": "grimjim/Llama-3-Instruct-8B-SimPO-SPPO-Iter3-merge",
+          "context": "US_COMMERCIAL",
+          "card_only": "ALLOWED_WITH_OBLIGATIONS",
+          "label": "ALLOWED_WITH_OBLIGATIONS",
+          "match_label": true
+        },
+        {
+          "model_id": "grimjim/Llama-3-Instruct-8B-SPPO-Iter3-SimPO-merge",
+          "context": "EU_COMMERCIAL",
+          "card_only": "ALLOWED_WITH_OBLIGATIONS",
+          "label": "ALLOWED_WITH_OBLIGATIONS",
+          "match_label": true
+        },
+        {
+          "model_id": "grimjim/Llama-3-Instruct-8B-SPPO-Iter3-SimPO-merge",
+          "context": "US_COMMERCIAL",
+          "card_only": "ALLOWED_WITH_OBLIGATIONS",
+          "label": "ALLOWED_WITH_OBLIGATIONS",
+          "match_label": true
+        },
+        {
+          "model_id": "SicariusSicariiStuff/Llama-3.2-1B_Base_FP8",
+          "context": "EU_COMMERCIAL",
+          "card_only": "ALLOWED",
+          "label": "ALLOWED_WITH_OBLIGATIONS",
+          "match_label": false
+        },
+        {
+          "model_id": "SicariusSicariiStuff/Llama-3.2-1B_Base_FP8",
+          "context": "US_COMMERCIAL",
+          "card_only": "ALLOWED",
+          "label": "ALLOWED_WITH_OBLIGATIONS",
+          "match_label": false
+        },
+        {
+          "model_id": "shuyuej/Llama-3.2-1B-GPTQ",
+          "context": "EU_COMMERCIAL",
+          "card_only": "ALLOWED",
+          "label": "ALLOWED_WITH_OBLIGATIONS",
+          "match_label": false
+        },
+        {
+          "model_id": "shuyuej/Llama-3.2-1B-GPTQ",
+          "context": "US_COMMERCIAL",
+          "card_only": "ALLOWED",
+          "label": "ALLOWED_WITH_OBLIGATIONS",
+          "match_label": false
+        },
+        {
+          "model_id": "alpindale/Llama-3.2-1B",
+          "context": "EU_COMMERCIAL",
+          "card_only": "ALLOWED",
+          "label": "ALLOWED_WITH_OBLIGATIONS",
+          "match_label": false
+        },
+        {
+          "model_id": "alpindale/Llama-3.2-1B",
+          "context": "US_COMMERCIAL",
+          "card_only": "ALLOWED",
+          "label": "ALLOWED_WITH_OBLIGATIONS",
+          "match_label": false
+        },
+        {
+          "model_id": "open-unlearning/tofu_Llama-3.2-1B-Instruct_full",
+          "context": "EU_COMMERCIAL",
+          "card_only": "ALLOWED",
+          "label": "CANNOT_DETERMINE",
+          "match_label": false
+        },
+        {
+          "model_id": "open-unlearning/tofu_Llama-3.2-1B-Instruct_full",
+          "context": "US_COMMERCIAL",
+          "card_only": "ALLOWED",
+          "label": "CANNOT_DETERMINE",
+          "match_label": false
+        },
+        {
+          "model_id": "DavidAU/Llama-3.2-1B-Instruct-NEO-SI-FI-GGUF",
+          "context": "EU_COMMERCIAL",
+          "card_only": "ALLOWED",
+          "label": "CANNOT_DETERMINE",
+          "match_label": false
+        },
+        {
+          "model_id": "DavidAU/Llama-3.2-1B-Instruct-NEO-SI-FI-GGUF",
+          "context": "US_COMMERCIAL",
+          "card_only": "ALLOWED",
+          "label": "CANNOT_DETERMINE",
+          "match_label": false
+        }
+      ]
+    },
+    "llm_card_only": {
+      "status": "skipped",
+      "reason": "no OPENROUTER_API_KEY"
+    }
+  }
+}

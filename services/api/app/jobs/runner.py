@@ -141,6 +141,13 @@ async def run_prewarm() -> None:
         except Exception:
             log.exception("prewarm failed for %s", model_id)
         await asyncio.sleep(0)
+    try:
+        from app.engine.resolver import run_resolver, set_declared_differs
+
+        run_resolver("hub")
+        set_declared_differs("hub")
+    except Exception:
+        log.exception("resolver after prewarm failed")
     log.info("prewarm finished")
 
 
