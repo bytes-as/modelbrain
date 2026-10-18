@@ -144,6 +144,19 @@ async def _load_one(
     return parsed, None
 
 
+async def canonical_id(source: HubSource, model_id: str) -> str:
+    """Renamed repos redirect (Meta-Llama-3.1-8B -> Llama-3.1-8B); key nodes by the Hub's own id."""
+    try:
+        status, payload = await source.model(model_id)
+    except Exception:
+        return model_id
+    if status == 200 and payload:
+        found = payload.get("id") or payload.get("modelId")
+        if isinstance(found, str) and "/" in found:
+            return found
+    return model_id
+
+
 async def ingest(
     model_id: str,
     source: HubSource,
@@ -174,6 +187,9 @@ async def ingest(
             result.incomplete_reasons.append(missing)
             continue
         assert parsed is not None
+        parsed.parents = [
+            (await canonical_id(source, parent), relation) for parent, relation in parsed.parents
+        ]
         result.edges += write_parsed(graph, parsed, now_ms)
         result.nodes += 1
         result.model_ids.append(current)

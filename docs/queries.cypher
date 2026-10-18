@@ -505,3 +505,23 @@ RETURN size(edges) AS removed
 // W15: which of these models are foundation references
 MATCH (m:Model) WHERE m.id IN $ids AND coalesce(m.dna_reference, false)
 RETURN m.id AS id
+
+// X7: (hub) edges that point at a model, with their properties (alias migration)
+MATCH (c:Model)-[e:DERIVED_FROM]->(:Model {id: $alias})
+RETURN c.id AS child, properties(e) AS props
+
+// X8: (hub) re-create one edge on the canonical node (never overwrites an existing edge)
+MATCH (c:Model {id: $child}), (k:Model {id: $canonical})
+MERGE (c)-[n:DERIVED_FROM]->(k)
+ON CREATE SET n += $props
+RETURN n.tier AS tier
+
+// X9: (hub) remove an alias node after its edges moved, recording the alias on the canonical node
+MATCH (a:Model {id: $alias}), (k:Model {id: $canonical})
+SET k.aliases = CASE WHEN $alias IN coalesce(k.aliases, []) THEN k.aliases ELSE coalesce(k.aliases, []) + [$alias] END
+DETACH DELETE a
+RETURN k.id AS canonical
+
+// X10: (hub) every model that is the target of a lineage edge (alias candidates)
+MATCH (:Model)-[:DERIVED_FROM]->(p:Model)
+RETURN DISTINCT p.id AS id

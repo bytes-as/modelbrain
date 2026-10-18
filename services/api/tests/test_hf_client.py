@@ -134,3 +134,24 @@ def test_hub_status_degrades_after_a_failure_and_recovers() -> None:
     hf_client.HubUnavailable("rate limited")
     assert hf_client.hub_status() == "degraded"
     hf_client._last_failure_at = 0.0
+
+
+@pytest.mark.asyncio
+async def test_follows_the_redirect_of_a_renamed_repo(tmp_path: Path) -> None:
+    def handler(request: httpx.Request) -> httpx.Response:
+        if request.url.path == "/api/models/meta-llama/Meta-Llama-3.1-8B":
+            return httpx.Response(
+                307,
+                headers={"Location": "https://huggingface.co/api/models/meta-llama/Llama-3.1-8B"},
+            )
+        return httpx.Response(200, json={"id": "meta-llama/Llama-3.1-8B"})
+
+    client = HFClient(cache=DiskCache(tmp_path), transport=httpx.MockTransport(handler))
+    try:
+        response = await client.get(
+            "https://huggingface.co/api/models/meta-llama/Meta-Llama-3.1-8B"
+        )
+    finally:
+        await client.aclose()
+    assert response.status == 200
+    assert json.loads(response.body)["id"] == "meta-llama/Llama-3.1-8B"

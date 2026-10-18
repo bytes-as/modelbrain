@@ -197,7 +197,10 @@ export function VerdictView({
 
   const label = verdict.verdict.replaceAll("_", " ");
   const cards = [...verdict.blocking, ...verdict.needs_counsel, ...verdict.obligations];
-  const path = cards[0]?.path ?? verdict.paths?.[0]?.path ?? [];
+  // Show the deepest ancestry path (it carries the weight evidence), else the first clause path.
+  const deepest = [...(verdict.paths ?? [])].sort((a, b) => b.path.length - a.path.length)[0];
+  const path =
+    deepest && deepest.path.length > 1 ? deepest.path : (cards[0]?.path ?? deepest?.path ?? []);
   const pathRow = verdict.paths?.find((row) => row.path.join(">") === path.join(">"));
   const hasMerge = (verdict.paths ?? []).some((row) => row.methods?.includes("weights_merge"));
 

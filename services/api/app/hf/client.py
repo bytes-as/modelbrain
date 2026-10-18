@@ -107,7 +107,8 @@ class HFClient:
         for attempt in range(4):
             await self.limiter.acquire()
             try:
-                response = await self._http.get(url)
+                # Renamed repos answer 307 to the new name; follow it.
+                response = await self._http.get(url, follow_redirects=True)
             except httpx.HTTPError as exc:
                 last_error = f"Hugging Face Hub request failed: {type(exc).__name__}"
                 if attempt >= 3:

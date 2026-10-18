@@ -509,6 +509,30 @@ MATCH (m:Model) WHERE m.id IN $ids AND coalesce(m.dna_reference, false)
 RETURN m.id AS id
 """
 
+X7 = """
+MATCH (c:Model)-[e:DERIVED_FROM]->(:Model {id: $alias})
+RETURN c.id AS child, properties(e) AS props
+"""
+
+X8 = """
+MATCH (c:Model {id: $child}), (k:Model {id: $canonical})
+MERGE (c)-[n:DERIVED_FROM]->(k)
+ON CREATE SET n += $props
+RETURN n.tier AS tier
+"""
+
+X9 = """
+MATCH (a:Model {id: $alias}), (k:Model {id: $canonical})
+SET k.aliases = CASE WHEN $alias IN coalesce(k.aliases, []) THEN k.aliases ELSE coalesce(k.aliases, []) + [$alias] END
+DETACH DELETE a
+RETURN k.id AS canonical
+"""
+
+X10 = """
+MATCH (:Model)-[:DERIVED_FROM]->(p:Model)
+RETURN DISTINCT p.id AS id
+"""
+
 QUERIES = {
     "SCHEMA": SCHEMA,
     "I1": I1,
@@ -575,4 +599,8 @@ QUERIES = {
     "X6": X6,
     "W14": W14,
     "W15": W15,
+    "X7": X7,
+    "X8": X8,
+    "X9": X9,
+    "X10": X10,
 }

@@ -140,3 +140,69 @@ async def test_children_ingest_writes_one_level(graph_name: str) -> None:
         {"root": root_id},
     ).result_set
     assert int(rows[0][0]) >= 25
+
+
+class RenamedParentHub(FixtureHub):
+    """Xkev declares an old repo name that the Hub now redirects (G147)."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        old = "meta-llama/Old-Llama-3.2-11B-Vision-Instruct"
+        xkev = json.loads(json.dumps(self.models["Xkev/Llama-3.2V-11B-cot"]))
+        card = xkev.setdefault("cardData", {})
+        card["base_model"] = old
+        xkev["tags"] = [t for t in xkev.get("tags", []) if not str(t).startswith("base_model:")] + [
+            f"base_model:{old}",
+            f"base_model:finetune:{old}",
+        ]
+        self.models["Xkev/Llama-3.2V-11B-cot"] = xkev
+        # The Hub answers the old name with the renamed repo's payload, including its id.
+        self.models[old] = {
+            **self.models["meta-llama/Llama-3.2-11B-Vision-Instruct"],
+            "id": "meta-llama/Llama-3.2-11B-Vision-Instruct",
+        }
+
+
+@pytest.mark.asyncio
+async def test_renamed_parent_is_written_once_under_its_canonical_id(graph_name: str) -> None:
+    await ingest(
+        "Xkev/Llama-3.2V-11B-cot",
+        RenamedParentHub(),
+        table=TABLE,
+        roots=ROOTS,
+        graph=graph_name,
+    )
+    rows = db.ro_query(
+        graph_name,
+        "MATCH (:Model {id:'Xkev/Llama-3.2V-11B-cot'})-[:DERIVED_FROM]->(p:Model) RETURN p.id",
+    ).result_set
+    assert rows == [["meta-llama/Llama-3.2-11B-Vision-Instruct"]]
+    old = db.ro_query(
+        graph_name,
+        "MATCH (m:Model {id:'meta-llama/Old-Llama-3.2-11B-Vision-Instruct'}) RETURN count(m)",
+    ).result_set
+    assert old == [[0]]
+
+
+@pytest.mark.asyncio
+async def test_alias_nodes_merge_into_the_canonical_node(graph_name: str) -> None:
+    from app.engine.canonical import merge_aliases
+
+    old = "meta-llama/Old-Llama-3.2-11B-Vision-Instruct"
+    new = "meta-llama/Llama-3.2-11B-Vision-Instruct"
+    db.query(
+        graph_name,
+        "CREATE (c:Model {id:'Xkev/Llama-3.2V-11B-cot'}), (a:Model {id:$old}), (k:Model {id:$new}),"
+        " (c)-[:DERIVED_FROM {relation:'finetune', source:'declared', tier:2}]->(a)",
+        {"old": old, "new": new},
+    )
+    merged = await merge_aliases(RenamedParentHub(), graph_name)
+    assert merged == [{"alias": old, "canonical": new}]
+    rows = db.ro_query(
+        graph_name,
+        "MATCH (:Model {id:'Xkev/Llama-3.2V-11B-cot'})-[e:DERIVED_FROM]->(p:Model)"
+        " RETURN p.id, e.tier, e.source",
+    ).result_set
+    assert rows == [[new, 2, "declared"]]
+    aliases = db.ro_query(graph_name, "MATCH (k:Model {id:$new}) RETURN k.aliases", {"new": new})
+    assert aliases.result_set == [[[old]]]
