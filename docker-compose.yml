@@ -28,6 +28,7 @@ services:
       - "8000:8000"
     volumes:
       - ./data:/app/data
+      - ./eval:/app/eval:ro
     depends_on:
       falkordb:
         condition: service_healthy
