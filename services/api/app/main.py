@@ -15,6 +15,7 @@ from app.graph.queries import C4
 from app.graph.rows import as_rows
 from app.graph.schema import apply_schema
 from app.observe import OriginAllowlistMiddleware, RequestIdMiddleware, configure_logging
+from app.routes.verdict import router as verdict_router
 
 configure_logging()
 log = logging.getLogger("modelbrain")
@@ -45,6 +46,7 @@ app.add_middleware(
 )
 app.add_middleware(OriginAllowlistMiddleware, origins=_origins)
 install_error_handlers(app)
+app.include_router(verdict_router)
 
 
 @app.get("/api/health")

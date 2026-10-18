@@ -168,7 +168,56 @@ def verdict_from_graph(
     props_rows = as_rows(db.ro_query(graph, C3, {"model_id": model_id}))
     model = props_rows[0] if props_rows else {}
     decided = decide(model_id, q1, q2, context, model)
+    decided["paths"] = _paths(q1)
     decided["computed_ms"] = int((time.perf_counter() - started) * 1000)
     decided["strict"] = min_tier >= 2
     decided["context"] = context
+    decided["alternatives"] = []
+    decided["ruling_id"] = None
+    decided["stale"] = False
+    decided["explanation_source"] = "template"
+    decided["explanation"] = explain_template(decided)
+    decided["cypher"] = {"q1": Q1.strip(), "q2": Q2.strip()}
     return decided
+
+
+def _paths(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    found: list[dict[str, Any]] = []
+    seen: set[tuple[str, ...]] = set()
+    for row in rows:
+        path = tuple(str(item) for item in (row.get("path") or []))
+        if not path or path in seen:
+            continue
+        seen.add(path)
+        found.append(
+            {
+                "path": list(path),
+                "tiers": [int(item) for item in (row.get("tiers") or [])],
+                "relations": [str(item) for item in (row.get("relations") or [])],
+            }
+        )
+    return found
+
+
+def explain_template(decided: dict[str, Any]) -> str:
+    verdict = str(decided["verdict"]).replace("_", " ")
+    declared = decided.get("declared_license") or "no declared licence"
+    inherited = ", ".join(decided.get("inherited_licenses") or []) or "nothing further"
+    lines = [
+        f"Verdict: {verdict}.",
+        f"The card declares {declared}. Inherited licences: {inherited}.",
+    ]
+    if decided.get("declared_differs"):
+        lines.append(
+            "The declared licence differs from the obligations inherited from its ancestors."
+        )
+    for hit in (decided.get("blocking") or [])[:2]:
+        lines.append(
+            f"Blocking clause {hit.get('clause_id')}: {hit.get('summary') or hit.get('quote')}"
+        )
+    for hit in (decided.get("obligations") or [])[:3]:
+        lines.append(f"Obligation {hit.get('clause_id')}: {hit.get('summary') or hit.get('quote')}")
+    if decided.get("incomplete_reasons"):
+        lines.append("Lineage notes: " + "; ".join(decided["incomplete_reasons"]))
+    lines.append(DISCLAIMER)
+    return " ".join(lines)
