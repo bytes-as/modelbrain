@@ -49,12 +49,9 @@ async def test_mocked_llm_cannot_change_blocked_verdict() -> None:
         {"declared_license": "apache-2.0"},
     )
     assert decided["verdict"] == "BLOCKED"
-    with patch("app.engine.explain.get_settings") as settings:
-        settings.return_value.openrouter_api_key = "sk-test"
-        settings.return_value.llm_model = "test/model"
-        settings.return_value.llm_daily_budget_calls = 100
+    with patch("app.llm.available", return_value=True):
         with patch(
-            "app.engine.explain._llm_phrase",
+            "app.llm.complete",
             new=AsyncMock(return_value="ALLOWED — you can ship this."),
         ):
             text, source = await explain_verdict(decided)
@@ -63,3 +60,23 @@ async def test_mocked_llm_cannot_change_blocked_verdict() -> None:
     assert "ALLOWED" in text
     # The structured verdict is unchanged; only the prose came from the LLM.
     assert explain_template(decided).startswith("Verdict: BLOCKED")
+
+
+@pytest.mark.asyncio
+async def test_template_when_no_key_or_llm_fails() -> None:
+    decided = {
+        "verdict": "ALLOWED",
+        "declared_license": "apache-2.0",
+        "inherited_licenses": [],
+        "blocking": [],
+        "obligations": [],
+        "needs_counsel": [],
+        "incomplete_reasons": [],
+    }
+    with patch("app.llm.available", return_value=False):
+        _text, source = await explain_verdict(decided)
+    assert source == "template"
+    with patch("app.llm.available", return_value=True):
+        with patch("app.llm.complete", new=AsyncMock(return_value=None)):
+            _text, source = await explain_verdict(decided)
+    assert source == "template"

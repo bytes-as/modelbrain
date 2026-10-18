@@ -1,0 +1,4 @@
+{
+  "status": "skipped",
+  "reason": "OPENROUTER_API_KEY or EVAL_BASELINE_MODELS not set"
+}
