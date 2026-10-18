@@ -247,6 +247,15 @@ async def trace_weights(model_id: str) -> str:
         )
         result["written"] = dna.resolve_model("hub", model_id)
         result["exposure"] = as_rows(ro_query("hub", W8, {"id": model_id, "min_tier": 1}))
+        from app.graph.queries import W16
+
+        result["inherited_by_weights"] = as_rows(
+            ro_query(
+                "hub",
+                W16,
+                {"id": model_id, "k": 50, "min_sim": settings.dna_derived_min, "min_tier": 1},
+            )
+        )
     result["note"] = (
         "Weights closely matching a parent means obligations of that parent may apply. "
         "Automated screening, not legal advice."

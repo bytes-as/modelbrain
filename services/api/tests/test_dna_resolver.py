@@ -340,3 +340,25 @@ def test_after_ingest_fingerprints_new_models_and_resolves_them(graph: str, monk
         )
     )
     assert edge == [{"p": "meta/base", "m": "weights"}]
+
+
+def test_one_query_from_weights_to_clauses(graph: str) -> None:
+    from app.graph.queries import W16
+
+    rng = random.Random(31)
+    base = _vec(rng)
+    _model(graph, "meta/base", "2024-01-01", root=True)
+    _model(graph, "x/relabel", "2025-01-01", lic="apache-2.0")
+    db.query(
+        graph,
+        "MATCH (m:Model {id:'meta/base'}) CREATE (m)-[:DECLARES]->(l:License {key:'llama3_1'}),"
+        " (l)-[:IMPOSES]->(:Clause {id:'llama3_1.aup'}), (l)-[:IMPOSES]->(:Clause {id:'llama3_1.mau_700m'})",
+    )
+    _fp(graph, "meta/base", base)
+    _fp(graph, "x/relabel", _near(rng, base, 0.02))
+    rows = as_rows(
+        db.ro_query(graph, W16, {"id": "x/relabel", "k": 10, "min_sim": 0.6, "min_tier": 1})
+    )
+    assert rows[0]["weights_parent"] == "meta/base"
+    assert rows[0]["license"] == "llama3_1"
+    assert sorted(rows[0]["clauses"]) == ["llama3_1.aup", "llama3_1.mau_700m"]

@@ -44,6 +44,18 @@ type PathRow = {
 
 type Exposure = { root: string; is_root: boolean; root_license: string | null; exposure: number };
 
+type Inherits = {
+  ms: number;
+  cypher: string;
+  rows: {
+    weights_parent: string;
+    sim: number;
+    path: string[];
+    license: string;
+    clauses: string[];
+  }[];
+};
+
 function edgeChip(row: PathRow | undefined, index: number, parent: string): string | null {
   if (!row) return null;
   const method = row.methods?.[index] ?? null;
@@ -82,6 +94,7 @@ export function VerdictView({
   const [progress, setProgress] = useState<string[]>([]);
   const [verdict, setVerdict] = useState<Verdict | null>(null);
   const [exposure, setExposure] = useState<Exposure[]>([]);
+  const [inherits, setInherits] = useState<Inherits | null>(null);
 
   useEffect(() => {
     const base = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
@@ -120,6 +133,15 @@ export function VerdictView({
       const merged = ((body.paths ?? []) as PathRow[]).some((row) =>
         row.methods?.includes("weights_merge"),
       );
+      const byWeights = ((body.paths ?? []) as PathRow[]).some((row) =>
+        (row.methods ?? []).some((m) => m === "weights" || m === "weights_merge"),
+      );
+      if (byWeights) {
+        fetch(`${base}/api/dna/inherits/${modelId}`, { signal: controller.signal })
+          .then((r) => (r.ok ? r.json() : null))
+          .then((data: Inherits | null) => setInherits(data))
+          .catch(() => setInherits(null));
+      }
       if (merged) {
         fetch(`${base}/api/dna/exposure/${modelId}`, { signal: controller.signal })
           .then((r) => (r.ok ? r.json() : []))
@@ -263,6 +285,33 @@ export function VerdictView({
             </li>
           ))}
         </ul>
+      ) : null}
+      {inherits && inherits.rows.length > 0 ? (
+        <section
+          className="rounded border border-accent/40 p-4 text-sm"
+          data-testid="weights-inherits"
+        >
+          <h2 className="font-medium">What the weights carry, in one FalkorDB query</h2>
+          <p className="mt-1 text-muted">
+            Vector search over the sampled weights found {inherits.rows[0].weights_parent}{" "}
+            (similarity {inherits.rows[0].sim.toFixed(3)}), then the same query walked its trusted
+            ancestry to the licences and clauses: {inherits.ms} ms.
+          </p>
+          <ul className="mt-2 space-y-1">
+            {inherits.rows.map((row) => (
+              <li key={row.path.join(">") + row.license}>
+                <span className="font-mono text-xs">{row.path.join(" → ")}</span>: {row.license}
+                {row.clauses.length ? ` (${row.clauses.length} clauses)` : ""}
+              </li>
+            ))}
+          </ul>
+          <details className="mt-2">
+            <summary className="cursor-pointer text-accent">The query</summary>
+            <pre className="mt-2 overflow-x-auto rounded bg-surface p-3 text-xs">
+              {inherits.cypher}
+            </pre>
+          </details>
+        </section>
       ) : null}
       <div className="space-y-3" data-testid="clause-cards">
         {cards.map((hit) => (

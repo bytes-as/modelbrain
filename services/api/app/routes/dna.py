@@ -11,7 +11,7 @@ from pydantic import BaseModel, Field
 from app.engine import dna
 from app.errors import ApiError
 from app.graph.db import ro_query
-from app.graph.queries import W4, W5, W6, W8
+from app.graph.queries import W4, W5, W6, W8, W16
 from app.graph.rows import as_rows
 from app.tenants.auth import require_admin
 
@@ -101,3 +101,32 @@ def last(authorization: str | None = Header(default=None)) -> dict:
 def reset_edges(authorization: str | None = Header(default=None)) -> dict:
     require_admin(authorization)
     return {"removed": dna.reset_weight_edges("hub")}
+
+
+@router.get("/api/dna/inherits/{owner}/{name}")
+def inherits(owner: str, name: str, strict: bool = False) -> dict[str, object]:
+    """One FalkorDB query: weights -> nearest parent -> ancestry -> licences -> clauses."""
+    import time
+
+    from app.config import get_settings
+
+    model_id = _model_id(owner, name)
+    started = time.perf_counter()
+    rows = as_rows(
+        ro_query(
+            "hub",
+            W16,
+            {
+                "id": model_id,
+                "k": 50,
+                "min_sim": get_settings().dna_derived_min,
+                "min_tier": 2 if strict else 1,
+            },
+        )
+    )
+    return {
+        "model_id": model_id,
+        "rows": rows,
+        "ms": round((time.perf_counter() - started) * 1000, 1),
+        "cypher": W16.strip(),
+    }

@@ -578,6 +578,22 @@ SET m.declared_differs = m.id IN $ids
 RETURN count(m) AS models
 """
 
+W16 = """
+MATCH (c:Model {id: $id}) WHERE c.dna_status = 'OK'
+CALL db.idx.vector.queryNodes('Model', 'dna', $k, c.dna) YIELD node, score
+WITH c, node, 1 - score AS sim
+WHERE node <> c AND node.dna_sig = c.dna_sig AND sim >= $min_sim
+WITH node, sim, coalesce(node.dna_reference, false) AS ref
+ORDER BY sim DESC, ref DESC LIMIT 1
+MATCH p = (node)-[:DERIVED_FROM*0..6]->(a:Model)
+WHERE all(r IN relationships(p) WHERE r.tier >= $min_tier)
+MATCH (a)-[:DECLARES]->(l:License)
+OPTIONAL MATCH (l)-[:IMPOSES]->(cl:Clause)
+WITH node, sim, p, l, collect(DISTINCT cl.id) AS clauses
+RETURN node.id AS weights_parent, sim, [n IN nodes(p) | n.id] AS path, l.key AS license, clauses, length(p) AS hops
+ORDER BY hops
+"""
+
 QUERIES = {
     "SCHEMA": SCHEMA,
     "I1": I1,
@@ -655,4 +671,5 @@ QUERIES = {
     "X15": X15,
     "X16": X16,
     "X17": X17,
+    "W16": W16,
 }
